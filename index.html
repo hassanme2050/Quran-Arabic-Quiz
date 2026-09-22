@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Vocabulary Flashcards</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #042f30 0%, #0c5a5c 50%, #042f30 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-tracker {
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+
+        .flashcard {
+            background: linear-gradient(180deg, #ffffff 0%, #f5f6f5 100%);
+            border: 2px solid #e2b35a;
+            border-radius: 16px;
+            width: 90%; 
+            height: 320px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 2px #e2b35a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 0 0 2px #e2b35a;
+        }
+
+        .arabic-text {
+            font-family: 'Traditional Arabic', 'Scheherazade New', Georgia, serif;
+            font-size: 5rem; 
+            font-weight: 700;
+            color: #042f30;
+            direction: rtl;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .divider {
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e2b35a, transparent);
+            margin: 5px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .translation-text {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #126e70;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .flashcard.revealed .divider,
+        .flashcard.revealed .translation-text {
+            opacity: 1;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #e2b35a 0%, #be8f35 100%);
+            color: #042f30;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(226, 179, 90, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(226, 179, 90, 0.45);
+            background: linear-gradient(135deg, #efc36e 0%, #cca047 100%);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 600px) {
+            .flashcard {
+                width: 95%; 
+                height: 260px;
+                padding: 20px;
+            }
+            .arabic-text {
+                font-size: 3.5rem;
+            }
+            .translation-text {
+                font-size: 1.6rem;
+            }
+            .action-btn {
+                width: 90%;
+                justify-content: center;
+                padding: 14px 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="progress-tracker" id="progressText">Word 4 of 4</div>
+        
+        <div class="flashcard" id="flashcard" onclick="revealTranslation()">
+            <div class="arabic-text" id="arabicWord">الرَّحْمَٰنِ</div>
+            <div class="divider"></div>
+            <div class="translation-text" id="translationWord">The Most Gracious</div>
+        </div>
+
+        <div class="controls-container">
+            <button class="action-btn" id="mainBtn" onclick="handlePrimaryAction()">
+                Show Meaning
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            { arabic: "ٱلْحَمْدُ", translation: "All praise", current: 1 },
+            { arabic: "لِلَّهِ", translation: "be to Allah", current: 2 },
+            { arabic: "رَبِّ", translation: "Lord", current: 3 },
+            { arabic: "الرَّحْمَٰنِ", translation: "The Most Gracious", current: 4 }
+        ];
+
+        let currentIndex = 3; 
+        let isRevealed = false;
+
+        const cardElement = document.getElementById("flashcard");
+        const mainBtn = document.getElementById("mainBtn");
+
+        function updateCard() {
+            const currentItem = words[currentIndex];
+            document.getElementById("arabicWord").textContent = currentItem.arabic;
+            document.getElementById("translationWord").textContent = currentItem.translation;
+            document.getElementById("progressText").textContent = `Word ${currentItem.current} of ${words.length}`;
+            
+            isRevealed = false;
+            cardElement.classList.remove("revealed");
+            mainBtn.innerHTML = 'Show Meaning';
+        }
+
+        function revealTranslation() {
+            if (!isRevealed) {
+                isRevealed = true;
+                cardElement.classList.add("revealed");
+                mainBtn.innerHTML = 'Next Word &rarr;';
+            }
+        }
+
+        function handlePrimaryAction() {
+            if (!isRevealed) {
+                revealTranslation();
+            } else {
+                nextWord();
+            }
+        }
+
+        function nextWord() {
+            currentIndex = (currentIndex + 1) % words.length;
+            updateCard();
+        }
+
+        window.onload = function() {
+            updateCard();
+        };
+    </script>
+
+</body>
+</html>
