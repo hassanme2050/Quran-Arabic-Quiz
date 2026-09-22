@@ -27,13 +27,64 @@
 
         .app-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen {
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 24px;
-            position: relative;
-            z-index: 1;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #e2b35a;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(226, 179, 90, 0.25);
+            border-radius: 16px;
+            width: 100%;
+            padding: 28px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-msg {
+            font-size: 0.95rem;
+            color: #efc36e;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .mode-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
         }
 
         .progress-tracker {
@@ -48,7 +99,7 @@
             background: linear-gradient(180deg, #ffffff 0%, #f5f6f5 100%);
             border: 2px solid #e2b35a;
             border-radius: 16px;
-            width: 90%; 
+            width: 100%; 
             height: 320px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 2px #e2b35a;
             display: flex;
@@ -120,11 +171,20 @@
             box-shadow: 0 6px 20px rgba(226, 179, 90, 0.3);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             transition: all 0.2s ease;
+            width: 100%;
         }
 
-        .action-btn:hover {
+        .action-btn:disabled {
+            background: #555 !important;
+            color: #aaa !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+        }
+
+        .action-btn:not(:disabled):hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(226, 179, 90, 0.45);
             background: linear-gradient(135deg, #efc36e 0%, #cca047 100%);
@@ -134,9 +194,22 @@
             transform: translateY(1px);
         }
 
+        .action-btn.secondary-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            font-size: 0.95rem;
+            padding: 12px 24px;
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 8px;
+        }
+
+        .action-btn.secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
         @media (max-width: 600px) {
             .flashcard {
-                width: 95%; 
                 height: 260px;
                 padding: 20px;
             }
@@ -146,51 +219,158 @@
             .translation-text {
                 font-size: 1.6rem;
             }
-            .action-btn {
-                width: 90%;
-                justify-content: center;
-                padding: 14px 32px;
-            }
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div class="progress-tracker" id="progressText">Word 4 of 4</div>
-        
-        <div class="flashcard" id="flashcard" onclick="revealTranslation()">
-            <div class="arabic-text" id="arabicWord">الرَّحْمَٰنِ</div>
-            <div class="divider"></div>
-            <div class="translation-text" id="translationWord">The Most Gracious</div>
+
+        <!-- 1. STARTUP MENU SCREEN -->
+        <div class="screen" id="menuScreen">
+            <h1 class="main-title">Arabic Flashcards</h1>
+            
+            <div class="menu-card">
+                <div id="statusMessage" class="status-msg">🔄 Checking for Vocabulary-File.txt...</div>
+            </div>
+            
+            <div class="menu-card">
+                <div class="mode-buttons">
+                    <button class="action-btn" id="btnAll" onclick="startSession('random')" disabled>
+                        Quiz All (10 Random Words)
+                    </button>
+                    <button class="action-btn" id="btnLast10" onclick="startSession('last10')" disabled>
+                        Quiz Last 10
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="controls-container">
-            <button class="action-btn" id="mainBtn" onclick="handlePrimaryAction()">
-                Show Meaning
-            </button>
+        <!-- 2. INTERACTIVE FLASHCARD SCREEN -->
+        <div class="screen" id="flashcardScreen" style="display: none;">
+            <div class="progress-tracker" id="progressText">Word 0 of 0</div>
+            
+            <div class="flashcard" id="flashcard" onclick="revealTranslation()">
+                <div class="arabic-text" id="arabicWord">-</div>
+                <div class="divider"></div>
+                <div class="translation-text" id="translationWord">-</div>
+            </div>
+
+            <div class="controls-container">
+                <button class="action-btn" id="mainBtn" onclick="handlePrimaryAction()">
+                    Show Meaning
+                </button>
+                <button class="action-btn secondary-btn" onclick="showScreen('menuScreen')">
+                    &larr; Exit to Menu
+                </button>
+            </div>
         </div>
+
+        <!-- 3. COMPLETION SCREEN -->
+        <div class="screen" id="completionScreen" style="display: none;">
+            <h1 class="main-title">Session Finished!</h1>
+            <div class="menu-card">
+                <p class="helper-text" id="completionSummary">Excellent job!</p>
+                <button class="action-btn" onclick="showScreen('menuScreen')">
+                    Back to Menu
+                </button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const words = [
-            { arabic: "ٱلْحَمْدُ", translation: "All praise", current: 1 },
-            { arabic: "لِلَّهِ", translation: "be to Allah", current: 2 },
-            { arabic: "رَبِّ", translation: "Lord", current: 3 },
-            { arabic: "الرَّحْمَٰنِ", translation: "The Most Gracious", current: 4 }
-        ];
-
-        let currentIndex = 3; 
+        // === PASTE ALL CODE FROM PART 2 DIRECTLY BELOW HERE ===
+        let allWords = [];
+        let activePool = [];
+        let currentIndex = 0; 
         let isRevealed = false;
 
         const cardElement = document.getElementById("flashcard");
         const mainBtn = document.getElementById("mainBtn");
+        const statusEl = document.getElementById("statusMessage");
+        const btnAll = document.getElementById("btnAll");
+        const btnLast10 = document.getElementById("btnLast10");
+
+        function showScreen(screenId) {
+            document.getElementById("menuScreen").style.display = "none";
+            document.getElementById("flashcardScreen").style.display = "none";
+            document.getElementById("completionScreen").style.display = "none";
+            
+            document.getElementById(screenId).style.display = "flex";
+        }
+
+        // Automatically fetch the vocabulary text file on startup
+        async function fetchVocabularyFile() {
+            try {
+                const response = await fetch('Vocabulary-File.txt');
+                if (!response.ok) {
+                    throw new Error('File not found');
+                }
+                const text = await response.text();
+                parseWordsText(text);
+            } catch (error) {
+                statusEl.innerHTML = "⚠️ <strong>Error:</strong> Could not load 'Vocabulary-File.txt'.<br>Make sure the file exists in the exact same folder as this HTML file.";
+                statusEl.style.color = "#ff8888";
+            }
+        }
+
+        function parseWordsText(text) {
+            const lines = text.split(/\r?\n/);
+            const parsedWords = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line || line.startsWith('#') || line.startsWith('//')) continue;
+                
+                const eqIndex = line.indexOf('=');
+                if (eqIndex !== -1) {
+                    const arabic = line.substring(0, eqIndex).trim();
+                    const translation = line.substring(eqIndex + 1).trim();
+                    if (arabic && translation) {
+                        parsedWords.push({ arabic, translation });
+                    }
+                }
+            }
+            
+            if (parsedWords.length > 0) {
+                allWords = parsedWords;
+                statusEl.innerHTML = `✅ <strong>Success:</strong> Loaded ${allWords.length} total words from Vocabulary-File.txt!`;
+                statusEl.style.color = "#efc36e";
+                
+                // Enable quiz selection options
+                btnAll.disabled = false;
+                btnLast10.disabled = false;
+            } else {
+                statusEl.innerHTML = "⚠️ <strong>Format Error:</strong> File found, but no words were correctly processed.<br>Ensure lines match format: <code>Arabic = English</code>";
+                statusEl.style.color = "#ff8888";
+            }
+        }
+
+        function startSession(mode) {
+            if (allWords.length === 0) return;
+
+            if (mode === 'random') {
+                // Shuffle copy of full pool and select a max pool size of 10 words
+                let shuffled = [...allWords].sort(() => 0.5 - Math.random());
+                activePool = shuffled.slice(0, Math.min(10, shuffled.length));
+            } else if (mode === 'last10') {
+                // Pull up to the last 10 words added chronologically to the list text file
+                activePool = allWords.slice(Math.max(0, allWords.length - 10));
+            }
+
+            currentIndex = 0;
+            showScreen("flashcardScreen");
+            updateCard();
+        }
 
         function updateCard() {
-            const currentItem = words[currentIndex];
+            if (activePool.length === 0) return;
+            const currentItem = activePool[currentIndex];
+            
             document.getElementById("arabicWord").textContent = currentItem.arabic;
             document.getElementById("translationWord").textContent = currentItem.translation;
-            document.getElementById("progressText").textContent = `Word ${currentItem.current} of ${words.length}`;
+            document.getElementById("progressText").textContent = `Word ${currentIndex + 1} of ${activePool.length}`;
             
             isRevealed = false;
             cardElement.classList.remove("revealed");
@@ -201,7 +381,11 @@
             if (!isRevealed) {
                 isRevealed = true;
                 cardElement.classList.add("revealed");
-                mainBtn.innerHTML = 'Next Word &rarr;';
+                if (currentIndex === activePool.length - 1) {
+                    mainBtn.innerHTML = 'Finish Session';
+                } else {
+                    mainBtn.innerHTML = 'Next Word &rarr;';
+                }
             }
         }
 
@@ -209,19 +393,20 @@
             if (!isRevealed) {
                 revealTranslation();
             } else {
-                nextWord();
+                if (currentIndex < activePool.length - 1) {
+                    currentIndex++;
+                    updateCard();
+                } else {
+                    document.getElementById("completionSummary").innerHTML = `Excellent job! You completed all ${activePool.length} cards in this quiz round.`;
+                    showScreen("completionScreen");
+                }
             }
         }
 
-        function nextWord() {
-            currentIndex = (currentIndex + 1) % words.length;
-            updateCard();
-        }
-
+        // Trigger automatic load when document mounts
         window.onload = function() {
-            updateCard();
+            fetchVocabularyFile();
         };
     </script>
-
 </body>
 </html>
