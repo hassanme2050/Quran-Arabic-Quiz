@@ -343,14 +343,25 @@
                 });
         };
         function parseVocabulary(text) {
+            if (!text) {
+                document.getElementById('status-message').textContent = '⚠️ The vocabulary text file is completely empty.';
+                return;
+            }
+
             const lines = text.split('\n');
             vocabularyList = [];
             
-            lines.forEach(line => {
-                if (line.includes('=')) {
-                    const parts = line.split('=');
+            lines.forEach((line, index) => {
+                // Completely skip completely blank or empty rows safely
+                if (!line || !line.trim() || !line.includes('=')) return;
+                
+                const parts = line.split('=');
+                
+                // Double check both sides of the equal sign exist before running .trim()
+                if (parts.length >= 2) {
                     const word = parts[0].trim();
                     const meaning = parts[1].trim();
+                    
                     if (word && meaning) {
                         vocabularyList.push({ word: word, meaning: meaning });
                     }
@@ -358,7 +369,7 @@
             });
 
             if (vocabularyList.length === 0) {
-                document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt loaded but no rows matched "word = meaning".';
+                document.getElementById('status-message').textContent = '⚠️ Loaded file, but found no matching "word = meaning" formats.';
             } else {
                 document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
                 switchView('menu-view');
