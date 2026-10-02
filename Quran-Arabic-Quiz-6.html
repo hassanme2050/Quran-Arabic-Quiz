@@ -32,7 +32,6 @@
             box-sizing: border-box;
         }
 
-        /* Central Layout Wrapper (No outer glass container background) */
         .app-wrapper {
             width: 100%;
             max-width: 600px;
@@ -72,62 +71,48 @@
             margin-top: 25px;
         }
 
-        /* Radio Buttons Group Design */
-        .radio-selection-group {
+        /* Premium Segmented Controls matching attachment architecture */
+        .segmented-slider-container {
             display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin: 20px auto;
-            text-align: left;
-            max-width: 320px;
-        }
-
-        .radio-label-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--counter-teal);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 4px;
+            border-radius: 12px;
+            margin: 25px auto;
+            max-width: 380px;
             user-select: none;
         }
 
-        .radio-label-container input[type="radio"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--counter-teal);
-            border-radius: 50%;
-            outline: none;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .segment-option {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--counter-teal);
             cursor: pointer;
-            transition: border-color 0.2s;
+            z-index: 2;
+            transition: color 0.25s ease;
         }
 
-        .radio-label-container input[type="radio"]:checked {
-            border-color: var(--button-gold);
+        .segment-option.active {
+            color: #1a1002;
         }
 
-        .radio-label-container input[type="radio"]::before {
-            content: "";
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--button-gold);
-            transform: scale(0);
-            transition: transform 0.15s;
+        .slider-pill {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: var(--button-gold);
+            border-radius: 9px;
+            z-index: 1;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .radio-label-container input[type="radio"]:checked::before {
-            transform: scale(1);
-        }
-
-        /* Core Button Styling with Slide Up & Golden Glow Effects */
         button {
             background-color: var(--button-gold);
             color: #1a1002;
@@ -152,7 +137,6 @@
             transform: translateY(-1px);
         }
 
-        /* Specialized Exit Buttons matching screenshot profiles */
         button.exit-btn {
             background-color: var(--exit-btn-color);
             color: var(--white);
@@ -165,7 +149,6 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
-        /* Flashcard and Display Boxes with Gold Border */
         .display-card-frame {
             background: #ffffff;
             border-radius: 12px;
@@ -209,7 +192,6 @@
             width: 100%;
         }
 
-        /* Quiz answer choices layout formatting */
         .quiz-options button {
             background-color: #ffffff;
             color: #1e2d2d;
@@ -239,7 +221,6 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
         }
 
-        /* Target area wrapper exclusively for screenshot captures */
         #screenshot-target-scorecard {
             background: #ffffff;
             color: #073636;
@@ -336,20 +317,14 @@
     <div class="app-wrapper">
         <h1 id="app-title">Quran Arabic Quiz</h1>
         
-        <!-- Status Banner (Only visible on initial load verification) -->
         <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
-        <!-- Reconfigured Main Hub Menu View -->
+        <!-- Segmented Button Controls on Hub View -->
         <div id="menu-view" class="hidden">
-            <div class="radio-selection-group">
-                <label class="radio-label-container">
-                    <input type="radio" name="quizStrategy" value="all" checked>
-                    All Words (10 Random)
-                </label>
-                <label class="radio-label-container">
-                    <input type="radio" name="quizStrategy" value="last">
-                    Last 10 Words
-                </label>
+            <div class="segmented-slider-container">
+                <div class="slider-pill" id="active-slider-pill"></div>
+                <div class="segment-option active" id="opt-all" onclick="updateSegmentSelection('all')">All Words</div>
+                <div class="segment-option" id="opt-last" onclick="updateSegmentSelection('last')">Last 10 Words</div>
             </div>
             <div class="menu-action-layout">
                 <button onclick="triggerSelectedSession('flashcard')">Review Mode</button>
@@ -357,7 +332,6 @@
             </div>
         </div>
 
-        <!-- Flashcard Module Framework -->
         <div id="flashcard-view" class="hidden">
             <div class="counter-label-text" id="card-counter"></div>
             <div class="display-card-frame" onclick="toggleFlashcardMeaning()">
@@ -370,7 +344,6 @@
             </div>
         </div>
 
-        <!-- Quiz Module Framework -->
         <div id="quiz-view" class="hidden">
             <div class="counter-label-text" id="quiz-counter"></div>
             <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
@@ -381,13 +354,9 @@
                 <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
             </div>
         </div>
-        <!-- Repositioned Scorecard & Summary Table Finish Panel -->
+        <!-- Fixed View Hierarchy according to Edit #1 -->
         <div id="quiz-finished-view" class="hidden">
-            <!-- Toggle Summary Table placed on TOP per instruction #7 -->
-            <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 20px;" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
-            <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
-
-            <!-- Targeted Snapshot Card Component placed in MIDDLE per instruction #7 -->
+            <!-- 1. Heading & Screenshot target Profile Card Container -->
             <div id="screenshot-target-scorecard">
                 <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
                 <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
@@ -397,14 +366,17 @@
                 </div>
             </div>
             
-            <!-- Snapshot Clipboard action and Exit Navigation placement -->
+            <!-- 2. Performance Summary Toggle and Container Box -->
+            <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
+            <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
+
+            <!-- 3. Action Operations & Navigation Controls -->
             <div class="navigation-buttons">
                 <button onclick="copyScreenshotToClipboard()">📋 Copy Screenshot to Clipboard</button>
                 <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
             </div>
         </div>
 
-        <!-- Flashcard Review Module Finish View -->
         <div id="review-finished-view" class="hidden">
             <div class="display-card-frame" style="cursor: default;">
                 <h2 style="margin-top:0; color: #0c4d4d; font-weight: bold;">Session Finished!</h2>
@@ -425,7 +397,8 @@
         let currentIndex = 0;
         let isMeaningVisible = false;
         let currentMode = 'flashcard'; 
-        let quizHistory = []; 
+        let quizHistory = [];
+        let activeStrategySetting = 'all'; // Local state tracker for slider pill switch
 
         window.onload = function() {
             fetch('Vocabulary-File.txt')
@@ -465,22 +438,30 @@
             if (vocabularyList.length === 0) {
                 document.getElementById('status-message').textContent = '⚠️ Loaded file, but found no matching "word = meaning" formats.';
             } else {
-                // Success banner updates and immediately shows menu
                 document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
                 switchView('menu-view');
             }
         }
-        function triggerSelectedSession(mode) {
-            // Read active radio configurations directly
-            const strategies = document.getElementsByName('quizStrategy');
-            let selectedStrategy = 'all';
-            for (let radio of strategies) {
-                if (radio.checked) {
-                    selectedStrategy = radio.value;
-                    break;
-                }
+
+        // Animates slider controls smoothly across active items
+        function updateSegmentSelection(targetStrategy) {
+            activeStrategySetting = targetStrategy;
+            const pill = document.getElementById('active-slider-pill');
+            const optAll = document.getElementById('opt-all');
+            const optLast = document.getElementById('opt-last');
+            
+            if (targetStrategy === 'all') {
+                pill.style.transform = 'translateX(0%)';
+                optAll.classList.add('active');
+                optLast.classList.remove('active');
+            } else {
+                pill.style.transform = 'translateX(100%)';
+                optLast.classList.add('active');
+                optAll.classList.remove('active');
             }
-            startSession(selectedStrategy, mode);
+        }
+        function triggerSelectedSession(mode) {
+            startSession(activeStrategySetting, mode);
         }
 
         function generateQuizChoices(correctItem) {
@@ -530,7 +511,6 @@
             currentMode = mode;
             quizHistory = [];
             
-            // Hides verification message everywhere else except on the core initial loader state
             document.getElementById('status-message').classList.add('hidden');
             
             if (strategy === 'all') {
@@ -689,7 +669,7 @@
         }
 
         function copyScreenshotToClipboard() {
-            // Targets exclusively the scorecard wrapper frame (#screenshot-target-scorecard)
+            // Isolates capture precisely onto the standalone Scorecard block element (#screenshot-target-scorecard)
             const target = document.getElementById('screenshot-target-scorecard');
             
             html2canvas(target, {
@@ -755,7 +735,6 @@
 
         function exitToHome() {
             document.getElementById('app-title').textContent = "Quran Arabic Quiz";
-            // Make banner visible again exclusively on main screen hub
             document.getElementById('status-message').classList.remove('hidden');
             switchView('menu-view');
         }
