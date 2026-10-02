@@ -38,3 +38,13 @@
 أَنْتُمْ = You All
 أَنَا = I
 نَحْنُ = We
+هِيَ = She/It
+هُنَّ = They
+هِيَ = It is/ They are (two)
+هُمَا = Those two
+الله = God the almighty
+فَوْقَ = Above/ Up
+تَحْتَ = Under
+بَيْنَ أَيْدِي / بَيْنَ يَدَيْ = In front of
+خَلْفَ = Behind
+إِمَامًا = Leader/ guide
