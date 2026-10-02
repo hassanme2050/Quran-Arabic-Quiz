@@ -29,7 +29,6 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-
         .container {
             width: 100%;
             max-width: 650px;
@@ -93,7 +92,6 @@
             transform: scale(0.99);
         }
 
-        /* Secondary utility buttons */
         button.secondary-btn {
             background-color: rgba(255, 255, 255, 0.12);
             color: var(--white);
@@ -103,7 +101,6 @@
         button.secondary-btn:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
-
         .card-box {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
@@ -145,7 +142,6 @@
             width: 100%;
         }
 
-        /* Quiz answer choices layout */
         .quiz-options button {
             background-color: rgba(255, 255, 255, 0.95);
             color: #1e2d2d;
@@ -170,7 +166,6 @@
             border-color: #ef4444 !important;
         }
 
-        /* Target area wrapper for screenshot captures */
         #screenshot-target-card {
             background: #ffffff;
             color: #073636;
@@ -204,7 +199,6 @@
             opacity: 0.85;
             margin-top: 2px;
         }
-
         .summary-table {
             width: 100%;
             border-collapse: collapse;
@@ -262,11 +256,8 @@
 
     <div class="container">
         <h1 id="app-title">Arabic Flashcards</h1>
-        
-        <!-- Status Message Banner View (Keeps clean count string) -->
         <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
-        <!-- Mode Selection Menu View -->
         <div id="menu-view" class="hidden">
             <div class="menu-buttons">
                 <button onclick="startSession('all', 'flashcard')">Review All (10 Random Words)</button>
@@ -276,7 +267,6 @@
             </div>
         </div>
 
-        <!-- Flashcard Review Mode View -->
         <div id="flashcard-view" class="hidden">
             <div class="counter-text" id="card-counter"></div>
             <div class="card-box" onclick="toggleFlashcardMeaning()">
@@ -289,24 +279,48 @@
             </div>
         </div>
 
-        <!-- Quiz Mode View -->
         <div id="quiz-view" class="hidden">
             <div class="counter-text" id="quiz-counter"></div>
             <div class="card-box" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
                 <div class="arabic-display" id="quiz-arabic-field">-</div>
             </div>
-            <div class="quiz-options" id="quiz-options-box">
-                <!-- Choices generated dynamically -->
-            </div>
+            <div class="quiz-options" id="quiz-options-box"></div>
             <div class="navigation-buttons" style="margin-top: 20px;">
                 <button class="secondary-btn" onclick="exitToHome()">← Exit to Menu</button>
             </div>
         </div>
-
-        <!-- Quiz Performance Score Screen View (Only contains Score Elements for Screenshot) -->
         <div id="quiz-finished-view" class="hidden">
             <div id="screenshot-target-card">
                 <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px;">Quiz Complete!</h2>
+                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px;">Arabic Vocabulary Performance Card</p>
+                <div class="circle-score-box">
+                    <div class="circle-score-val" id="score-text-value">0/10</div>
+                    <div class="circle-percent-val" id="percent-text-value">0%</div>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button onclick="copyScreenshotToClipboard()">📋 Copy Screenshot to Clipboard</button>
+                <button class="secondary-btn" id="toggle-table-btn" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
+                <button class="secondary-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+
+            <div id="summary-table-container" class="hidden" style="margin-top: 20px; overflow-x: auto;"></div>
+        </div>
+
+        <div id="review-finished-view" class="hidden">
+            <div class="card-box" style="cursor: default;">
+                <h2 style="margin-top:0; color: #0c4d4d;">Session Finished!</h2>
+                <p style="margin: 0; color: #334155; font-size: 16px;">Excellent job completing your vocabulary review.</p>
+            </div>
+            <div class="navigation-buttons">
+                <button class="secondary-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Action Status Alert</div>
+
     <script>
         let vocabularyList = [];
         let currentPool = [];
@@ -322,14 +336,13 @@
                     if (!response.ok) throw new Error('File read failure.');
                     return response.text();
                 })
-                .then(text => { parseVocabularyTextFile(text); })
+                .then(text => { parseVocabulary(text); })
                 .catch(error => {
                     console.error(error);
                     document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt. Check folder files.';
                 });
         };
-
-        function parseVocabularyTextFile(text) {
+        function parseVocabulary(text) {
             const lines = text.split('\n');
             vocabularyList = [];
             
@@ -347,7 +360,6 @@
             if (vocabularyList.length === 0) {
                 document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt loaded but no rows matched "word = meaning".';
             } else {
-                // Clear and display success banner matching your request exactly
                 document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
                 switchView('menu-view');
             }
@@ -357,12 +369,10 @@
             let choices = [correctItem];
             const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
 
-            // Filter out items with identical meanings or overlapping translations
             let validDistractors = vocabularyList.filter(item => {
                 if (item.word === correctItem.word) return false;
                 
                 const itemMeaningsLower = getMeaningTokens(item.meaning);
-                
                 if (item.meaning.toLowerCase() === correctItem.meaning.toLowerCase()) return false;
                 
                 const hasOverlap = itemMeaningsLower.some(token => correctMeaningsLower.includes(token));
@@ -423,7 +433,6 @@
             }
         }
 
-        /* --- Flashcard Mode View Actions --- */
         function showCard() {
             isMeaningVisible = false;
             document.getElementById('card-meaning-field').classList.add('hidden');
@@ -456,8 +465,6 @@
                 }
             }
         }
-
-        /* --- Quiz Mode View Actions --- */
         function showQuizQuestion() {
             const currentItem = sessionWords[currentIndex];
             document.getElementById('quiz-counter').textContent = "Question " + (currentIndex + 1) + " of " + sessionWords.length;
@@ -514,7 +521,6 @@
                 }
             }, 1200);
         }
-
         function displayQuizSummary() {
             const totalCorrect = quizHistory.filter(h => h.isCorrect).length;
             const percentage = Math.round((totalCorrect / sessionWords.length) * 100);
@@ -522,7 +528,6 @@
             document.getElementById('score-text-value').textContent = totalCorrect + "/" + sessionWords.length;
             document.getElementById('percent-text-value').textContent = percentage + "%";
 
-            // Hide the table initially per instructions
             const tableContainer = document.getElementById('summary-table-container');
             tableContainer.classList.add('hidden');
             document.getElementById('toggle-table-btn').textContent = "📊 Show Performance Summary";
@@ -559,8 +564,6 @@
                 toggleBtn.textContent = "📊 Show Performance Summary";
             }
         }
-
-        /* --- Canvas Capture Mechanism Fix --- */
         function copyScreenshotToClipboard() {
             const target = document.getElementById('screenshot-target-card');
             
@@ -602,7 +605,6 @@
             launchToastAlert("📥 Clipboard restricted. Scorecard saved as download!");
         }
 
-        /* --- General System Utilities --- */
         function getRandomSubset(arr, size) {
             let shuffled = [...arr];
             shuffleArray(shuffled);
@@ -634,8 +636,11 @@
         function launchToastAlert(message) {
             const toast = document.getElementById('toast-alert');
             toast.textContent = message;
-			toast.classList.add('show');
-			setTimeout(() => {
-			toast.classList.remove('show');
-		}, 3500);
-	}
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
