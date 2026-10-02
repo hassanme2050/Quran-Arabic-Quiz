@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz</title>
+    <!-- Library required to screenshot only the targeted scorecard component -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root {
+            --primary-teal: #0c4d4d;
+            --button-gold: #d49a3b;
+            --button-gold-hover: #e5ab4f;
+            --button-gold-active: #b5802e;
+            --exit-btn-color: rgba(255, 255, 255, 0.12);
+            --exit-btn-hover: rgba(255, 255, 255, 0.2);
+            --counter-teal: #a2cbcb;
+            --white: #ffffff;
+            --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #073636 0%, #0d5454 50%, #083c3c 100%);
+            color: var(--white);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Central Layout Wrapper (No outer glass container background) */
+        .app-wrapper {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--button-gold);
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .status-banner {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #b3dfdf;
+            margin-bottom: 30px;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: 500;
+        }
+
+        .menu-action-layout, .quiz-options, .navigation-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 25px;
+        }
+
+        /* Radio Buttons Group Design */
+        .radio-selection-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 20px auto;
+            text-align: left;
+            max-width: 320px;
+        }
+
+        .radio-label-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--counter-teal);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .radio-label-container input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--counter-teal);
+            border-radius: 50%;
+            outline: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .radio-label-container input[type="radio"]:checked {
+            border-color: var(--button-gold);
+        }
+
+        .radio-label-container input[type="radio"]::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--button-gold);
+            transform: scale(0);
+            transition: transform 0.15s;
+        }
+
+        .radio-label-container input[type="radio"]:checked::before {
+            transform: scale(1);
+        }
+
+        /* Core Button Styling with Slide Up & Golden Glow Effects */
+        button {
+            background-color: var(--button-gold);
+            color: #1a1002;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: var(--button-gold-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--gold-glow), 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            background-color: var(--button-gold-active);
+            transform: translateY(-1px);
+        }
+
+        /* Specialized Exit Buttons matching screenshot profiles */
+        button.exit-btn {
+            background-color: var(--exit-btn-color);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+        }
+
+        button.exit-btn:hover {
+            background-color: var(--exit-btn-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        /* Flashcard and Display Boxes with Gold Border */
+        .display-card-frame {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 35px 25px;
+            margin: 25px 0;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #1e2d2d;
+            border: 3px solid var(--button-gold);
+            box-shadow: var(--gold-glow), 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .counter-label-text {
+            font-size: 13px;
+            color: var(--counter-teal);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .arabic-text-render {
+            font-size: 64px;
+            font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #0c4d4d;
+        }
+
+        .meaning-text-render {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 10px;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 20px;
+            width: 100%;
+        }
+
+        /* Quiz answer choices layout formatting */
+        .quiz-options button {
+            background-color: #ffffff;
+            color: #1e2d2d;
+            text-align: center;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .quiz-options button:hover {
+            background-color: #ffffff;
+            border-color: var(--button-gold);
+            transform: translateY(-3px);
+            box-shadow: var(--gold-glow), 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .quiz-options button.correct-choice {
+            background-color: #10b981 !important;
+            color: white !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .quiz-options button.wrong-choice {
+            background-color: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+        }
+
+        /* Target area wrapper exclusively for screenshot captures */
+        #screenshot-target-scorecard {
+            background: #ffffff;
+            color: #073636;
+            padding: 35px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 3px solid var(--button-gold);
+            box-shadow: var(--gold-glow), 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .summary-metric-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #0d5454;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            border: 4px solid var(--button-gold);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .summary-score-big {
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .summary-percent-small {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 1px;
+            font-weight: 600;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            color: #1e2d2d;
+            border-radius: 10px;
+            overflow: hidden;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        .summary-arabic-text {
+            font-size: 22px;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            font-weight: bold;
+            color: #0d5454;
+        }
+
+        .badge-right { color: #10b981; font-weight: bold; }
+        .badge-wrong { color: #ef4444; font-weight: bold; }
+
+        .hidden { display: none !important; }
+        
+        .toast-popup {
+            position: fixed;
+            bottom: 30px;
+            background: var(--button-gold);
+            color: #1a1002;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 2500;
+            box-shadow: var(--gold-glow), 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .toast-popup.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <h1 id="app-title">Quran Arabic Quiz</h1>
+        
+        <!-- Status Banner (Only visible on initial load verification) -->
+        <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
+
+        <!-- Reconfigured Main Hub Menu View -->
+        <div id="menu-view" class="hidden">
+            <div class="radio-selection-group">
+                <label class="radio-label-container">
+                    <input type="radio" name="quizStrategy" value="all" checked>
+                    All Words (10 Random)
+                </label>
+                <label class="radio-label-container">
+                    <input type="radio" name="quizStrategy" value="last">
+                    Last 10 Words
+                </label>
+            </div>
+            <div class="menu-action-layout">
+                <button onclick="triggerSelectedSession('flashcard')">Review Mode</button>
+                <button onclick="triggerSelectedSession('quiz')">Quiz Mode</button>
+            </div>
+        </div>
+
+        <!-- Flashcard Module Framework -->
+        <div id="flashcard-view" class="hidden">
+            <div class="counter-label-text" id="card-counter"></div>
+            <div class="display-card-frame" onclick="toggleFlashcardMeaning()">
+                <div class="arabic-text-render" id="card-arabic-field">-</div>
+                <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
+            </div>
+            <div class="navigation-buttons">
+                <button id="card-action-btn" onclick="handleCardProgression()">Show Meaning</button>
+                <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <!-- Quiz Module Framework -->
+        <div id="quiz-view" class="hidden">
+            <div class="counter-label-text" id="quiz-counter"></div>
+            <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
+                <div class="arabic-text-render" id="quiz-arabic-field">-</div>
+            </div>
+            <div class="quiz-options" id="quiz-options-box"></div>
+            <div class="navigation-buttons" style="margin-top: 20px;">
+                <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
+            </div>
+        </div>
+        <!-- Repositioned Scorecard & Summary Table Finish Panel -->
+        <div id="quiz-finished-view" class="hidden">
+            <!-- Toggle Summary Table placed on TOP per instruction #7 -->
+            <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 20px;" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
+            <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
+
+            <!-- Targeted Snapshot Card Component placed in MIDDLE per instruction #7 -->
+            <div id="screenshot-target-scorecard">
+                <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
+                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
+                <div class="summary-metric-circle">
+                    <div class="summary-score-big" id="score-text-value">0/10</div>
+                    <div class="summary-percent-small" id="percent-text-value">0%</div>
+                </div>
+            </div>
+            
+            <!-- Snapshot Clipboard action and Exit Navigation placement -->
+            <div class="navigation-buttons">
+                <button onclick="copyScreenshotToClipboard()">📋 Copy Screenshot to Clipboard</button>
+                <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+        </div>
+
+        <!-- Flashcard Review Module Finish View -->
+        <div id="review-finished-view" class="hidden">
+            <div class="display-card-frame" style="cursor: default;">
+                <h2 style="margin-top:0; color: #0c4d4d; font-weight: bold;">Session Finished!</h2>
+                <p style="margin: 0; color: #334155; font-size: 16px; font-weight: 500;">Excellent job completing your vocabulary review.</p>
+            </div>
+            <div class="navigation-buttons">
+                <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+
+    <script>
+        let vocabularyList = [];
+        let currentPool = [];
+        let sessionWords = [];
+        let currentIndex = 0;
+        let isMeaningVisible = false;
+        let currentMode = 'flashcard'; 
+        let quizHistory = []; 
+
+        window.onload = function() {
+            fetch('Vocabulary-File.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network file access error.');
+                    return response.text();
+                })
+                .then(text => { parseVocabulary(text); })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt. Check folder files.';
+                });
+        };
+
+        function parseVocabulary(text) {
+            if (!text) {
+                document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt is empty.';
+                return;
+            }
+
+            const lines = text.split('\n');
+            vocabularyList = [];
+            
+            lines.forEach(line => {
+                if (!line || !line.trim() || !line.includes('=')) return;
+                
+                const parts = line.split('=');
+                if (parts.length >= 2) {
+                    const word = parts[0].trim();
+                    const meaning = parts[1].trim();
+                    if (word && meaning) {
+                        vocabularyList.push({ word: word, meaning: meaning });
+                    }
+                }
+            });
+
+            if (vocabularyList.length === 0) {
+                document.getElementById('status-message').textContent = '⚠️ Loaded file, but found no matching "word = meaning" formats.';
+            } else {
+                // Success banner updates and immediately shows menu
+                document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
+                switchView('menu-view');
+            }
+        }
+        function triggerSelectedSession(mode) {
+            // Read active radio configurations directly
+            const strategies = document.getElementsByName('quizStrategy');
+            let selectedStrategy = 'all';
+            for (let radio of strategies) {
+                if (radio.checked) {
+                    selectedStrategy = radio.value;
+                    break;
+                }
+            }
+            startSession(selectedStrategy, mode);
+        }
+
+        function generateQuizChoices(correctItem) {
+            let choices = [correctItem];
+            const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
+
+            let validDistractors = vocabularyList.filter(item => {
+                if (item.word === correctItem.word) return false;
+                
+                const itemMeaningsLower = getMeaningTokens(item.meaning);
+                if (item.meaning.toLowerCase() === correctItem.meaning.toLowerCase()) return false;
+                
+                const hasOverlap = itemMeaningsLower.some(token => correctMeaningsLower.includes(token));
+                return !hasOverlap;
+            });
+
+            if (validDistractors.length < 3) {
+                validDistractors = vocabularyList.filter(item => item.word !== correctItem.word);
+            }
+
+            shuffleArray(validDistractors);
+
+            for (let i = 0; i < validDistractors.length; i++) {
+                if (choices.length >= 4) break;
+                if (!choices.some(c => c.meaning.toLowerCase() === validDistractors[i].meaning.toLowerCase())) {
+                    choices.push(validDistractors[i]);
+                }
+            }
+
+            while (choices.length < 4) {
+                choices.push({ word: '—', meaning: 'Alternative Choice Option ' + (choices.length + 1) });
+            }
+
+            shuffleArray(choices);
+            return choices;
+        }
+
+        function getMeaningTokens(meaningString) {
+            return meaningString.toLowerCase()
+                .replace(/[!.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                .split('/')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+        }
+
+        function startSession(strategy, mode) {
+            currentMode = mode;
+            quizHistory = [];
+            
+            // Hides verification message everywhere else except on the core initial loader state
+            document.getElementById('status-message').classList.add('hidden');
+            
+            if (strategy === 'all') {
+                currentPool = [...vocabularyList];
+                sessionWords = getRandomSubset(currentPool, 10);
+            } else if (strategy === 'last') {
+                currentPool = vocabularyList.slice(-10);
+                sessionWords = [...currentPool];
+                shuffleArray(sessionWords);
+            }
+
+            currentIndex = 0;
+            
+            if (currentMode === 'flashcard') {
+                document.getElementById('app-title').textContent = "Quran Arabic Flashcards";
+                switchView('flashcard-view');
+                showCard();
+            } else {
+                document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+                switchView('quiz-view');
+                showQuizQuestion();
+            }
+        }
+
+        function showCard() {
+            isMeaningVisible = false;
+            document.getElementById('card-meaning-field').classList.add('hidden');
+            document.getElementById('card-counter').textContent = "Word " + (currentIndex + 1) + " of " + sessionWords.length;
+            document.getElementById('card-arabic-field').textContent = sessionWords[currentIndex].word;
+            document.getElementById('card-meaning-field').textContent = sessionWords[currentIndex].meaning;
+            document.getElementById('card-action-btn').textContent = "Show Meaning";
+        }
+
+        function toggleFlashcardMeaning() {
+            isMeaningVisible = !isMeaningVisible;
+            if (isMeaningVisible) {
+                document.getElementById('card-meaning-field').classList.remove('hidden');
+                document.getElementById('card-action-btn').textContent = "Next Word";
+            } else {
+                document.getElementById('card-meaning-field').classList.add('hidden');
+                document.getElementById('card-action-btn').textContent = "Show Meaning";
+            }
+        }
+
+        function handleCardProgression() {
+            if (!isMeaningVisible) {
+                toggleFlashcardMeaning();
+            } else {
+                currentIndex++;
+                if (currentIndex < sessionWords.length) {
+                    showCard();
+                } else {
+                    switchView('review-finished-view');
+                }
+            }
+        }
+        function showQuizQuestion() {
+            const currentItem = sessionWords[currentIndex];
+            document.getElementById('quiz-counter').textContent = "Question " + (currentIndex + 1) + " of " + sessionWords.length;
+            document.getElementById('quiz-arabic-field').textContent = currentItem.word;
+
+            const optionsBox = document.getElementById('quiz-options-box');
+            optionsBox.innerHTML = '';
+
+            const choices = generateQuizChoices(currentItem);
+            
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.textContent = choice.meaning;
+                btn.onclick = function() { evaluateQuizAnswer(btn, choice, currentItem); };
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
+            const optionsBox = document.getElementById('quiz-options-box');
+            const buttons = optionsBox.getElementsByTagName('button');
+            
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            const isCorrect = (chosenChoice.meaning === correctItem.meaning);
+            
+            quizHistory.push({
+                index: currentIndex + 1,
+                word: correctItem.word,
+                chosen: chosenChoice.meaning,
+                correct: correctItem.meaning,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct-choice');
+            } else {
+                selectedButton.classList.add('wrong-choice');
+                for (let btn of buttons) {
+                    if (btn.textContent === correctItem.meaning) {
+                        btn.classList.add('correct-choice');
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < sessionWords.length) {
+                    showQuizQuestion();
+                } else {
+                    displayQuizSummary();
+                }
+            }, 1200);
+        }
+
+        function displayQuizSummary() {
+            const totalCorrect = quizHistory.filter(h => h.isCorrect).length;
+            const percentage = Math.round((totalCorrect / sessionWords.length) * 100);
+            
+            document.getElementById('score-text-value').textContent = totalCorrect + "/" + sessionWords.length;
+            document.getElementById('percent-text-value').textContent = percentage + "%";
+
+            const tableContainer = document.getElementById('summary-table-container');
+            tableContainer.classList.add('hidden');
+            document.getElementById('toggle-table-btn').textContent = "📊 Show Performance Summary";
+
+            let tableHtml = '<table class="summary-table"><thead><tr>' +
+                '<th>#</th><th>Word</th><th>Your Choice</th><th>Correct Meaning</th><th>Result</th>' +
+                '</tr></thead><tbody>';
+
+            quizHistory.forEach(item => {
+                const badge = item.isCorrect ? '<span class="badge-right">Right</span>' : '<span class="badge-wrong">Wrong</span>';
+                tableHtml += '<tr>' +
+                    '<td>' + item.index + '</td>' +
+                    '<td class="summary-arabic-text"><b>' + item.word + '</b></td>' +
+                    '<td>' + item.chosen + '</td>' +
+                    '<td><b>' + item.correct + '</b></td>' +
+                    '<td>' + badge + '</td>' +
+                    '</tr>';
+            });
+
+            tableHtml += '</tbody></table>';
+            tableContainer.innerHTML = tableHtml;
+            switchView('quiz-finished-view');
+        }
+
+        function toggleSummaryTableVisibility() {
+            const tableContainer = document.getElementById('summary-table-container');
+            const toggleBtn = document.getElementById('toggle-table-btn');
+            
+            if (tableContainer.classList.contains('hidden')) {
+                tableContainer.classList.remove('hidden');
+                toggleBtn.textContent = "📊 Hide Performance Summary";
+            } else {
+                tableContainer.classList.add('hidden');
+                toggleBtn.textContent = "📊 Show Performance Summary";
+            }
+        }
+
+        function copyScreenshotToClipboard() {
+            // Targets exclusively the scorecard wrapper frame (#screenshot-target-scorecard)
+            const target = document.getElementById('screenshot-target-scorecard');
+            
+            html2canvas(target, {
+                scale: 2,
+                backgroundColor: "#ffffff",
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        launchToastAlert("⚠️ Rendering image profile failed.");
+                        return;
+                    }
+                    
+                    try {
+                        navigator.clipboard.write([
+                            new ClipboardItem({ [blob.type]: blob })
+                        ]).then(() => {
+                            launchToastAlert("📸 Scorecard copied! Paste (Ctrl+V) it into your chat.");
+                        }).catch(err => {
+                            console.error(err);
+                            fallbackDownloadMechanism(canvas);
+                        });
+                    } catch (clipboardError) {
+                        console.error(clipboardError);
+                        fallbackDownloadMechanism(canvas);
+                    }
+                }, 'image/png');
+            });
+        }
+
+        function fallbackDownloadMechanism(canvas) {
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.download = 'Quiz_Scorecard.png';
+            link.href = dataUrl;
+            link.click();
+            launchToastAlert("📥 Clipboard restricted. Scorecard saved as download!");
+        }
+
+        function getRandomSubset(arr, size) {
+            let shuffled = [...arr];
+            shuffleArray(shuffled);
+            return shuffled.slice(0, size);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function switchView(viewId) {
+            document.getElementById('menu-view').classList.add('hidden');
+            document.getElementById('flashcard-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('quiz-finished-view').classList.add('hidden');
+            document.getElementById('review-finished-view').classList.add('hidden');
+
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function exitToHome() {
+            document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+            // Make banner visible again exclusively on main screen hub
+            document.getElementById('status-message').classList.remove('hidden');
+            switchView('menu-view');
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
