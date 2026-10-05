@@ -113,7 +113,6 @@
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-
         .range-drawer-panel {
             max-height: 0;
             overflow: hidden;
@@ -280,7 +279,6 @@
             position: relative;
         }
 
-        /* Fixed SVG cross-over dynamic indicator icon container overlay */
         .card-eye-toggle-overlay {
             position: absolute;
             bottom: 15px;
@@ -305,7 +303,6 @@
             color: var(--button-gold);
         }
 
-        /* Hides or displays the cross line path seamlessly based on state overrides */
         .card-eye-toggle-overlay .eye-slash-path {
             display: block;
         }
@@ -434,7 +431,7 @@
         .large-bold-cell {
             font-size: 22px;
             font-weight: bold;
-            font-style: normal !important; /* Forces normal text styling */
+            font-style: normal !important;
         }
         
         .large-arabic-cell {
@@ -447,7 +444,6 @@
             color: #475569;
         }
 
-        /* Large, un-italicized simple indicators matching instruction #4 */
         .classic-indicator-pass {
             font-size: 24px; 
             font-weight: bold;
@@ -485,13 +481,12 @@
     </style>
 </head>
 <body>
-
     <div class="app-wrapper">
         <h1 id="app-title">Quran Arabic Quiz</h1>
         
         <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
-        <!-- Home Hub View with reordered input fields per Instruction #1 -->
+        <!-- Dashboard View Framework Layout -->
         <div id="menu-view" class="hidden">
             <div class="segmented-slider-container">
                 <div class="slider-pill" id="active-slider-pill"></div>
@@ -514,34 +509,31 @@
                 <button onclick="triggerSelectedSession('quiz')">Quiz Mode</button>
             </div>
 
-            <!-- A. Dropdown Select Menu moved immediately underneath the Quiz mode button -->
+            <!-- Book Selection Dropdown element positioned under Quiz Mode -->
             <select class="custom-select-menu" id="vocabulary-book-selector">
                 <option value="book_a" selected>Book A - Arabic to English</option>
                 <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
                 <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
             </select>
 
-            <!-- B. Quiz Code Field moved immediately under the Book Select Menu -->
+            <!-- Locked Quiz Code Field positioned directly under Book Select Menu -->
             <div class="custom-input-field-group">
                 <input type="text" class="custom-text-input" id="quiz-code-field" placeholder="I have a quiz code" disabled>
                 <button id="quiz-code-btn" style="padding: 14px 22px;" disabled>GO</button>
             </div>
         </div>
-        <!-- Flashcard View Panel with updated tooltips and structural layout logic -->
+
+        <!-- Flashcard Session Module Display Box Container -->
         <div id="flashcard-view" class="hidden">
             <div class="counter-label-text" id="card-counter"></div>
             <div class="display-card-frame" id="review-card-frame" onclick="handleFlashCardBodyClick()">
-                
-                <!-- Custom Title attributes handle interactive tooltips natively based on state variations -->
                 <div class="card-eye-toggle-overlay" id="card-eye-toggle" onclick="handleEyeToggleIntercept(event)" title="Show Meaning Permanently">
                     <svg xmlns="http://w3.org" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
-                        <!-- Added slash path for a clear cross-over indicator line matching refinement #3 -->
                         <line class="eye-slash-path" x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2.5"></line>
                     </svg>
                 </div>
-                
                 <div class="arabic-text-render" id="card-arabic-field">-</div>
                 <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
             </div>
@@ -562,6 +554,7 @@
             </div>
         </div>
 
+        <!-- Reordered Quiz Summary Screen Layout Panels -->
         <div id="quiz-finished-view" class="hidden">
             <div id="screenshot-target-scorecard">
                 <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
@@ -631,7 +624,7 @@
                 
                 const parts = line.split('=');
                 if (parts.length >= 2) {
-                    // FIXED: Re-added the exact array brackets [0] and [1] so it reads both sides perfectly!
+                    // FIXED: Re-added precise explicit array indices assignment parameters
                     const word = parts[0].trim();
                     const meaning = parts[1].trim();
                     if (word && meaning) {
@@ -678,13 +671,11 @@
                 optCustom.classList.add('active');
                 drawer.classList.add('open');
                 
-                // Triggers immediate real-time synchronization checks upon unlocking the range panel
                 let startInp = document.getElementById('range-input-start');
                 validateLiveCustomBounds(startInp, 'start');
             }
         }
 
-        /* --- Smart Real-Time Range Corrections matching Refinement #2 --- */
         function validateLiveCustomBounds(inputElement, sourceField) {
             if (vocabularyList.length === 0) return;
 
@@ -694,14 +685,12 @@
             let startVal = parseInt(startInp.value);
             let endVal = parseInt(endInp.value);
 
-            // A. Auto-correct floor boundaries if user inputs 0 or negative values
             if (sourceField === 'start' && (isNaN(startVal) || startVal < 1)) {
                 startInp.value = 1;
                 launchToastAlert("⚠️ Range must start at 1. Corrected automatically!");
                 return;
             }
 
-            // B. Auto-correct ceiling limits if user exceeds library vocabulary lengths
             if (sourceField === 'end' && (isNaN(endVal) || endVal > vocabularyList.length)) {
                 endInp.value = vocabularyList.length;
                 launchToastAlert("⚠️ Range cannot exceed " + vocabularyList.length + " words. Corrected automatically!");
@@ -716,7 +705,6 @@
                 let startVal = parseInt(startInp.value) || 1;
                 let endVal = parseInt(endInp.value) || vocabularyList.length;
 
-                // Absolute fallback boundaries validation
                 if (startVal < 1) startVal = 1;
                 if (endVal > vocabularyList.length) endVal = vocabularyList.length;
                 
@@ -728,19 +716,14 @@
 
                 let totalSpan = (endVal - startVal) + 1;
 
-                // C. Auto-adjusting window span calculation matching Refinement #2 bounds
                 if (totalSpan < 10) {
                     launchToastAlert("⚠️ Custom range requires 10 words at least. Adjusting automatically!");
-                    
-                    // Attempt to expand the upper index ceiling safely
                     if (startVal + 9 <= vocabularyList.length) {
                         endVal = startVal + 9;
                     } else {
-                        // If near the top end, slide the starting base backwards instead
                         endVal = vocabularyList.length;
                         startVal = Math.max(1, endVal - 9);
                     }
-                    
                     startInp.value = startVal;
                     endInp.value = endVal;
                 }
@@ -850,7 +833,6 @@
             }
         }
 
-        /* --- Dynamic Tooltip Text Updates matching Refinement #3 --- */
         function handleEyeToggleIntercept(event) {
             event.stopPropagation(); 
             
@@ -861,13 +843,13 @@
             
             if (globalPersistentEyeToggleStatus) {
                 eyeNode.classList.add('visible-state');
-                eyeNode.setAttribute('title', 'Hide Meaning Permanently'); // Tooltip changes dynamically
+                eyeNode.setAttribute('title', 'Hide Meaning Permanently');
                 isMeaningVisible = true;
                 meaningField.classList.remove('hidden');
                 actBtn.textContent = "Next Word";
             } else {
                 eyeNode.classList.remove('visible-state');
-                eyeNode.setAttribute('title', 'Show Meaning Permanently'); // Tooltip changes dynamically
+                eyeNode.setAttribute('title', 'Show Meaning Permanently');
                 isMeaningVisible = false;
                 meaningField.classList.add('hidden');
                 actBtn.textContent = "Show Meaning";
@@ -981,14 +963,13 @@
                 '</tr></thead><tbody>';
 
             quizHistory.forEach(item => {
-                // High-visibility, classic un-italicized ticks and crosses matching refinement #4
                 const classicSymbolToken = item.isCorrect ? 
                     '<span class="classic-indicator-pass">✓</span>' : 
                     '<span class="classic-indicator-fail">✗</span>';
                 
                 tableHtml += '<tr>' +
                     '<td>' + item.index + '</td>' +
-                    '<td>' + classicSymbolToken + '</td>' + // Aligned indicator sizes
+                    '<td>' + classicSymbolToken + '</td>' +
                     '<td class="large-bold-cell large-arabic-cell">' + item.word + '</td>' +
                     '<td class="large-bold-cell" style="color:#0f172a;">' + item.correct + '</td>' +
                     '<td class="small-choice-cell">' + item.chosen + '</td>' +
