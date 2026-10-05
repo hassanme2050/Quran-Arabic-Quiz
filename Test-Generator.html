@@ -4,214 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quran Arabic Quiz - Test Generator</title>
+    <!-- Library required to screenshot only the targeted scorecard component -->
+    <script src="https://cloudflare.com"></script>
     <style>
         :root {
-            --primary-teal: #0c4d4d;
+            --primary-gray: #2d3748;
             --button-gold: #d49a3b;
             --button-gold-hover: #e5ab4f;
             --button-gold-active: #b5802e;
             --exit-btn-color: rgba(255, 255, 255, 0.12);
             --exit-btn-hover: rgba(255, 255, 255, 0.2);
-            --counter-teal: #a2cbcb;
+            --counter-gray: #a0aec0;
             --white: #ffffff;
             --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
-            --disabled-gray: rgba(255, 255, 255, 0.15);
-            --disabled-text: rgba(255, 255, 255, 0.3);
+            --disabled-gray: rgba(255, 255, 255, 0.1);
+            --disabled-text: rgba(255, 255, 255, 0.25);
         }
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #073636 0%, #0d5454 50%, #083c3c 100%);
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #1a202c 100%);
             color: var(--white);
             margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
+            padding: 20px;
+            height: 100vh;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow: hidden; /* Strictly prevents page scroll */
         }
 
         .generator-wrapper {
             width: 100%;
-            max-width: 1200px;
-            text-align: center;
+            max-width: 1400px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             box-sizing: border-box;
+            text-align: center;
         }
 
         h1 {
             color: var(--button-gold);
             margin-top: 0;
             margin-bottom: 10px;
-            font-size: 36px;
+            font-size: 28px;
             font-weight: bold;
             letter-spacing: 0.5px;
         }
 
-        .subtitle {
-            color: var(--counter-teal);
-            font-size: 16px;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
         .status-banner {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 15px;
-            color: #b3dfdf;
-            margin-bottom: 25px;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #cbd5e0;
+            margin-bottom: 10px;
             display: inline-block;
             width: 100%;
             box-sizing: border-box;
             font-weight: 500;
+            transition: opacity 0.5s ease;
         }
-
-        /* Sticky Control Bar containing Selection Trackers */
-        .sticky-control-dashboard {
-            position: sticky;
-            top: 20px;
-            background: rgba(12, 77, 77, 0.95);
-            border: 2px solid var(--button-gold);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 20px;
-            border-radius: 14px;
-            margin-bottom: 30px;
-            box-shadow: var(--gold-glow), 0 10px 25px rgba(0,0,0,0.4);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .counter-status-text {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--white);
-        }
-
-        .counter-status-text span {
-            color: var(--text-gold);
-        }
-
-        .output-code-container {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 650px;
-        }
-
-        .hex-output-field {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 14px 16px;
-            color: var(--button-gold);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            font-weight: bold;
-            outline: none;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-        /* 5-Column Grid Matrix Layout for Desktop Environments */
+        /* Flexible content matrix box optimized to lock cards on a single screen framework */
         .words-selection-grid {
             display: grid;
-            grid-template-columns: repeat(5, 153fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(10, 1fr); /* Default 10 columns */
+            grid-template-rows: repeat(5, 1fr);    /* Default 5 rows */
+            gap: 10px;
+            flex: 1;
+            min-height: 0; /* Critical override allows inner elements to shrink smoothly */
+            margin-bottom: 15px;
             width: 100%;
+            box-sizing: border-box;
         }
 
-        @media (max-width: 1024px) {
-            .words-selection-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .words-selection-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 480px) {
-            .words-selection-grid { grid-template-columns: repeat(1, 1fr); }
+        /* Responsive adaptation parameters for tighter aspect displays */
+        @media (max-width: 1200px) or (max-height: 750px) {
+            .words-selection-grid {
+                grid-template-columns: repeat(8, 1fr); /* Drops to 8 columns safely */
+            }
         }
 
         .compact-word-tile {
             background: #ffffff;
-            border-radius: 10px;
-            padding: 15px;
-            color: #1e2d2d;
+            border-radius: 8px;
+            padding: 8px;
+            color: #1a202c;
             border: 2px solid #e2e8f0;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s, border-color 0.2s;
             cursor: pointer;
             user-select: none;
             box-sizing: border-box;
             text-align: center;
             justify-content: space-between;
-            min-height: 140px;
+            min-height: 0; /* Essential parameter protecting container structure limits */
         }
 
         .compact-word-tile:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            border-color: #cbd5e0;
         }
 
         .compact-word-tile.selected-state {
             border-color: var(--button-gold);
-            background: #fffcf5;
-            box-shadow: 0 0 12px rgba(212, 154, 59, 0.25);
+            background: #fdfbf7;
         }
 
         .tile-header-index {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
-            color: #64748b;
+            color: #718096;
             text-align: left;
-            letter-spacing: 0.5px;
         }
 
         .tile-arabic-text {
-            font-size: 28px;
+            font-size: 24px;
             font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
             font-weight: bold;
-            color: #0c4d4d;
-            margin: 5px 0;
-            line-height: 1.2;
-        }
-
-        .tile-meaning-text {
-            font-size: 14px;
-            font-weight: 600;
-            color: #475569;
+            color: #2d3748;
+            margin: 2px 0;
+            line-height: 1.1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding-top: 5px;
-            border-top: 1px dashed #e2e8f0;
+        }
+
+        .tile-meaning-text {
+            font-size: 11px;
+            font-weight: 700;
+            color: #4a5568;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-top: 2px;
+            border-top: 1px dashed #edf2f7;
         }
 
         .tile-checkbox-anchor {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #cbd5e1;
-            border-radius: 4px;
+            top: 8px;
+            right: 8px;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #cbd5e0;
+            border-radius: 3px;
             background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.15s, border-color 0.15s;
         }
 
         .compact-word-tile.selected-state .tile-checkbox-anchor {
@@ -222,120 +169,166 @@
         .compact-word-tile.selected-state .tile-checkbox-anchor::after {
             content: "✓";
             color: #1a1002;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
         }
 
-        /* Pagination Interface Controls Rules */
+        /* Control desk frame repositioned directly on the bottom edge */
+        .bottom-control-dashboard {
+            background: rgba(45, 55, 72, 0.95);
+            border: 2px solid var(--button-gold);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: var(--gold-glow), 0 -4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .counter-status-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--white);
+            text-align: left;
+            min-width: 280px;
+        }
+
+        .counter-status-text span {
+            color: var(--button-gold);
+        }
+
+        .output-code-container {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hex-output-field {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--button-gold);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            font-weight: bold;
+            outline: none;
+            text-align: center;
+        }
+
         .pagination-bar-wrapper {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 10px;
         }
 
         .page-indicator-text {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 600;
-            color: var(--counter-teal);
+            color: var(--counter-gray);
+            white-space: nowrap;
         }
 
         button {
             background-color: var(--button-gold);
             color: #1a1002;
             border: none;
-            padding: 14px 22px;
-            font-size: 15px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
+            white-space: nowrap;
         }
 
         button:hover:not(:disabled) {
             background-color: var(--button-gold-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--gold-glow), 0 5px 12px rgba(0,0,0,0.25);
         }
 
         button:disabled {
             background-color: var(--disabled-gray);
             color: var(--disabled-text);
             cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
         }
 
         .toast-popup {
             position: fixed;
-            bottom: 30px;
+            bottom: 100px;
             background: var(--button-gold);
             color: #1a1002;
-            padding: 14px 30px;
+            padding: 12px 28px;
             border-radius: 30px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
             z-index: 2500;
-            box-shadow: var(--gold-glow), 0 4px 15px rgba(0,0,0,0.3);
         }
         .toast-popup.show { opacity: 1; }
     </style>
 </head>
 <body>
     <div class="generator-wrapper">
-        <h1>Test Generator</h1>
-        <div class="subtitle">Standalone Teacher Utility Portal — BetaV.100526</div>
+        <!-- Re-labeled Main Title Header Profile matching Specification #2 -->
+        <h1>Quran Arabic Quiz - Test Generator</h1>
         
-        <div class="status-banner" id="status-message">Loading complete vocabulary library data...</div>
+        <!-- Flash Message Announcement Box -->
+        <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
-        <!-- Sticky Selection Management Dashboard Header Panel -->
-        <div class="sticky-control-dashboard">
+        <!-- 5x10 / 5x8 Word Grid Workspace Box placed directly at the TOP -->
+        <div class="words-selection-grid" id="tiles-matrix-box"></div>
+
+        <!-- Control Console Panel cleanly anchored at the BOTTOM matching Specification #4 -->
+        <div class="bottom-control-dashboard">
             <div class="counter-status-text" id="selection-counter-banner">
                 Please select exactly 10 words (10 remaining)
             </div>
             
             <div class="output-code-container">
                 <button id="generate-code-btn" onclick="processSelectedHexadecimalQuizCode()" disabled>Generate Quiz Code</button>
-                <input type="text" class="hex-output-field" id="quiz-code-output" placeholder="[ Your Generated Hex Code Will Appear Here ]" readonly>
-                <button id="copy-code-btn" onclick="copyGeneratedCodeToClipboard()" style="background-color: rgba(255,255,255,0.1); color:#ffffff; border:1px solid rgba(255,255,255,0.2);" disabled>Copy Code</button>
+                <input type="text" class="hex-output-field" id="quiz-code-output" placeholder="[ Quiz Code Output ]" readonly>
+                <button id="copy-code-btn" onclick="copyGeneratedCodeToClipboard()" style="background-color: rgba(255,255,255,0.08); color:#ffffff; border:1px solid rgba(255,255,255,0.15);" disabled>Copy Code</button>
             </div>
-        </div>
 
-        <!-- Word Tiles Display Matrix Target Point -->
-        <div class="words-selection-grid" id="tiles-matrix-box"></div>
-
-        <!-- Pagination Controls Bar Layout Footer -->
-        <div class="pagination-bar-wrapper id="pagination-controls-row">
-            <button id="prev-page-btn" onclick="changeMatrixActivePage(-1)" disabled>Previous</button>
-            <span class="page-indicator-text" id="page-number-text">Page 1 of 1</span>
-            <button id="next-page-btn" onclick="changeMatrixActivePage(1)" disabled>Next</button>
+            <!-- Integrated Pagination Elements Row -->
+            <div class="pagination-bar-wrapper">
+                <button id="prev-page-btn" style="padding: 8px 12px;" onclick="changeMatrixActivePage(-1)" disabled>◀</button>
+                <span class="page-indicator-text" id="page-number-text">Page 1 of 1</span>
+                <button id="next-page-btn" style="padding: 8px 12px;" onclick="changeMatrixActivePage(1)" disabled>▶</button>
+            </div>
         </div>
     </div>
 
-    <div class="toast-popup" id="toast-alert">Action Status Alert</div>
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
     <script>
         let fullVocabularyInventory = []; 
         let userSelectedAbsoluteIndices = []; 
         
-        // Pagination runtime parameter properties
         let activeMatrixPage = 1;
-        const totalCardsPerPageLimit = 50; 
+        let totalCardsPerPageLimit = 50; // Dynamic baseline configuration
 
         window.onload = function() {
+            // Evaluates real-time width constraints to shift page limits from 50 to 40 dynamically
+            if (window.innerWidth <= 1200) {
+                totalCardsPerPageLimit = 40;
+            }
+
             fetch('Vocabulary-File.txt')
                 .then(response => {
-                    if (!response.ok) throw new Error('Network text source connection failure.');
+                    if (!response.ok) throw new Error('File collection failure.');
                     return response.text();
                 })
                 .then(text => { processIncomingTextData(text); })
                 .catch(error => {
                     console.error(error);
-                    document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt. Verify file is in this directory.';
+                    document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt.';
                 });
         };
 
@@ -348,7 +341,6 @@
                 
                 const parts = line.split('=');
                 if (parts.length >= 2) {
-                    // FIXED: Re-added precise explicit element indices [0] and [1] before calling trim()
                     const word = parts[0].trim();
                     const meaning = parts[1].trim();
                     if (word && meaning) {
@@ -358,9 +350,18 @@
             });
 
             if (fullVocabularyInventory.length === 0) {
-                document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt loaded but found no matching "word = meaning" entries.';
+                document.getElementById('status-message').textContent = '⚠️ No matching vocabulary format found.';
             } else {
-                document.getElementById('status-message').textContent = '✅ Success: Parsed ' + fullVocabularyInventory.length + ' library records.';
+                const bannerNode = document.getElementById('status-message');
+                bannerNode.textContent = '✅ Success: Parsed ' + fullVocabularyInventory.length + ' library records.';
+                
+                // Triggers brief timed fade out matching Specification #3
+                setTimeout(() => {
+                    bannerNode.style.opacity = '0';
+                    // Completely clear space after animation fades
+                    setTimeout(() => { bannerNode.classList.add('hidden'); }, 500);
+                }, 2500);
+
                 renderInventoryTilesGrid();
             }
         }
@@ -410,12 +411,9 @@
             const indexLocation = userSelectedAbsoluteIndices.indexOf(absoluteIndex);
 
             if (indexLocation > -1) {
-                // Remove if already selected
                 userSelectedAbsoluteIndices.splice(indexLocation, 1);
-                // Clear any leftover code box values if edits occur
                 resetOutputCodeState();
             } else {
-                // Block additions if limit reached
                 if (userSelectedAbsoluteIndices.length >= 10) {
                     launchToastAlert("⚠️ Selection filled! You have already picked 10 questions.");
                     return;
@@ -437,7 +435,7 @@
                 banner.innerHTML = 'Please select exactly 10 words (<span>' + requiredRemaining + '</span> remaining)';
                 generateBtn.disabled = true;
             } else {
-                banner.innerHTML = '✅ 10 questions selected successfully! Ready to compile.';
+                banner.innerHTML = '✅ 10 questions selected successfully!';
                 generateBtn.disabled = false;
             }
         }
@@ -447,31 +445,26 @@
             document.getElementById('copy-code-btn').disabled = true;
         }
 
-        /* --- Hexadecimal Cipher Compression Logic matching Specifications --- */
         function processSelectedHexadecimalQuizCode() {
             if (userSelectedAbsoluteIndices.length !== 10) return;
 
-            // Clone and sort selections sequentially to normalize strings cleanly
             let sortedIndices = [...userSelectedAbsoluteIndices].sort((a, b) => a - b);
-
-            // Pad each entry into 3 fixed digits
             let paddedNumericStringSequence = '';
+            
             sortedIndices.forEach(idx => {
                 paddedNumericStringSequence += String(idx).padStart(3, '0');
             });
 
             try {
-                // Convert string safely using native BigInt to avoid floating point issues
                 let largeNumericRepresentation = BigInt(paddedNumericStringSequence);
                 let computedHexadecimalCipherString = largeNumericRepresentation.toString(16).toUpperCase();
 
-                // Output result to field
                 document.getElementById('quiz-code-output').value = computedHexadecimalCipherString;
                 document.getElementById('copy-code-btn').disabled = false;
                 launchToastAlert("🎉 Quiz code compiled successfully!");
             } catch (error) {
                 console.error(error);
-                launchToastAlert("⚠️ Cipher runtime generation failure.");
+                launchToastAlert("⚠️ Cipher generation failure.");
             }
         }
 
@@ -481,11 +474,11 @@
 
             navigator.clipboard.writeText(outputField.value)
                 .then(() => {
-                    launchToastAlert("📋 Code copied to clipboard! Share with your class.");
+                    launchToastAlert("📋 Code copied to clipboard!");
                 })
                 .catch(err => {
                     console.error(err);
-                    launchToastAlert("⚠️ Clipboard write permissions blocked. Copy text manually.");
+                    launchToastAlert("⚠️ Clipboard permissions blocked.");
                 });
         }
 
