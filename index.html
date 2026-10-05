@@ -631,8 +631,9 @@
                 
                 const parts = line.split('=');
                 if (parts.length >= 2) {
-                    const word = parts.trim();
-                    const meaning = parts.trim();
+                    // FIXED: Re-added the exact array brackets [0] and [1] so it reads both sides perfectly!
+                    const word = parts[0].trim();
+                    const meaning = parts[1].trim();
                     if (word && meaning) {
                         vocabularyList.push({ word: word, meaning: meaning });
                     }
