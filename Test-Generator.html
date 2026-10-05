@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz - Test Generator</title>
+    <style>
+        :root {
+            --primary-teal: #0c4d4d;
+            --button-gold: #d49a3b;
+            --button-gold-hover: #e5ab4f;
+            --button-gold-active: #b5802e;
+            --exit-btn-color: rgba(255, 255, 255, 0.12);
+            --exit-btn-hover: rgba(255, 255, 255, 0.2);
+            --counter-teal: #a2cbcb;
+            --white: #ffffff;
+            --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
+            --disabled-gray: rgba(255, 255, 255, 0.15);
+            --disabled-text: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #073636 0%, #0d5454 50%, #083c3c 100%);
+            color: var(--white);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .generator-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--button-gold);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            color: var(--counter-teal);
+            font-size: 16px;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .status-banner {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #b3dfdf;
+            margin-bottom: 25px;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: 500;
+        }
+
+        /* Sticky Control Bar containing Selection Trackers */
+        .sticky-control-dashboard {
+            position: sticky;
+            top: 20px;
+            background: rgba(12, 77, 77, 0.95);
+            border: 2px solid var(--button-gold);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            box-shadow: var(--gold-glow), 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .counter-status-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--white);
+        }
+
+        .counter-status-text span {
+            color: var(--text-gold);
+        }
+
+        .output-code-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .hex-output-field {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--button-gold);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        /* 5-Column Grid Matrix Layout for Desktop Environments */
+        .words-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 153fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .words-selection-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .words-selection-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .words-selection-grid { grid-template-columns: repeat(1, 1fr); }
+        }
+
+        .compact-word-tile {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            color: #1e2d2d;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            user-select: none;
+            box-sizing: border-box;
+            text-align: center;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+
+        .compact-word-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            border-color: #cbd5e1;
+        }
+
+        .compact-word-tile.selected-state {
+            border-color: var(--button-gold);
+            background: #fffcf5;
+            box-shadow: 0 0 12px rgba(212, 154, 59, 0.25);
+        }
+
+        .tile-header-index {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            text-align: left;
+            letter-spacing: 0.5px;
+        }
+
+        .tile-arabic-text {
+            font-size: 28px;
+            font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
+            font-weight: bold;
+            color: #0c4d4d;
+            margin: 5px 0;
+            line-height: 1.2;
+        }
+
+        .tile-meaning-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-top: 5px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .tile-checkbox-anchor {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+
+        .compact-word-tile.selected-state .tile-checkbox-anchor {
+            background-color: var(--button-gold);
+            border-color: var(--button-gold);
+        }
+
+        .compact-word-tile.selected-state .tile-checkbox-anchor::after {
+            content: "✓";
+            color: #1a1002;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Pagination Interface Controls Rules */
+        .pagination-bar-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .page-indicator-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--counter-teal);
+        }
+
+        button {
+            background-color: var(--button-gold);
+            color: #1a1002;
+            border: none;
+            padding: 14px 22px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--button-gold-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--gold-glow), 0 5px 12px rgba(0,0,0,0.25);
+        }
+
+        button:disabled {
+            background-color: var(--disabled-gray);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .toast-popup {
+            position: fixed;
+            bottom: 30px;
+            background: var(--button-gold);
+            color: #1a1002;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 2500;
+            box-shadow: var(--gold-glow), 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .toast-popup.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="generator-wrapper">
+        <h1>Test Generator</h1>
+        <div class="subtitle">Standalone Teacher Utility Portal — BetaV.100526</div>
+        
+        <div class="status-banner" id="status-message">Loading complete vocabulary library data...</div>
+
+        <!-- Sticky Selection Management Dashboard Header Panel -->
+        <div class="sticky-control-dashboard">
+            <div class="counter-status-text" id="selection-counter-banner">
+                Please select exactly 10 words (10 remaining)
+            </div>
+            
+            <div class="output-code-container">
+                <button id="generate-code-btn" onclick="processSelectedHexadecimalQuizCode()" disabled>Generate Quiz Code</button>
+                <input type="text" class="hex-output-field" id="quiz-code-output" placeholder="[ Your Generated Hex Code Will Appear Here ]" readonly>
+                <button id="copy-code-btn" onclick="copyGeneratedCodeToClipboard()" style="background-color: rgba(255,255,255,0.1); color:#ffffff; border:1px solid rgba(255,255,255,0.2);" disabled>Copy Code</button>
+            </div>
+        </div>
+
+        <!-- Word Tiles Display Matrix Target Point -->
+        <div class="words-selection-grid" id="tiles-matrix-box"></div>
+
+        <!-- Pagination Controls Bar Layout Footer -->
+        <div class="pagination-bar-wrapper id="pagination-controls-row">
+            <button id="prev-page-btn" onclick="changeMatrixActivePage(-1)" disabled>Previous</button>
+            <span class="page-indicator-text" id="page-number-text">Page 1 of 1</span>
+            <button id="next-page-btn" onclick="changeMatrixActivePage(1)" disabled>Next</button>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Action Status Alert</div>
+    <script>
+        let fullVocabularyInventory = []; 
+        let userSelectedAbsoluteIndices = []; 
+        
+        // Pagination runtime parameter properties
+        let activeMatrixPage = 1;
+        const totalCardsPerPageLimit = 50; 
+
+        window.onload = function() {
+            fetch('Vocabulary-File.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network text source connection failure.');
+                    return response.text();
+                })
+                .then(text => { processIncomingTextData(text); })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt. Verify file is in this directory.';
+                });
+        };
+
+        function processIncomingTextData(text) {
+            const lines = text.split('\n');
+            fullVocabularyInventory = [];
+            
+            lines.forEach(line => {
+                if (!line || !line.trim() || !line.includes('=')) return;
+                
+                const parts = line.split('=');
+                if (parts.length >= 2) {
+                    const word = parts[0].trim();
+                    const meaning = parts[1].trim();
+                    if (word && meaning) {
+                        fullVocabularyInventory.push({ word: word, meaning: meaning });
+                    }
+                }
+            });
+
+            if (fullVocabularyInventory.length === 0) {
+                document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt loaded but found no matching "word = meaning" entries.';
+            } else {
+                document.getElementById('status-message').textContent = '✅ Success: Parsed ' + fullVocabularyInventory.length + ' library records.';
+                renderInventoryTilesGrid();
+            }
+        }
+
+        function renderInventoryTilesGrid() {
+            const gridBox = document.getElementById('tiles-matrix-box');
+            gridBox.innerHTML = '';
+
+            // Compute total pages based on 50 item intervals
+            const totalRequiredPages = Math.ceil(fullVocabularyInventory.length / totalCardsPerPageLimit) || 1;
+            
+            // Constrain page indexing to real ranges
+            if (activeMatrixPage < 1) activeMatrixPage = 1;
+            if (activeMatrixPage > totalRequiredPages) activeMatrixPage = totalRequiredPages;
+
+            const startIdx = (activeMatrixPage - 1) * totalCardsPerPageLimit;
+            const endIdx = Math.min(startIdx + totalCardsPerPageLimit, fullVocabularyInventory.length);
+
+            // Populate the active segment
+            for (let i = startIdx; i #' + String(absoluteIndex).padStart(3, '0') + '</div>' +
+                    '<div class="tile-checkbox-anchor"></div>' +
+                    '<div class="tile-arabic-text">' + item.word + '</div>' +
+                    '<div class="tile-meaning-text" title="' + item.meaning + '">' + item.meaning + '</div>';
+
+                gridBox.appendChild(tile);
+            }
+
+            // Update pagination text labels and control fields
+            document.getElementById('page-number-text').textContent = 'Page ' + activeMatrixPage + ' of ' + totalRequiredPages;
+            document.getElementById('prev-page-btn').disabled = (activeMatrixPage === 1);
+            document.getElementById('next-page-btn').disabled = (activeMatrixPage === totalRequiredPages);
+
+            updateStickyCounterBanner();
+        }
+
+        function changeMatrixActivePage(offset) {
+            activeMatrixPage += offset;
+            renderInventoryTilesGrid();
+        }
+        function toggleWordSelection(absoluteIndex) {
+            const indexLocation = userSelectedAbsoluteIndices.indexOf(absoluteIndex);
+
+            if (indexLocation > -1) {
+                // Remove if already selected
+                userSelectedAbsoluteIndices.splice(indexLocation, 1);
+                // Clear any leftover code box values if edits occur
+                resetOutputCodeState();
+            } else {
+                // Block additions if limit reached
+                if (userSelectedAbsoluteIndices.length >= 10) {
+                    launchToastAlert("⚠️ Selection filled! You have already picked 10 questions.");
+                    return;
+                }
+                userSelectedAbsoluteIndices.push(absoluteIndex);
+                resetOutputCodeState();
+            }
+
+            renderInventoryTilesGrid();
+        }
+
+        function updateStickyCounterBanner() {
+            const banner = document.getElementById('selection-counter-banner');
+            const totalPicked = userSelectedAbsoluteIndices.length;
+            const generateBtn = document.getElementById('generate-code-btn');
+
+            if (totalPicked < 10) {
+                const requiredRemaining = 10 - totalPicked;
+                banner.innerHTML = 'Please select exactly 10 words (<span>' + requiredRemaining + '</span> remaining)';
+                generateBtn.disabled = true;
+            } else {
+                banner.innerHTML = '✅ 10 questions selected successfully! Ready to compile.';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function resetOutputCodeState() {
+            document.getElementById('quiz-code-output').value = '';
+            document.getElementById('copy-code-btn').disabled = true;
+        }
+
+        /* --- Hexadecimal Cipher Compression Logic matching Specifications --- */
+        function processSelectedHexadecimalQuizCode() {
+            if (userSelectedAbsoluteIndices.length !== 10) return;
+
+            // Clone and sort selections sequentially to normalize strings cleanly
+            let sortedIndices = [...userSelectedAbsoluteIndices].sort((a, b) => a - b);
+
+            // Pad each entry into 3 fixed digits
+            let paddedNumericStringSequence = '';
+            sortedIndices.forEach(idx => {
+                paddedNumericStringSequence += String(idx).padStart(3, '0');
+            });
+
+            try {
+                // Convert string safely using native BigInt to avoid floating point issues
+                let largeNumericRepresentation = BigInt(paddedNumericStringSequence);
+                let computedHexadecimalCipherString = largeNumericRepresentation.toString(16).toUpperCase();
+
+                // Output result to field
+                document.getElementById('quiz-code-output').value = computedHexadecimalCipherString;
+                document.getElementById('copy-code-btn').disabled = false;
+                launchToastAlert("🎉 Quiz code compiled successfully!");
+            } catch (error) {
+                console.error(error);
+                launchToastAlert("⚠️ Cipher runtime generation failure.");
+            }
+        }
+
+        function copyGeneratedCodeToClipboard() {
+            const outputField = document.getElementById('quiz-code-output');
+            if (!outputField.value) return;
+
+            navigator.clipboard.writeText(outputField.value)
+                .then(() => {
+                    launchToastAlert("📋 Code copied to clipboard! Share with your class.");
+                })
+                .catch(err => {
+                    console.error(err);
+                    launchToastAlert("⚠️ Clipboard write permissions blocked. Copy text manually.");
+                });
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
