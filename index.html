@@ -17,6 +17,8 @@
             --counter-teal: #a2cbcb;
             --white: #ffffff;
             --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
+            --disabled-gray: rgba(255, 255, 255, 0.15);
+            --disabled-text: rgba(255, 255, 255, 0.3);
         }
 
         body {
@@ -71,7 +73,7 @@
             margin-top: 25px;
         }
 
-        /* Premium Segmented Controls matching attachment architecture */
+        /* 3-Way Expandable Segmented Control architecture */
         .segmented-slider-container {
             display: flex;
             position: relative;
@@ -79,8 +81,8 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 4px;
             border-radius: 12px;
-            margin: 25px auto;
-            max-width: 380px;
+            margin: 25px auto 15px auto;
+            max-width: 480px;
             user-select: none;
         }
 
@@ -88,7 +90,7 @@
             flex: 1;
             text-align: center;
             padding: 14px 0;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: var(--counter-teal);
             cursor: pointer;
@@ -104,13 +106,121 @@
             position: absolute;
             top: 4px;
             left: 4px;
-            width: calc(50% - 4px);
+            width: calc(33.333% - 4px);
             height: calc(100% - 8px);
             background: var(--button-gold);
             border-radius: 9px;
             z-index: 1;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Expandable Range Drawer Box Style */
+        .range-drawer-panel {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            padding: 0 15px;
+            max-width: 480px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .range-drawer-panel.open {
+            max-height: 120px;
+            opacity: 1;
+            margin-top: 15px;
+            border-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+        }
+
+        .range-flex-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: bold;
+            color: var(--counter-teal);
+        }
+
+        .range-flex-row input {
+            width: 75px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px;
+            color: #ffffff;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .range-flex-row input:focus {
+            border-color: var(--button-gold);
+        }
+
+        /* Future-Proof Input Custom Field Group */
+        .custom-input-field-group {
+            display: flex;
+            gap: 10px;
+            max-width: 480px;
+            margin: 20px auto 0 auto;
+            width: 100%;
+        }
+
+        .custom-text-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--white);
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .custom-text-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-text-input:disabled {
+            background: var(--disabled-gray);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            border-color: transparent;
+        }
+
+        /* Dropdown custom selectors rules */
+        .custom-select-menu {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            margin: 20px auto 5px auto;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .custom-select-menu option {
+            background: #073636;
+            color: var(--white);
+        }
+
+        .custom-select-menu option:disabled {
+            color: rgba(255, 255, 255, 0.25);
+            background: #052626;
         }
 
         button {
@@ -126,15 +236,23 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background-color: var(--button-gold-hover);
             transform: translateY(-3px);
             box-shadow: var(--gold-glow), 0 6px 15px rgba(0,0,0,0.3);
         }
 
-        button:active {
+        button:active:not(:disabled) {
             background-color: var(--button-gold-active);
             transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: var(--disabled-gray);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         button.exit-btn {
@@ -163,6 +281,32 @@
             border: 3px solid var(--button-gold);
             box-shadow: var(--gold-glow), 0 10px 30px rgba(0,0,0,0.3);
             cursor: pointer;
+            position: relative;
+        }
+
+        /* Persistent Positioning vector rules for Eye overlay */
+        .card-eye-toggle-overlay {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            transition: color 0.2s, transform 0.1s;
+            z-index: 10;
+        }
+
+        .card-eye-toggle-overlay:hover {
+            color: #0c4d4d;
+            transform: scale(1.1);
+        }
+
+        .card-eye-toggle-overlay.visible-state {
+            color: var(--button-gold);
         }
 
         .counter-label-text {
@@ -258,6 +402,7 @@
             font-weight: 600;
         }
 
+        /* Redefined dynamic table styling constraints for analytics re-sorting */
         .summary-table {
             width: 100%;
             border-collapse: collapse;
@@ -273,7 +418,7 @@
         .summary-table th, .summary-table td {
             padding: 14px 12px;
             border-bottom: 1px solid #e2e8f0;
-            text-align: left;
+            text-align: center;
         }
 
         .summary-table th {
@@ -282,15 +427,25 @@
             font-weight: bold;
         }
 
-        .summary-arabic-text {
+        /* Large bold text profiles for target columns */
+        .large-bold-cell {
             font-size: 22px;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
             font-weight: bold;
+        }
+        
+        .large-arabic-cell {
+            font-family: 'Traditional Arabic', 'Amiri', serif;
             color: #0d5454;
         }
 
-        .badge-right { color: #10b981; font-weight: bold; }
-        .badge-wrong { color: #ef4444; font-weight: bold; }
+        /* Reduced subtle size constraints for student selection output entries */
+        .small-choice-cell {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .badge-icon-pass { font-size: 18px; color: #10b981; }
+        .badge-icon-fail { font-size: 18px; color: #ef4444; }
 
         .hidden { display: none !important; }
         
@@ -317,24 +472,58 @@
     <div class="app-wrapper">
         <h1 id="app-title">Quran Arabic Quiz</h1>
         
+        <!-- Status Banner Panel -->
         <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
-        <!-- Segmented Button Controls on Hub View -->
+        <!-- Modified App Hub Dashboard Interface Screen -->
         <div id="menu-view" class="hidden">
+            <!-- 3-Way Selector Controls Grid -->
             <div class="segmented-slider-container">
                 <div class="slider-pill" id="active-slider-pill"></div>
                 <div class="segment-option active" id="opt-all" onclick="updateSegmentSelection('all')">All Words</div>
                 <div class="segment-option" id="opt-last" onclick="updateSegmentSelection('last')">Last 10 Words</div>
+                <div class="segment-option" id="opt-custom" onclick="updateSegmentSelection('custom')">Custom Range</div>
             </div>
+
+            <!-- Expandable Range Entry Form Box Drawer -->
+            <div class="range-drawer-panel" id="range-drawer-box">
+                <div class="range-flex-row">
+                    <span>From</span>
+                    <input type="number" id="range-input-start" value="1" min="1" onchange="validateLiveCustomBounds()">
+                    <span>To</span>
+                    <input type="number" id="range-input-end" value="10" min="1" onchange="validateLiveCustomBounds()">
+                </div>
+            </div>
+
+            <!-- Future-Proof Locked Quiz Code Entry Component -->
+            <div class="custom-input-field-group">
+                <input type="text" class="custom-text-input" id="quiz-code-field" placeholder="I have a quiz code" disabled>
+                <button id="quiz-code-btn" style="padding: 14px 22px;" disabled>GO</button>
+            </div>
+
+            <!-- Dropdown Resource Selector menu component -->
+            <select class="custom-select-menu" id="vocabulary-book-selector">
+                <option value="book_a" selected>Book A - Arabic to English</option>
+                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+            </select>
+
             <div class="menu-action-layout">
                 <button onclick="triggerSelectedSession('flashcard')">Review Mode</button>
                 <button onclick="triggerSelectedSession('quiz')">Quiz Mode</button>
             </div>
         </div>
-
+        <!-- Flashcard View Panel with persistent inline vector eye toggler object components -->
         <div id="flashcard-view" class="hidden">
             <div class="counter-label-text" id="card-counter"></div>
-            <div class="display-card-frame" onclick="toggleFlashcardMeaning()">
+            <div class="display-card-frame" id="review-card-frame" onclick="handleFlashCardBodyClick()">
+                <!-- Inline SVG Vector Eye object overlay node tracking instruction set configurations -->
+                <div class="card-eye-toggle-overlay" id="card-eye-toggle" onclick="handleEyeToggleIntercept(event)">
+                    <svg xmlns="http://w3.org" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
                 <div class="arabic-text-render" id="card-arabic-field">-</div>
                 <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
             </div>
@@ -344,6 +533,7 @@
             </div>
         </div>
 
+        <!-- Quiz Display View Panel -->
         <div id="quiz-view" class="hidden">
             <div class="counter-label-text" id="quiz-counter"></div>
             <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
@@ -354,9 +544,10 @@
                 <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
             </div>
         </div>
-        <!-- Fixed View Hierarchy according to Edit #1 -->
+
+        <!-- Reordered Analytics Summary Screen according to Instruction #1 -->
         <div id="quiz-finished-view" class="hidden">
-            <!-- 1. Heading & Screenshot target Profile Card Container -->
+            <!-- 1. Heading & Isolated Score Target Card Block for screenshot rendering -->
             <div id="screenshot-target-scorecard">
                 <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
                 <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
@@ -366,11 +557,11 @@
                 </div>
             </div>
             
-            <!-- 2. Performance Summary Toggle and Container Box -->
+            <!-- 2. Re-sorted columns list sheet drawer trigger button -->
             <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
             <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
 
-            <!-- 3. Action Operations & Navigation Controls -->
+            <!-- 3. Final Execution Copy Commands and Reset Routines -->
             <div class="navigation-buttons">
                 <button onclick="copyScreenshotToClipboard()">📋 Copy Screenshot to Clipboard</button>
                 <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
@@ -389,7 +580,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-
     <script>
         let vocabularyList = [];
         let currentPool = [];
@@ -398,7 +588,10 @@
         let isMeaningVisible = false;
         let currentMode = 'flashcard'; 
         let quizHistory = [];
-        let activeStrategySetting = 'all'; // Local state tracker for slider pill switch
+        let activeStrategySetting = 'all'; 
+        
+        // Persistent tracking property matching eye visibility status across increments
+        let globalPersistentEyeToggleStatus = false; 
 
         window.onload = function() {
             fetch('Vocabulary-File.txt')
@@ -439,28 +632,78 @@
                 document.getElementById('status-message').textContent = '⚠️ Loaded file, but found no matching "word = meaning" formats.';
             } else {
                 document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
+                
+                // Initialize default custom range value configurations based on structural capacity
+                document.getElementById('range-input-start').value = 1;
+                document.getElementById('range-input-end').value = vocabularyList.length;
+                document.getElementById('range-input-end').max = vocabularyList.length;
+                
                 switchView('menu-view');
             }
         }
 
-        // Animates slider controls smoothly across active items
+        // Moves slider pill and reveals custom numeric input panel
         function updateSegmentSelection(targetStrategy) {
             activeStrategySetting = targetStrategy;
             const pill = document.getElementById('active-slider-pill');
             const optAll = document.getElementById('opt-all');
             const optLast = document.getElementById('opt-last');
+            const optCustom = document.getElementById('opt-custom');
+            const drawer = document.getElementById('range-drawer-box');
+            
+            optAll.classList.remove('active');
+            optLast.classList.remove('active');
+            optCustom.classList.remove('active');
             
             if (targetStrategy === 'all') {
                 pill.style.transform = 'translateX(0%)';
                 optAll.classList.add('active');
-                optLast.classList.remove('active');
-            } else {
+                drawer.classList.remove('open');
+            } else if (targetStrategy === 'last') {
                 pill.style.transform = 'translateX(100%)';
                 optLast.classList.add('active');
-                optAll.classList.remove('active');
+                drawer.classList.remove('open');
+            } else if (targetStrategy === 'custom') {
+                pill.style.transform = 'translateX(200%)';
+                optCustom.classList.add('active');
+                drawer.classList.add('open');
+                validateLiveCustomBounds();
             }
         }
+
+        function validateLiveCustomBounds() {
+            let startInp = document.getElementById('range-input-start');
+            let endInp = document.getElementById('range-input-end');
+            
+            let startVal = parseInt(startInp.value) || 1;
+            let endVal = parseInt(endInp.value) || vocabularyList.length;
+            
+            if (startVal < 1) startVal = 1;
+            if (startVal > vocabularyList.length) startVal = vocabularyList.length;
+            if (endVal > vocabularyList.length) endVal = vocabularyList.length;
+            
+            startInp.value = startVal;
+            endInp.value = endVal;
+        }
         function triggerSelectedSession(mode) {
+            if (activeStrategySetting === 'custom') {
+                let startVal = parseInt(document.getElementById('range-input-start').value);
+                let endVal = parseInt(document.getElementById('range-input-end').value);
+                
+                if (startVal > endVal) {
+                    let temp = startVal;
+                    startVal = endVal;
+                    endVal = temp;
+                    document.getElementById('range-input-start').value = startVal;
+                    document.getElementById('range-input-end').value = endVal;
+                }
+                
+                let rangeSpan = (endVal - startVal) + 1;
+                if (rangeSpan < 10) {
+                    launchToastAlert("⚠️ Custom Range selection requires at least 10 words!");
+                    return;
+                }
+            }
             startSession(activeStrategySetting, mode);
         }
 
@@ -520,6 +763,11 @@
                 currentPool = vocabularyList.slice(-10);
                 sessionWords = [...currentPool];
                 shuffleArray(sessionWords);
+            } else if (strategy === 'custom') {
+                let startIdx = parseInt(document.getElementById('range-input-start').value) - 1;
+                let endIdx = parseInt(document.getElementById('range-input-end').value) - 1;
+                currentPool = vocabularyList.slice(startIdx, endIdx + 1);
+                sessionWords = getRandomSubset(currentPool, 10);
             }
 
             currentIndex = 0;
@@ -527,6 +775,15 @@
             if (currentMode === 'flashcard') {
                 document.getElementById('app-title').textContent = "Quran Arabic Flashcards";
                 switchView('flashcard-view');
+                
+                // Set toggle color state initially based on student configuration properties
+                const eyeNode = document.getElementById('card-eye-toggle');
+                if (globalPersistentEyeToggleStatus) {
+                    eyeNode.classList.add('visible-state');
+                } else {
+                    eyeNode.classList.remove('visible-state');
+                }
+                
                 showCard();
             } else {
                 document.getElementById('app-title').textContent = "Quran Arabic Quiz";
@@ -535,29 +792,67 @@
             }
         }
 
+        /* --- Interactive Review Visibility Control Logics --- */
         function showCard() {
-            isMeaningVisible = false;
-            document.getElementById('card-meaning-field').classList.add('hidden');
             document.getElementById('card-counter').textContent = "Word " + (currentIndex + 1) + " of " + sessionWords.length;
             document.getElementById('card-arabic-field').textContent = sessionWords[currentIndex].word;
             document.getElementById('card-meaning-field').textContent = sessionWords[currentIndex].meaning;
-            document.getElementById('card-action-btn').textContent = "Show Meaning";
-        }
-
-        function toggleFlashcardMeaning() {
-            isMeaningVisible = !isMeaningVisible;
-            if (isMeaningVisible) {
+            
+            // Respect and apply eye toggle state properties
+            if (globalPersistentEyeToggleStatus) {
+                isMeaningVisible = true;
                 document.getElementById('card-meaning-field').classList.remove('hidden');
                 document.getElementById('card-action-btn').textContent = "Next Word";
             } else {
+                isMeaningVisible = false;
                 document.getElementById('card-meaning-field').classList.add('hidden');
                 document.getElementById('card-action-btn').textContent = "Show Meaning";
             }
         }
 
+        function handleEyeToggleIntercept(event) {
+            event.stopPropagation(); // Stops main background click trigger events from executing
+            
+            globalPersistentEyeToggleStatus = !globalPersistentEyeToggleStatus;
+            const eyeNode = document.getElementById('card-eye-toggle');
+            const meaningField = document.getElementById('card-meaning-field');
+            const actBtn = document.getElementById('card-action-btn');
+            
+            if (globalPersistentEyeToggleStatus) {
+                eyeNode.classList.add('visible-state');
+                isMeaningVisible = true;
+                meaningField.classList.remove('hidden');
+                actBtn.textContent = "Next Word";
+            } else {
+                eyeNode.classList.remove('visible-state');
+                isMeaningVisible = false;
+                meaningField.classList.add('hidden');
+                actBtn.textContent = "Show Meaning";
+            }
+        }
+
+        function handleFlashCardBodyClick() {
+            // Body click action ignores input if eye status forces definition visibility rules
+            if (globalPersistentEyeToggleStatus) return;
+            
+            isMeaningVisible = !isMeaningVisible;
+            const meaningField = document.getElementById('card-meaning-field');
+            const actBtn = document.getElementById('card-action-btn');
+            
+            if (isMeaningVisible) {
+                meaningField.classList.remove('hidden');
+                actBtn.textContent = "Next Word";
+            } else {
+                meaningField.classList.add('hidden');
+                actBtn.textContent = "Show Meaning";
+            }
+        }
+
         function handleCardProgression() {
             if (!isMeaningVisible) {
-                toggleFlashcardMeaning();
+                isMeaningVisible = true;
+                document.getElementById('card-meaning-field').classList.remove('hidden');
+                document.getElementById('card-action-btn').textContent = "Next Word";
             } else {
                 currentIndex++;
                 if (currentIndex < sessionWords.length) {
@@ -567,6 +862,7 @@
                 }
             }
         }
+        /* --- Quiz Engine Functional Logic --- */
         function showQuizQuestion() {
             const currentItem = sessionWords[currentIndex];
             document.getElementById('quiz-counter').textContent = "Question " + (currentIndex + 1) + " of " + sessionWords.length;
@@ -635,18 +931,25 @@
             tableContainer.classList.add('hidden');
             document.getElementById('toggle-table-btn').textContent = "📊 Show Performance Summary";
 
+            // Reordered Sheet Column Mapping per Instruction #1: # | Result | Word | Correct Meaning | Your Choice
             let tableHtml = '<table class="summary-table"><thead><tr>' +
-                '<th>#</th><th>Word</th><th>Your Choice</th><th>Correct Meaning</th><th>Result</th>' +
+                '<th style="width: 8%;">#</th>' +
+                '<th style="width: 15%;">Result</th>' +
+                '<th style="width: 25%;">Word</th>' +
+                '<th style="width: 27%;">Correct Meaning</th>' +
+                '<th style="width: 25%;">Your Choice</th>' +
                 '</tr></thead><tbody>';
 
             quizHistory.forEach(item => {
-                const badge = item.isCorrect ? '<span class="badge-right">Right</span>' : '<span class="badge-wrong">Wrong</span>';
+                // High-visibility checkmark indicator tokens
+                const badgeToken = item.isCorrect ? '<span class="badge-icon-pass">✓</span>' : '<span class="badge-icon-fail">✗</span>';
+                
                 tableHtml += '<tr>' +
                     '<td>' + item.index + '</td>' +
-                    '<td class="summary-arabic-text"><b>' + item.word + '</b></td>' +
-                    '<td>' + item.chosen + '</td>' +
-                    '<td><b>' + item.correct + '</b></td>' +
-                    '<td>' + badge + '</td>' +
+                    '<td>' + badgeToken + '</td>' +
+                    '<td class="large-bold-cell large-arabic-cell">' + item.word + '</td>' +
+                    '<td class="large-bold-cell" style="color:#0f172a;">' + item.correct + '</td>' +
+                    '<td class="small-choice-cell">' + item.chosen + '</td>' +
                     '</tr>';
             });
 
@@ -669,7 +972,6 @@
         }
 
         function copyScreenshotToClipboard() {
-            // Isolates capture precisely onto the standalone Scorecard block element (#screenshot-target-scorecard)
             const target = document.getElementById('screenshot-target-scorecard');
             
             html2canvas(target, {
