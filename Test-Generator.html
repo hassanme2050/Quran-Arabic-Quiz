@@ -348,6 +348,7 @@
                 
                 const parts = line.split('=');
                 if (parts.length >= 2) {
+                    // FIXED: Re-added precise explicit element indices [0] and [1] before calling trim()
                     const word = parts[0].trim();
                     const meaning = parts[1].trim();
                     if (word && meaning) {
@@ -368,18 +369,25 @@
             const gridBox = document.getElementById('tiles-matrix-box');
             gridBox.innerHTML = '';
 
-            // Compute total pages based on 50 item intervals
             const totalRequiredPages = Math.ceil(fullVocabularyInventory.length / totalCardsPerPageLimit) || 1;
             
-            // Constrain page indexing to real ranges
             if (activeMatrixPage < 1) activeMatrixPage = 1;
             if (activeMatrixPage > totalRequiredPages) activeMatrixPage = totalRequiredPages;
 
             const startIdx = (activeMatrixPage - 1) * totalCardsPerPageLimit;
             const endIdx = Math.min(startIdx + totalCardsPerPageLimit, fullVocabularyInventory.length);
 
-            // Populate the active segment
-            for (let i = startIdx; i #' + String(absoluteIndex).padStart(3, '0') + '</div>' +
+            for (let i = startIdx; i < endIdx; i++) {
+                const item = fullVocabularyInventory[i];
+                const absoluteIndex = i + 1; 
+                const isSelected = userSelectedAbsoluteIndices.includes(absoluteIndex);
+
+                const tile = document.createElement('div');
+                tile.className = 'compact-word-tile' + (isSelected ? ' selected-state' : '');
+                tile.onclick = function() { toggleWordSelection(absoluteIndex); };
+
+                tile.innerHTML = 
+                    '<div class="tile-header-index">#' + String(absoluteIndex).padStart(3, '0') + '</div>' +
                     '<div class="tile-checkbox-anchor"></div>' +
                     '<div class="tile-arabic-text">' + item.word + '</div>' +
                     '<div class="tile-meaning-text" title="' + item.meaning + '">' + item.meaning + '</div>';
@@ -387,7 +395,6 @@
                 gridBox.appendChild(tile);
             }
 
-            // Update pagination text labels and control fields
             document.getElementById('page-number-text').textContent = 'Page ' + activeMatrixPage + ' of ' + totalRequiredPages;
             document.getElementById('prev-page-btn').disabled = (activeMatrixPage === 1);
             document.getElementById('next-page-btn').disabled = (activeMatrixPage === totalRequiredPages);
