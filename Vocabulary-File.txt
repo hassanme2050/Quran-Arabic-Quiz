@@ -48,3 +48,6 @@
 بَيْنَ أَيْدِي / بَيْنَ يَدَيْ = In front of
 خَلْفَ = Behind
 إِمَامًا = Leader/ guide
+وَرَاءَ = Behind
+يَمِين / أَيْمَان = Right; Oath
+شِمَال / شَمَائِل = Left
