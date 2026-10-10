@@ -51,3 +51,10 @@
 وَرَاءَ = Behind
 يَمِين / أَيْمَان = Right; Oath
 شِمَال / شَمَائِل = Left
+بَيْنَ = Between
+حَوْلَ = Around
+حَيْثُ = Wherever
+أَيْنَمَا = Wherever
+مَا = What?, That which
+مَنْ = Who?, The one who
+مَتَى = When?, The time When
