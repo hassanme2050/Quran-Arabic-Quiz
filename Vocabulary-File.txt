@@ -58,3 +58,10 @@
 مَا = What?, That which
 مَنْ = Who?, The one who
 مَتَى = When?, The time When
+أَيْنَ = Where?
+كَيْفَ = How
+كَمْ = How Many
+أَيُّ = Which
+أَنَّىٰ = Where from?, Why?
+أَ, هَلْ = Is? Am? Are? do? Have
+مَاذَا = What
