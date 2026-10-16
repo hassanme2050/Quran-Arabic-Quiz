@@ -419,11 +419,25 @@
 
             const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
 
+            // Added strict mode configurations to bypass basic browser request filtering
             fetch(apiUrl, {
-                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+                method: 'GET',
+                mode: 'cors',
+                headers: { 
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
             })
             .then(res => {
-                if (!res.ok) throw new Error("Failed to read metadata properties from GitHub.");
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        throw new Error("GitHub rejected your Access Token. Re-check your token string!");
+                    } else if (res.status === 404) {
+                        throw new Error("Repository or file path not found. Verify your username/repo/filename!");
+                    } else {
+                        throw new Error(`GitHub returned status code ${res.status}`);
+                    }
+                }
                 return res.json();
             })
             .then(fileMeta => {
@@ -453,9 +467,11 @@
 
                 return fetch(apiUrl, {
                     method: 'PUT',
+                    mode: 'cors',
                     headers: {
                         'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
                     },
                     body: JSON.stringify({
                         message: `Admin Panel Update: Modified entry item #${indexPointer}`,
@@ -466,7 +482,7 @@
                 });
             })
             .then(putRes => {
-                if (!putRes.ok) throw new Error("GitHub repository transaction write execution failed.");
+                if (!putRes.ok) throw new Error("GitHub write transaction failed.");
                 return putRes.json();
             })
             .then(() => {
@@ -475,9 +491,15 @@
                 launchToastAlert("🎉 Modifications pushed to GitHub and updated live!");
             })
             .catch(error => {
-                console.error(error);
+                console.error("Detailed Error Context:", error);
                 saveBtn.disabled = false;
-                launchToastAlert("❌ Update failed. Verify configuration values inside script.");
+                
+                // Provides a smart text breakdown directly to your screen banner
+                if (error.message.includes("Failed to fetch")) {
+                    launchToastAlert("❌ Network blocked! Try pausing Ad-Blockers/Brave shields, or check your internet.");
+                } else {
+                    launchToastAlert(`❌ ${error.message}`);
+                }
             });
         }
 
@@ -490,3 +512,4 @@
     </script>
 </body>
 </html>
+
