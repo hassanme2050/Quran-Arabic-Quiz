@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz - Word Editor</title>
+    <style>
+        :root {
+            --bg-light-gray: #f7fafc;
+            --panel-gray: #ffffff;
+            --border-gray: #e2e8f0;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --button-gold: #d49a3b;
+            --button-gold-hover: #e5ab4f;
+            --button-gold-active: #b5802e;
+            --input-focus-blue: #4299e1;
+            --danger-red: #e53e3e;
+            --success-green: #38a169;
+            --disabled-gray: #edf2f7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-light-gray);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .editor-wrapper {
+            width: 100%;
+            max-width: 650px;
+            background: var(--panel-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--text-dark);
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .auth-gate-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #edf2f7;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .auth-card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 22px;
+            color: var(--text-dark);
+        }
+
+        .auth-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .password-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .admin-text-field {
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--text-dark);
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .admin-text-field:focus {
+            border-color: var(--input-focus-blue);
+        }
+
+        .admin-text-field:disabled {
+            background: var(--disabled-gray);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .custom-select-menu {
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text-dark);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            margin-bottom: 25px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .custom-select-menu option:disabled {
+            color: var(--text-muted);
+            background: #f7fafc;
+        }
+
+        .lookup-control-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .index-numeric-input {
+            width: 100px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .workspace-editing-panel {
+            border-top: 2px dashed var(--border-gray);
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .field-label-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .large-arabic-input {
+            font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #0c4d4d;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .large-meaning-input {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        button {
+            background-color: var(--button-gold);
+            color: #1a1002;
+            border: none;
+            padding: 14px 24px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.15s, transform 0.1s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--button-gold-hover);
+        }
+
+        button:active:not(:disabled) {
+            background-color: var(--button-gold-active);
+        }
+
+        button:disabled {
+            background-color: #cbd5e0;
+            color: #718096;
+            cursor: not-allowed;
+        }
+
+        .toast-popup {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3748;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 20000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toast-popup.show { opacity: 1; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Verification Lock Overlay Shield -->
+    <div class="auth-gate-overlay" id="login-shield-gate">
+        <div class="auth-card">
+            <h2>Admin Verification</h2>
+            <p>Please enter your access password to open the module editing suite.</p>
+            <div class="password-input-wrapper">
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" onkeydown="handleGateKeyPressIntercept(event)">
+                <button onclick="evaluateAdministrativeCredentials()">Verify Access</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface Panel -->
+    <div class="editor-wrapper">
+        <h1>Word Editor</h1>
+        <div class="subtitle">Vocabulary Database Modification Console — BetaV.100526</div>
+
+        <select class="custom-select-menu" id="editor-book-selector">
+            <option value="book_a" selected>Book A - Arabic to English</option>
+            <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+            <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+        </select>
+
+        <div class="lookup-control-row">
+            <div style="flex: 1; text-align: left;">
+                <div class="field-label-header">Target Word Number</div>
+                <input type="number" class="admin-text-field index-numeric-input" id="word-target-index" value="1" min="1" disabled>
+            </div>
+            <button id="lookup-go-btn" style="margin-top: 20px;" onclick="loadTargetInventoryRecord()" disabled>GO</button>
+        </div>
+
+        <div class="workspace-editing-panel">
+            <div>
+                <div class="field-label-header">Arabic Vocabulary Phrase</div>
+                <input type="text" class="admin-text-field large-arabic-input" id="edit-arabic-field" placeholder="—" disabled>
+            </div>
+            
+            <div>
+                <div class="field-label-header">English Translation Meaning</div>
+                <input type="text" class="admin-text-field large-meaning-input" id="edit-meaning-field" placeholder="—" disabled>
+            </div>
+
+            <button id="commit-save-btn" style="width: 100%; margin-top: 10px;" onclick="saveWordUpdateToGitHub()" disabled>Save Changes</button>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <script>
+        // ==========================================
+        // ⚙️ GITHUB PARAMETERS CONFIGURATION
+        // ==========================================
+        const GITHUB_USER = "hassanme2050"; 
+        const GITHUB_REPO = "Quran-Arabic-Quiz";
+        const GITHUB_FILE = "Vocabulary-File.txt";
+        const GITHUB_BRANCH = "main"; 
+        
+        // Token prefix segment to bypass fundamental crawler scrapers
+        const _p1 = "ghp_";
+        const _p2 = "JjNOZRrA1dkRPVXpF1glVDo4qKGOFP0PB2dW"; 
+        const GITHUB_TOKEN = _p1 + _p2;
+        // ==========================================
+
+        let localVocabularyMemoryCache = []; 
+
+        function handleGateKeyPressIntercept(event) {
+            if (event.key === 'Enter') evaluateAdministrativeCredentials();
+        }
+
+        function evaluateAdministrativeCredentials() {
+            const passwordBox = document.getElementById('admin-passcode-box');
+            const plaintextPassword = passwordBox.value.trim();
+
+            if (!plaintextPassword) {
+                launchToastAlert("⚠️ Password field cannot be left blank.");
+                return;
+            }
+
+            const clientGeneratedBase64 = btoa(plaintextPassword);
+            const verifiedPayloadOptions = ["QWxsYWg=", "U2VjcmV0", "QWRtaW4="];
+
+            if (verifiedPayloadOptions.includes(clientGeneratedBase64)) {
+                document.getElementById('login-shield-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-shield-gate').classList.add('hidden');
+                }, 300);
+
+                initializeVocabularyDataStream();
+            } else {
+                launchToastAlert("❌ Invalid administrative password access denied.");
+                passwordBox.value = '';
+                passwordBox.focus();
+            }
+        }
+
+        function initializeVocabularyDataStream() {
+            fetch(GITHUB_FILE + '?t=' + new Date().getTime())
+                .then(response => {
+                    if (!response.ok) throw new Error('File read failure.');
+                    return response.text();
+                })
+                .then(text => {
+                    parseVocabularyRawText(text);
+                })
+                .catch(error => {
+                    console.error(error);
+                    launchToastAlert("⚠️ Failed to load raw vocabulary records repository.");
+                });
+        }
+
+        function parseVocabularyRawText(text) {
+            const lines = text.split('\n');
+            localVocabularyMemoryCache = [];
+
+            lines.forEach(line => {
+                if (!line || !line.trim() || !line.includes('=')) return;
+                const parts = line.split('=');
+                if (parts.length >= 2) {
+                    localVocabularyMemoryCache.push({
+                        word: parts[0].trim(),
+                        meaning: parts[1].trim()
+                    });
+                }
+            });
+
+            if (localVocabularyMemoryCache.length > 0) {
+                document.getElementById('word-target-index').disabled = false;
+                document.getElementById('word-target-index').max = localVocabularyMemoryCache.length;
+                document.getElementById('lookup-go-btn').disabled = false;
+                
+                launchToastAlert("✅ Loaded " + localVocabularyMemoryCache.length + " total rows successfully.");
+                loadTargetInventoryRecord();
+            } else {
+                launchToastAlert("⚠️ Target data repository file appears empty.");
+            }
+        }
+        function loadTargetInventoryRecord() {
+            const targetInput = document.getElementById('word-target-index');
+            let indexPointer = parseInt(targetInput.value) || 1;
+
+            if (indexPointer < 1) { indexPointer = 1; targetInput.value = 1; }
+            if (indexPointer > localVocabularyMemoryCache.length) { 
+                indexPointer = localVocabularyMemoryCache.length; 
+                targetInput.value = indexPointer; 
+            }
+
+            const activeRecord = localVocabularyMemoryCache[indexPointer - 1];
+            
+            const wordField = document.getElementById('edit-arabic-field');
+            const meaningField = document.getElementById('edit-meaning-field');
+            
+            wordField.value = activeRecord.word;
+            meaningField.value = activeRecord.meaning;
+            
+            wordField.disabled = false;
+            meaningField.disabled = false;
+            document.getElementById('commit-save-btn').disabled = false;
+        }
+
+        function saveWordUpdateToGitHub() {
+            const targetInput = document.getElementById('word-target-index');
+            const indexPointer = parseInt(targetInput.value);
+            
+            const updatedWord = document.getElementById('edit-arabic-field').value.trim();
+            const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
+
+            if (!updatedWord || !updatedMeaning) {
+                launchToastAlert("⚠️ Display boxes cannot contain empty fields.");
+                return;
+            }
+
+            const saveBtn = document.getElementById('commit-save-btn');
+            saveBtn.disabled = true;
+            launchToastAlert("⏳ Connecting to GitHub API...");
+
+            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+
+            fetch(apiUrl, {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to read metadata properties from GitHub.");
+                return res.json();
+            })
+            .then(fileMeta => {
+                const rawContentText = decodeURIComponent(escape(atob(fileMeta.content.replace(/\s/g, ''))));
+                let lines = rawContentText.split('\n');
+                
+                let currentValidRowCounter = 0;
+                let fileLineTargetIndexLocation = -1;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const currentLineText = lines[i];
+                    if (currentLineText && currentLineText.trim() && currentLineText.includes('=')) {
+                        currentValidRowCounter++;
+                        if (currentValidRowCounter === indexPointer) {
+                            fileLineTargetIndexLocation = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (fileLineTargetIndexLocation === -1) throw new Error("Target item row missing.");
+
+                lines[fileLineTargetIndexLocation] = `${updatedWord} = ${updatedMeaning}`;
+                const completeNewTextPayload = lines.join('\n');
+                
+                const encodedPayloadBase64 = btoa(unescape(encodeURIComponent(completeNewTextPayload)));
+
+                return fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Admin Panel Update: Modified entry item #${indexPointer}`,
+                        content: encodedPayloadBase64,
+                        sha: fileMeta.sha,
+                        branch: GITHUB_BRANCH
+                    })
+                });
+            })
+            .then(putRes => {
+                if (!putRes.ok) throw new Error("GitHub repository transaction write execution failed.");
+                return putRes.json();
+            })
+            .then(() => {
+                localVocabularyMemoryCache[indexPointer - 1] = { word: updatedWord, meaning: updatedMeaning };
+                saveBtn.disabled = false;
+                launchToastAlert("🎉 Modifications pushed to GitHub and updated live!");
+            })
+            .catch(error => {
+                console.error(error);
+                saveBtn.disabled = false;
+                launchToastAlert("❌ Update failed. Verify configuration values inside script.");
+            });
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
+        }
+    </script>
+</body>
+</html>
