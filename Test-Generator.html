@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quran Arabic Quiz - Test Generator</title>
     <style>
-        /* Base Theme Elements */
+        /* Base Dark Theme Elements */
         body {
             background-color: #1e1e1e;
             color: #e0e0e0;
@@ -43,9 +43,10 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #b0b0b0;
+            font-size: 14px;
         }
 
-        select, input[type="password"] {
+        select, input[type="password"], input[type="file"] {
             width: 100%;
             padding: 12px;
             background-color: #3d3d3d;
@@ -54,6 +55,12 @@
             color: #fff;
             box-sizing: border-box;
             font-size: 16px;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         select:focus, input[type="password"]:focus {
@@ -83,7 +90,7 @@
             cursor: not-allowed;
         }
 
-        /* Screen Visibility Controllers */
+        /* Visibility Screen Toggles */
         #login-screen {
             display: block;
         }
@@ -92,7 +99,7 @@
             display: none;
         }
 
-        /* Test Generator App UI Specifics */
+        /* App UI Specifics */
         .word-counter {
             text-align: center;
             font-size: 1.1em;
@@ -100,7 +107,7 @@
             color: #4a90e2;
         }
 
-        /* Notification Popup styling */
+        /* Notification Box */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -120,12 +127,11 @@
     </style>
 </head>
 <body>
-
-    <!-- SECTION 1: VERIFICATION SCREEN (BOOK SELECTOR & PASSWORD ONLY) -->
+    <!-- SCREEN 1: ADMIN VERIFICATION LAYOUT -->
     <div id="login-screen" class="container">
-        <h2>Admin Verification-LALLU</h2>
+        <h2>Admin Verification</h2>
         <p style="text-align: center; color: #aaa; font-size: 0.9em; margin-bottom: 20px;">
-            Select the vocabulary book and enter your password to access the test generator.
+            Select the vocabulary book, upload CP.TXT, and enter your password.
         </p>
         
         <div class="form-group">
@@ -138,15 +144,18 @@
         </div>
 
         <div class="form-group">
+            <label for="cp-file-input">Load Password Database File (CP.TXT)</label>
+            <input type="file" id="cp-file-input" accept=".txt">
+        </div>
+
+        <div class="form-group">
             <label for="system-password">System Password</label>
             <input type="password" id="system-password" placeholder="Enter password...">
         </div>
 
-        <button id="verify-btn" class="btn" onclick="handleVerification()">Verify & Open Generator</button>
+        <button id="verify-btn" class="btn" onclick="handleVerificationWithFile()">Verify & Open Generator</button>
     </div>
-
-
-    <!-- SECTION 2: TEST GENERATOR DEFAULT SCREEN -->
+    <!-- SCREEN 2: TEST GENERATOR DEFAULT SCREEN -->
     <div id="generator-screen" class="container">
         <h1>Quran Arabic Quiz</h1>
         <h3 style="text-align: center; margin-top:0; color: #888;">Test Generator</h3>
@@ -157,7 +166,7 @@
 
         <div class="form-group" style="text-align: center; margin: 30px 0;">
             <p id="selection-prompt" style="color: #b0b0b0;">Please select exactly 10 words (10 remaining)</p>
-            <!-- Your core database dictionary loop or checklist UI rendering goes here -->
+            <!-- Checkbox matrix or data loops drop here -->
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -170,19 +179,17 @@
         </div>
     </div>
 
-    <!-- NOTIFICATION POPUP -->
+    <!-- NOTIFICATION ALERTS -->
     <div id="notification-popup" class="notification">Notification Popup</div>
-
-
-    <!-- APP JAVASCRIPT LOGIC -->
+    <!-- START JAVASCRIPT LAYER -->
     <script>
-        // Global State matching Editor-Beta storage requirements
+        // Global system memory configurations mapping to Editor-Beta state hooks
         const AppConfig = {
             selectedBook: 'book_a',
             isAuthenticated: false
         };
 
-        // UI Notification Helper
+        // Custom notification component logic
         function showNotification(message, isSuccess = false) {
             const popup = document.getElementById('notification-popup');
             popup.innerText = message;
@@ -194,13 +201,18 @@
             popup.style.display = 'block';
             setTimeout(() => { popup.style.display = 'none'; }, 3000);
         }
-
-        // Authentication & Book Selection Logic
-        async function handleVerification() {
+        // FileReader-based authentication controller loop 
+        function handleVerificationWithFile() {
             const passwordInput = document.getElementById('system-password').value;
             const selectedBook = document.getElementById('book-selector').value;
+            const fileInput = document.getElementById('cp-file-input');
             const verifyBtn = document.getElementById('verify-btn');
 
+            // Quick interface sanity safeguards
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showNotification("Please load your CP.TXT file first.");
+                return;
+            }
             if (!passwordInput) {
                 showNotification("Please enter your system password.");
                 return;
@@ -209,57 +221,59 @@
             verifyBtn.disabled = true;
             verifyBtn.innerText = "Verifying...";
 
-            try {
-                // Fetch the list of Base64 encoded passwords from CP.TXT
-                const response = await fetch('CP.TXT');
-                if (!response.ok) {
-                    throw new Error("Could not access password database configuration file (CP.TXT).");
-                }
+            // Captures target text payload safely
+            const targetFile = fileInput.files[0];
+            const reader = new FileReader();
+
+            // Run asynchronously upon browser payload clearance
+            reader.onload = function(e) {
+                const textData = e.target.result;
                 
-                const textData = await response.text();
-                // Clean lines and isolate encoded keys
+                // Formats target inputs, removing empty entries or windows breaks
                 const validHashes = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
                 
-                // Process input to standard Base64 string match
+                // Converts input string to Base64 match index criteria
                 const encodedInput = btoa(passwordInput);
 
                 if (validHashes.includes(encodedInput)) {
-                    // 1. Save chosen book value to state and Storage mimicking Editor-Beta
+                    // Update global configurations tracking mapping systems
                     AppConfig.selectedBook = selectedBook;
                     localStorage.setItem('quran_quiz_active_book', selectedBook);
 
-                    // 2. Clear password input security track
+                    // Flush fields
                     document.getElementById('system-password').value = '';
 
-                    // 3. Transition display screens smoothly 
+                    // Adjust layouts
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('generator-screen').style.display = 'block';
                     
                     showNotification("Verification successful!", true);
                     
-                    // Initialize system core loop
+                    // Boot up app operations core
                     initializeTestGenerator();
                 } else {
                     showNotification("Invalid System Password. Access Denied.");
                     verifyBtn.disabled = false;
                     verifyBtn.innerText = "Verify & Open Generator";
                 }
+            };
 
-            } catch (error) {
-                showNotification(error.message || "An error occurred during verification.");
+            reader.onerror = function() {
+                showNotification("Failed to read the loaded password database file.");
                 verifyBtn.disabled = false;
                 verifyBtn.innerText = "Verify & Open Generator";
-            }
-        }
+            };
 
-        // Placeholder Core functions for Test Generator System 
+            // Read the local file contents
+            reader.readAsText(targetFile);
+        }
+        // Core application layout startup hook
         function initializeTestGenerator() {
-            // Emulating connection update using the saved book config context
             const statusMsg = document.getElementById('status-message');
-            statusMsg.innerText = `Connected to [${AppConfig.selectedBook.toUpperCase()}] Database Successfully.`;
-            statusMsg.style.color = "#4aff4a";
             
-            // Your custom parsing loop for words array payload runs here...
+            // Populates notification string using our updated context parameters
+            statusMsg.innerText = `Connected to [${AppConfig.selectedBook.toUpperCase()}] Database Records...`;
+            statusMsg.style.color = "#4aff4a";
         }
 
         function generateQuizCode() {
@@ -270,10 +284,10 @@
             showNotification("Quiz Code copied to clipboard!", true);
         }
 
-        // Allow 'Enter' key submission inside the password layout field
+        // Action keystroke handling utilities
         document.getElementById('system-password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                handleVerification();
+                handleVerificationWithFile();
             }
         });
     </script>
