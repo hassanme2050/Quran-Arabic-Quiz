@@ -46,7 +46,7 @@
             font-size: 14px;
         }
 
-        select, input[type="password"], input[type="file"] {
+        select, input[type="password"] {
             width: 100%;
             padding: 12px;
             background-color: #3d3d3d;
@@ -55,12 +55,6 @@
             color: #fff;
             box-sizing: border-box;
             font-size: 16px;
-        }
-
-        input[type="file"] {
-            padding: 8px;
-            font-size: 14px;
-            cursor: pointer;
         }
 
         select:focus, input[type="password"]:focus {
@@ -129,9 +123,9 @@
 <body>
     <!-- SCREEN 1: ADMIN VERIFICATION LAYOUT -->
     <div id="login-screen" class="container">
-        <h2>Admin Verification-Baluga</h2>
+        <h2>Admin Verification-Balugi</h2>
         <p style="text-align: center; color: #aaa; font-size: 0.9em; margin-bottom: 20px;">
-            Select the vocabulary book, upload CP.TXT, and enter your password.
+            Select the vocabulary book and enter your security password.
         </p>
         
         <div class="form-group">
@@ -144,17 +138,14 @@
         </div>
 
         <div class="form-group">
-            <label for="cp-file-input">Load Password Database File (CP.TXT)</label>
-            <input type="file" id="cp-file-input" accept=".txt">
-        </div>
-
-        <div class="form-group">
             <label for="system-password">System Password</label>
             <input type="password" id="system-password" placeholder="Enter password...">
         </div>
 
-        <button id="verify-btn" class="btn" onclick="handleVerificationWithFile()">Verify & Open Generator</button>
+        <button id="verify-btn" class="btn" onclick="handleVerification()">Verify & Open Generator</button>
     </div>
+
+
     <!-- SCREEN 2: TEST GENERATOR DEFAULT SCREEN -->
     <div id="generator-screen" class="container">
         <h1>Quran Arabic Quiz</h1>
@@ -166,7 +157,6 @@
 
         <div class="form-group" style="text-align: center; margin: 30px 0;">
             <p id="selection-prompt" style="color: #b0b0b0;">Please select exactly 10 words (10 remaining)</p>
-            <!-- Checkbox matrix or data loops drop here -->
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -181,7 +171,6 @@
 
     <!-- NOTIFICATION ALERTS -->
     <div id="notification-popup" class="notification">Notification Popup</div>
-    <!-- START JAVASCRIPT LAYER -->
     <script>
         // Global system memory configurations mapping to Editor-Beta state hooks
         const AppConfig = {
@@ -201,18 +190,13 @@
             popup.style.display = 'block';
             setTimeout(() => { popup.style.display = 'none'; }, 3000);
         }
-        // FileReader-based authentication controller loop 
-        function handleVerificationWithFile() {
+
+        // Automatic fetch verification engine
+        async function handleVerification() {
             const passwordInput = document.getElementById('system-password').value;
             const selectedBook = document.getElementById('book-selector').value;
-            const fileInput = document.getElementById('cp-file-input');
             const verifyBtn = document.getElementById('verify-btn');
 
-            // Quick interface sanity safeguards
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showNotification("Please load your CP.TXT file first.");
-                return;
-            }
             if (!passwordInput) {
                 showNotification("Please enter your system password.");
                 return;
@@ -221,51 +205,43 @@
             verifyBtn.disabled = true;
             verifyBtn.innerText = "Verifying...";
 
-            // Captures target text payload safely
-            const targetFile = fileInput.files[0];
-            const reader = new FileReader();
-
-            // Run asynchronously upon browser payload clearance
-            reader.onload = function(e) {
-                const textData = e.target.result;
+            try {
+                // Reads CP.TXT directly from the same directory level
+                const response = await fetch('CP.TXT');
+                if (!response.ok) {
+                    throw new Error("Could not automatically read CP.TXT from this directory layer.");
+                }
                 
-                // Formats target inputs, removing empty entries or windows breaks
+                const textData = await response.text();
+                
+                // Cleans text breaks and empty line allocations
                 const validHashes = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
                 
-                // Converts input string to Base64 match index criteria
+                // Base64 calculation match check
                 const encodedInput = btoa(passwordInput);
 
                 if (validHashes.includes(encodedInput)) {
-                    // Update global configurations tracking mapping systems
+                    // Update layout parameters and state tracking
                     AppConfig.selectedBook = selectedBook;
                     localStorage.setItem('quran_quiz_active_book', selectedBook);
 
-                    // Flush fields
                     document.getElementById('system-password').value = '';
-
-                    // Adjust layouts
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('generator-screen').style.display = 'block';
                     
                     showNotification("Verification successful!", true);
-                    
-                    // Boot up app operations core
                     initializeTestGenerator();
                 } else {
                     showNotification("Invalid System Password. Access Denied.");
                     verifyBtn.disabled = false;
                     verifyBtn.innerText = "Verify & Open Generator";
                 }
-            };
 
-            reader.onerror = function() {
-                showNotification("Failed to read the loaded password database file.");
+            } catch (error) {
+                showNotification(error.message || "An authentication error occurred.");
                 verifyBtn.disabled = false;
                 verifyBtn.innerText = "Verify & Open Generator";
-            };
-
-            // Read the local file contents
-            reader.readAsText(targetFile);
+            }
         }
         // Core application layout startup hook
         function initializeTestGenerator() {
@@ -284,10 +260,10 @@
             showNotification("Quiz Code copied to clipboard!", true);
         }
 
-        // Action keystroke handling utilities
+        // Action keystroke handling utilities for easy submissions
         document.getElementById('system-password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                handleVerificationWithFile();
+                handleVerification();
             }
         });
     </script>
