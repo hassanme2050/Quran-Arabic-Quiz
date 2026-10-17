@@ -147,7 +147,6 @@
             background: #f7fafc;
         }
 
-        /* Reordered Layout Row: Target Number -> GO -> Prev -> Next */
         .lookup-control-row {
             display: flex;
             gap: 12px;
@@ -201,28 +200,28 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 8px;
-            text-align: center; /* Centered field descriptions */
+            text-align: center;
         }
 
-        /* Center-aligned Arabic field with protective vertical breathing room */
+        /* Center aligned Arabic text workspace area with deep top/bottom spacing protection */
         .large-arabic-input {
             font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
             font-size: 64px;
             font-weight: bold;
             color: #0c4d4d;
-            text-align: center; /* Center-aligned Arabic text */
+            text-align: center;
             direction: rtl;
-            padding: 30px 20px; /* Enhanced vertical padding prevents diacritic clipping */
+            padding: 30px 20px;
             height: auto;
-            line-height: 1.6; /* Generous vertical clearance for high/low accents */
+            line-height: 1.6;
         }
 
-        /* Center-aligned translation meaning field */
+        /* Center aligned translation meaning data entry box */
         .large-meaning-input {
             font-size: 20px;
             font-weight: 600;
             color: #2c3e50;
-            text-align: center; /* Center-aligned English translation */
+            text-align: center;
             height: 54px;
         }
 
@@ -280,7 +279,7 @@
     <!-- Verification Lock Overlay Shield containing Book Selector -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
-            <h2>Admin Verification</h2>
+            <h2>Admin Verification - Cat</h2>
             <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
                 <select class="custom-select-menu" id="auth-book-selector">
@@ -300,7 +299,7 @@
         <h1>Word Editor</h1>
         <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
-        <!-- Corrected Navigation Flow: Target Number -> GO -> Prev -> Next -->
+        <!-- Corrected Navigation Flow Layout Configuration -->
         <div class="lookup-control-row">
             <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
@@ -313,7 +312,6 @@
             </div>
         </div>
 
-        <!-- Working Workspace Input Management Frame Container -->
         <div class="workspace-editing-panel">
             <div>
                 <div class="field-label-header">Arabic Vocabulary Word</div>
@@ -348,13 +346,6 @@
             "book_a": "Vocabulary-File.txt",
             "book_b": "Vocabulary-File-Urdu.txt",
             "book_c": "Vocabulary-File-Tajweed.txt"
-        };
-
-        // Static backup arrays to ensure stability if API network delays occur
-        const fallbackLocalDatabases = {
-            "book_a": `کِتَابٌ = book\nقَلَمٌ = pen\nبَيْتٌ = house\nمَسْجِدٌ = mosque\nعَالِمٌ = scholar`,
-            "book_b": `کِتَابٌ = کتاب\nقَلَمٌ = قلم\nبَيْتٌ = گھر`,
-            "book_c": `مَدْ = Prolongation\nإِظْهَارٌ = Clear Pronunciation`
         };
 
         function evaluateAdministrativeCredentials() {
@@ -397,23 +388,21 @@
         function initializeVocabularyDataStream() {
             launchToastAlert("⏳ Syncing with remote repository...");
 
-            // Restored back to your original direct working file stream path
             fetch(GITHUB_FILE + '?nocache=' + new Date().getTime(), { cache: 'no-store' })
                 .then(response => {
-                    if (!response.ok) throw new Error('File read failure.');
+                    if (!response.ok) throw new Error(`Could not read ${GITHUB_FILE}`);
                     return response.text();
                 })
                 .then(text => {
-                    parseVocabularyRawText(text, false);
+                    parseVocabularyRawText(text);
                 })
                 .catch(error => {
-                    console.warn("Network policy blocked direct fetch. Activating fallback array.");
-                    const fallbackData = fallbackLocalDatabases[activeBookSelectionKey] || "";
-                    parseVocabularyRawText(fallbackData, true);
+                    console.error("Repository Fetch Failure:", error);
+                    launchToastAlert(`❌ Error: Failed to fetch ${GITHUB_FILE}. Configuration locks applied.`);
                 });
         }
 
-        function parseVocabularyRawText(text, isFallbackActive) {
+        function parseVocabularyRawText(text) {
             const lines = text.split('\n');
             localVocabularyMemoryCache = [];
 
@@ -422,8 +411,8 @@
                 const parts = line.split('=');
                 if (parts.length >= 2) {
                     localVocabularyMemoryCache.push({
-                        word: parts[0].trim(),
-                        meaning: parts[1].trim()
+                        word: parts.trim(),
+                        meaning: parts.trim()
                     });
                 }
             });
@@ -435,14 +424,150 @@
                 document.getElementById('lookup-prev-btn').disabled = false;
                 document.getElementById('lookup-next-btn').disabled = false;
                 
-                if (isFallbackActive) {
-                    launchToastAlert("ℹ️ CORS block active. Operating in Offline Fallback Mode.");
-                } else {
-                    launchToastAlert("✅ Loaded repository data rows successfully.");
-                }
+                launchToastAlert("✅ Loaded repository data rows successfully.");
                 loadTargetInventoryRecord();
             } else {
-                launchToastAlert("⚠️ Target file content appears empty.");
+                launchToastAlert(`⚠️ Error: ${GITHUB_FILE} parsed 0 entries. Check file content.`);
+            }
+        }
+        function offsetTargetWordNumber(offsetAmount) {
+            const targetInput = document.getElementById('word-target-index');
+            let indexValue = (parseInt(targetInput.value, 10) || 1) + offsetAmount;
+            
+            if (indexValue < 1) indexValue = 1;
+            if (indexValue > localVocabularyMemoryCache.length) indexValue = localVocabularyMemoryCache.length;
+            
+            targetInput.value = indexValue;
+            loadTargetInventoryRecord();
+        }
+
+        function loadTargetInventoryRecord() {
+            const targetInput = document.getElementById('word-target-index');
+            let indexPointer = parseInt(targetInput.value, 10) || 1;
+
+            if (indexPointer < 1) { indexPointer = 1; targetInput.value = 1; }
+            if (indexPointer > localVocabularyMemoryCache.length) { 
+                indexPointer = localVocabularyMemoryCache.length; 
+                targetInput.value = indexPointer; 
+            }
+
+            const activeRecord = localVocabularyMemoryCache[indexPointer - 1];
+            
+            const wordField = document.getElementById('edit-arabic-field');
+            const meaningField = document.getElementById('edit-meaning-field');
+            
+            wordField.value = activeRecord.word;
+            meaningField.value = activeRecord.meaning;
+            
+            wordField.disabled = false;
+            meaningField.disabled = false;
+            document.getElementById('commit-save-btn').disabled = false;
+        }
+
+        async function saveWordUpdateToGitHub() {
+            const targetInput = document.getElementById('word-target-index');
+            const indexPointer = parseInt(targetInput.value, 10);
+
+            const updatedWord = document.getElementById('edit-arabic-field').value.trim();
+            const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
+            const saveBtn = document.getElementById('commit-save-btn');
+
+            if (!updatedWord || !updatedMeaning) {
+                launchToastAlert("⚠️ Both fields are required.");
+                return;
+            }
+
+            saveBtn.disabled = true;
+            launchToastAlert("⏳ Pushing modification to GitHub API...");
+
+            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+
+            try {
+                const getResponse = await fetch(
+                    `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        },
+                        cache: 'no-store'
+                    }
+                );
+
+                if (!getResponse.ok) {
+                    const error = await getResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `API read failed status: ${getResponse.status}`);
+                }
+
+                const fileMeta = await getResponse.json();
+
+                const binary = atob(fileMeta.content.replace(/\s/g, ''));
+                const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+                const rawContentText = new TextDecoder().decode(bytes);
+                const lines = rawContentText.split('\n');
+
+                let validRowCounter = 0;
+                let targetLineIndex = -1;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (line && line.trim() && line.includes('=')) {
+                        validRowCounter++;
+                        if (validRowCounter === indexPointer) {
+                            targetLineIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetLineIndex === -1) {
+                    throw new Error(`Word number ${indexPointer} was not found inside the remote text target.`);
+                }
+
+                lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
+                const newContent = lines.join('\n');
+
+                const encodedContent = btoa(
+                    Array.from(new TextEncoder().encode(newContent),
+                        byte => String.fromCharCode(byte)).join('')
+                );
+
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        message: `Beta Console: Modified row index item #${indexPointer}`,
+                        content: encodedContent,
+                        sha: fileMeta.sha,
+                        branch: GITHUB_BRANCH
+                    })
+                });
+
+                if (!putResponse.ok) {
+                    const error = await putResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `API write failed status: ${putResponse.status}`);
+                }
+
+                localVocabularyMemoryCache[indexPointer - 1] = {
+                    word: updatedWord,
+                    meaning: updatedMeaning
+                };
+
+                launchToastAlert(`🎉 Word #${indexPointer} successfully updated live on GitHub!`);
+
+            } catch (error) {
+                console.error('API Sync Error:', error);
+                launchToastAlert(`❌ Save failed: ${error.message}`);
+            } finally {
+                saveBtn.disabled = false;
             }
         }
     </script>
+</body>
+</html>
