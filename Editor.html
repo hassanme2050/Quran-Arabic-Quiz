@@ -81,7 +81,7 @@
             border: 1px solid var(--border-gray);
             border-radius: 12px;
             padding: 40px 30px;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
             text-align: center;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
@@ -243,14 +243,15 @@
     </style>
 </head>
 <body>
-    <!-- Verification Lock Overlay Shield -->
+    <!-- Dual-Authentication Admin Access Overlay Shield -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
             <h2>Admin Verification</h2>
-            <p>Please enter your access password to open the module editing suite.</p>
+            <p>Enter your system password and fresh GitHub Classic Token to access live modifications securely.</p>
             <div class="password-input-wrapper">
-                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" onkeydown="handleGateKeyPressIntercept(event)">
-                <button onclick="evaluateAdministrativeCredentials()">Verify Access</button>
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password">
+                <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)">
+                <button onclick="evaluateAdministrativeCredentials()">Verify & Open Editor</button>
             </div>
         </div>
     </div>
@@ -292,31 +293,26 @@
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
     <script>
         // ==========================================
-        // ⚙️ GITHUB PARAMETERS CONFIGURATION
+        // ⚙️ CHOOSE YOUR TARGET GITHUB DIRECTORY HERE
         // ==========================================
         const GITHUB_USER = "hassanme2050"; 
         const GITHUB_REPO = "Quran-Arabic-Quiz";
         const GITHUB_FILE = "Vocabulary-File.txt";
         const GITHUB_BRANCH = "main"; 
-        
-        // Token prefix segment to bypass fundamental crawler scrapers
-        const _p1 = "ghp_";
-        const _p2 = "JjNOZRrA1dkRPVXpF1glVDo4qKGOFP0PB2dW"; 
-        const GITHUB_TOKEN = _p1 + _p2;
         // ==========================================
 
+        let GITHUB_TOKEN = ""; // Captured safely from user inputs during login steps
         let localVocabularyMemoryCache = []; 
-
-        function handleGateKeyPressIntercept(event) {
-            if (event.key === 'Enter') evaluateAdministrativeCredentials();
-        }
 
         function evaluateAdministrativeCredentials() {
             const passwordBox = document.getElementById('admin-passcode-box');
+            const tokenBox = document.getElementById('admin-token-box');
+            
             const plaintextPassword = passwordBox.value.trim();
+            const inputToken = tokenBox.value.trim();
 
-            if (!plaintextPassword) {
-                launchToastAlert("⚠️ Password field cannot be left blank.");
+            if (!plaintextPassword || !inputToken) {
+                launchToastAlert("⚠️ Both password and GitHub token fields are required.");
                 return;
             }
 
@@ -324,6 +320,9 @@
             const verifiedPayloadOptions = ["QWxsYWg=", "U2VjcmV0", "QWRtaW4="];
 
             if (verifiedPayloadOptions.includes(clientGeneratedBase64)) {
+                // Store input token dynamically into memory space
+                GITHUB_TOKEN = inputToken;
+
                 document.getElementById('login-shield-gate').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-shield-gate').classList.add('hidden');
@@ -338,7 +337,7 @@
         }
 
         function initializeVocabularyDataStream() {
-            fetch(GITHUB_FILE + '?t=' + new Date().getTime())
+            fetch(GITHUB_FILE + '?nocache=' + new Date().getTime(), { cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) throw new Error('File read failure.');
                     return response.text();
@@ -415,14 +414,12 @@
 
             const saveBtn = document.getElementById('commit-save-btn');
             saveBtn.disabled = true;
-            launchToastAlert("⏳ Connecting to GitHub API...");
+            launchToastAlert("⏳ Syncing changes live to GitHub...");
 
             const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
 
-            // Added strict mode configurations to bypass basic browser request filtering
             fetch(apiUrl, {
                 method: 'GET',
-                mode: 'cors',
                 headers: { 
                     'Authorization': `token ${GITHUB_TOKEN}`,
                     'Accept': 'application/vnd.github.v3+json'
@@ -431,11 +428,11 @@
             .then(res => {
                 if (!res.ok) {
                     if (res.status === 401 || res.status === 403) {
-                        throw new Error("GitHub rejected your Access Token. Re-check your token string!");
+                        throw new Error("GitHub rejected credentials. Your token may be invalid, incorrect, or expired.");
                     } else if (res.status === 404) {
-                        throw new Error("Repository or file path not found. Verify your username/repo/filename!");
+                        throw new Error("File path or repository not found. Verify GITHUB_USER and GITHUB_REPO variables.");
                     } else {
-                        throw new Error(`GitHub returned status code ${res.status}`);
+                        throw new Error(`Server returned code ${res.status}`);
                     }
                 }
                 return res.json();
@@ -458,7 +455,7 @@
                     }
                 }
 
-                if (fileLineTargetIndexLocation === -1) throw new Error("Target item row missing.");
+                if (fileLineTargetIndexLocation === -1) throw new Error("Target row index out of bounds.");
 
                 lines[fileLineTargetIndexLocation] = `${updatedWord} = ${updatedMeaning}`;
                 const completeNewTextPayload = lines.join('\n');
@@ -467,14 +464,13 @@
 
                 return fetch(apiUrl, {
                     method: 'PUT',
-                    mode: 'cors',
                     headers: {
                         'Authorization': `token ${GITHUB_TOKEN}`,
                         'Content-Type': 'application/json',
                         'Accept': 'application/vnd.github.v3+json'
                     },
                     body: JSON.stringify({
-                        message: `Admin Panel Update: Modified entry item #${indexPointer}`,
+                        message: `Admin Panel: Updated word entry #${indexPointer}`,
                         content: encodedPayloadBase64,
                         sha: fileMeta.sha,
                         branch: GITHUB_BRANCH
@@ -482,24 +478,18 @@
                 });
             })
             .then(putRes => {
-                if (!putRes.ok) throw new Error("GitHub write transaction failed.");
+                if (!putRes.ok) throw new Error("Write request rejected by GitHub file system.");
                 return putRes.json();
             })
             .then(() => {
                 localVocabularyMemoryCache[indexPointer - 1] = { word: updatedWord, meaning: updatedMeaning };
                 saveBtn.disabled = false;
-                launchToastAlert("🎉 Modifications pushed to GitHub and updated live!");
+                launchToastAlert("🎉 Changes committed and written to GitHub successfully!");
             })
             .catch(error => {
-                console.error("Detailed Error Context:", error);
+                console.error("Error Detail:", error);
                 saveBtn.disabled = false;
-                
-                // Provides a smart text breakdown directly to your screen banner
-                if (error.message.includes("Failed to fetch")) {
-                    launchToastAlert("❌ Network blocked! Try pausing Ad-Blockers/Brave shields, or check your internet.");
-                } else {
-                    launchToastAlert(`❌ ${error.message}`);
-                }
+                launchToastAlert(`❌ ${error.message}`);
             });
         }
 
@@ -512,4 +502,3 @@
     </script>
 </body>
 </html>
-
