@@ -203,7 +203,7 @@
             text-align: center;
         }
 
-        /* Center aligned Arabic text workspace area with deep top/bottom spacing protection */
+        /* Center-aligned Arabic field with vertical padding protection against accent cuts */
         .large-arabic-input {
             font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
             font-size: 64px;
@@ -216,7 +216,7 @@
             line-height: 1.6;
         }
 
-        /* Center aligned translation meaning data entry box */
+        /* Center-aligned Translation data cell */
         .large-meaning-input {
             font-size: 20px;
             font-weight: 600;
@@ -279,13 +279,13 @@
     <!-- Verification Lock Overlay Shield containing Book Selector -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
-            <h2>Admin Verification - Cat</h2>
+            <h2>Admin Verification -  LULU</h2>
             <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
                 <select class="custom-select-menu" id="auth-book-selector">
                     <option value="book_a" selected>Book A - Arabic to English</option>
-                    <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
-                    <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+                    <option value="book_b">Book B - Arabic to Urdu</option>
+                    <option value="book_c">Book C - Tajweed</option>
                 </select>
                 <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password">
                 <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)">
@@ -299,7 +299,7 @@
         <h1>Word Editor</h1>
         <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
-        <!-- Corrected Navigation Flow Layout Configuration -->
+        <!-- Corrected Navigation Layout Grid: Target Number -> GO -> Prev -> Next -->
         <div class="lookup-control-row">
             <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
@@ -388,27 +388,65 @@
         function initializeVocabularyDataStream() {
             launchToastAlert("⏳ Syncing with remote repository...");
 
-            // FIX: Computes absolute folder paths dynamically and drops '?nocache' string rejections
+            // Pulls the absolute relative folder location context dynamically 
             const absoluteBasePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
             const absoluteTargetUrl = absoluteBasePath + GITHUB_FILE;
 
             fetch(absoluteTargetUrl, { 
                 method: "GET",
-                headers: {
-                    "Accept": "text/plain, */*"
-                }
+                headers: { "Accept": "text/plain, */*" }
             })
             .then(response => {
-                if (!response.ok) throw new Error(`HTTP status code returned: ${response.status}`);
+                if (!response.ok) throw new Error(`Missing`);
                 return response.text();
             })
             .then(text => {
                 parseVocabularyRawText(text);
             })
             .catch(error => {
-                console.error("Repository Fetch Failure:", error);
-                launchToastAlert(`❌ Error: Could not read ${GITHUB_FILE}. Check file existence.`);
+                console.warn(`File ${GITHUB_FILE} missing locally. Initializing automated cloud generation script...`);
+                executeAutomatedCloudFileGeneration();
             });
+        }
+
+        async function executeAutomatedCloudFileGeneration() {
+            launchToastAlert(`ℹ️ File ${GITHUB_FILE} not found. Auto-generating template layout...`);
+            
+            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+            const placeholderContent = "کِتَابٌ = book\nقَلَمٌ = pen";
+            
+            const encoded = btoa(
+                Array.from(new TextEncoder().encode(placeholderContent),
+                    byte => String.fromCharCode(byte)).join('')
+            );
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        message: `System: Auto-provisioned empty database track for ${GITHUB_FILE}`,
+                        content: encoded,
+                        branch: GITHUB_BRANCH
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("GitHub provisioning pipeline rejected transaction entry.");
+                }
+
+                launchToastAlert(`✅ Successfully auto-created ${GITHUB_FILE}!`);
+                parseVocabularyRawText(placeholderContent);
+
+            } catch (err) {
+                console.error("Auto-provision block:", err);
+                launchToastAlert(`❌ Error: Could not load or auto-create ${GITHUB_FILE}. Provide valid token.`);
+            }
         }
 
         function parseVocabularyRawText(text) {
@@ -420,8 +458,8 @@
                 const parts = line.split('=');
                 if (parts.length >= 2) {
                     localVocabularyMemoryCache.push({
-                        word: parts[0].trim(),
-                        meaning: parts[1].trim()
+                        word: parts.trim(),
+                        meaning: parts.trim()
                     });
                 }
             });
@@ -433,11 +471,155 @@
                 document.getElementById('lookup-prev-btn').disabled = false;
                 document.getElementById('lookup-next-btn').disabled = false;
                 
-                launchToastAlert("✅ Loaded repository data rows successfully.");
                 loadTargetInventoryRecord();
             } else {
-                launchToastAlert(`⚠️ Error: ${GITHUB_FILE} parsed 0 entries. Check file content layout.`);
+                launchToastAlert("⚠️ System Error: Parsed file structure is invalid or empty.");
             }
+        }
+        function offsetTargetWordNumber(offsetAmount) {
+            const targetInput = document.getElementById('word-target-index');
+            let indexValue = (parseInt(targetInput.value, 10) || 1) + offsetAmount;
+            
+            if (indexValue < 1) indexValue = 1;
+            if (indexValue > localVocabularyMemoryCache.length) indexValue = localVocabularyMemoryCache.length;
+            
+            targetInput.value = indexValue;
+            loadTargetInventoryRecord();
+        }
+
+        function loadTargetInventoryRecord() {
+            const targetInput = document.getElementById('word-target-index');
+            let indexPointer = parseInt(targetInput.value, 10) || 1;
+
+            if (indexPointer < 1) { indexPointer = 1; targetInput.value = 1; }
+            if (indexPointer > localVocabularyMemoryCache.length) { 
+                indexPointer = localVocabularyMemoryCache.length; 
+                targetInput.value = indexPointer; 
+            }
+
+            const activeRecord = localVocabularyMemoryCache[indexPointer - 1];
+            
+            const wordField = document.getElementById('edit-arabic-field');
+            const meaningField = document.getElementById('edit-meaning-field');
+            
+            wordField.value = activeRecord.word;
+            meaningField.value = activeRecord.meaning;
+            
+            wordField.disabled = false;
+            meaningField.disabled = false;
+            document.getElementById('commit-save-btn').disabled = false;
+        }
+
+        async function saveWordUpdateToGitHub() {
+            const targetInput = document.getElementById('word-target-index');
+            const indexPointer = parseInt(targetInput.value, 10);
+
+            const updatedWord = document.getElementById('edit-arabic-field').value.trim();
+            const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
+            const saveBtn = document.getElementById('commit-save-btn');
+
+            if (!updatedWord || !updatedMeaning) {
+                launchToastAlert("⚠️ Both fields are required.");
+                return;
+            }
+
+            saveBtn.disabled = true;
+            launchToastAlert("⏳ Pushing modification to GitHub API...");
+
+            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+
+            try {
+                const getResponse = await fetch(
+                    `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        },
+                        cache: 'no-store'
+                    }
+                );
+
+                if (!getResponse.ok) {
+                    const error = await getResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `API read failed status: ${getResponse.status}`);
+                }
+
+                const fileMeta = await getResponse.json();
+
+                const binary = atob(fileMeta.content.replace(/\s/g, ''));
+                const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+                const rawContentText = new TextDecoder().decode(bytes);
+                const lines = rawContentText.split('\n');
+
+                let validRowCounter = 0;
+                let targetLineIndex = -1;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (line && line.trim() && line.includes('=')) {
+                        validRowCounter++;
+                        if (validRowCounter === indexPointer) {
+                            targetLineIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetLineIndex === -1) {
+                    throw new Error(`Word number ${indexPointer} was not found inside the remote text target.`);
+                }
+
+                lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
+                const newContent = lines.join('\n');
+
+                const encodedContent = btoa(
+                    Array.from(new TextEncoder().encode(newContent),
+                        byte => String.fromCharCode(byte)).join('')
+                );
+
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        message: `Beta Console: Modified row index item #${indexPointer}`,
+                        content: encodedContent,
+                        sha: fileMeta.sha,
+                        branch: GITHUB_BRANCH
+                    })
+                });
+
+                if (!putResponse.ok) {
+                    const error = await putResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `API write failed status: ${putResponse.status}`);
+                }
+
+                localVocabularyMemoryCache[indexPointer - 1] = {
+                    word: updatedWord,
+                    meaning: updatedMeaning
+                };
+
+                launchToastAlert(`🎉 Word #${indexPointer} successfully updated live on GitHub!`);
+
+            } catch (error) {
+                console.error('API Sync Error:', error);
+                launchToastAlert(`❌ Save failed: ${error.message}`);
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
         }
     </script>
 </body>
