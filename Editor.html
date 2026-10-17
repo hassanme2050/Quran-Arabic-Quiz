@@ -203,7 +203,6 @@
             text-align: center;
         }
 
-        /* Center-aligned Arabic field with vertical padding protection against accent cuts */
         .large-arabic-input {
             font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
             font-size: 64px;
@@ -216,7 +215,6 @@
             line-height: 1.6;
         }
 
-        /* Center-aligned Translation data cell */
         .large-meaning-input {
             font-size: 20px;
             font-weight: 600;
@@ -279,7 +277,7 @@
     <!-- Verification Lock Overlay Shield containing Book Selector -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
-            <h2>Admin Verification -  LULU</h2>
+            <h2>Admin Verification-BALAH</h2>
             <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
                 <select class="custom-select-menu" id="auth-book-selector">
@@ -299,7 +297,6 @@
         <h1>Word Editor</h1>
         <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
-        <!-- Corrected Navigation Layout Grid: Target Number -> GO -> Prev -> Next -->
         <div class="lookup-control-row">
             <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
@@ -388,7 +385,6 @@
         function initializeVocabularyDataStream() {
             launchToastAlert("⏳ Syncing with remote repository...");
 
-            // Pulls the absolute relative folder location context dynamically 
             const absoluteBasePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
             const absoluteTargetUrl = absoluteBasePath + GITHUB_FILE;
 
@@ -397,7 +393,7 @@
                 headers: { "Accept": "text/plain, */*" }
             })
             .then(response => {
-                if (!response.ok) throw new Error(`Missing`);
+                if (!response.ok) throw new Error("Missing");
                 return response.text();
             })
             .then(text => {
@@ -410,7 +406,7 @@
         }
 
         async function executeAutomatedCloudFileGeneration() {
-            launchToastAlert(`ℹ️ File ${GITHUB_FILE} not found. Auto-generating template layout...`);
+            launchToastAlert(`ℹ️ File ${GITHUB_FILE} not found. Attempting to create it via API...`);
             
             const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
             const placeholderContent = "کِتَابٌ = book\nقَلَمٌ = pen";
@@ -418,7 +414,7 @@
             const encoded = btoa(
                 Array.from(new TextEncoder().encode(placeholderContent),
                     byte => String.fromCharCode(byte)).join('')
-            );
+                );
 
             try {
                 const response = await fetch(apiUrl, {
@@ -430,7 +426,7 @@
                         'X-GitHub-Api-Version': '2022-11-28'
                     },
                     body: JSON.stringify({
-                        message: `System: Auto-provisioned empty database track for ${GITHUB_FILE}`,
+                        message: `System: Auto-created database track for ${GITHUB_FILE}`,
                         content: encoded,
                         branch: GITHUB_BRANCH
                     })
@@ -445,7 +441,7 @@
 
             } catch (err) {
                 console.error("Auto-provision block:", err);
-                launchToastAlert(`❌ Error: Could not load or auto-create ${GITHUB_FILE}. Provide valid token.`);
+                launchToastAlert(`❌ Token Error: GitHub API rejected access. Check permissions or generate a new token.`);
             }
         }
 
@@ -473,7 +469,7 @@
                 
                 loadTargetInventoryRecord();
             } else {
-                launchToastAlert("⚠️ System Error: Parsed file structure is invalid or empty.");
+                launchToastAlert("⚠️ Error: Parsed file content layout is invalid or empty.");
             }
         }
         function offsetTargetWordNumber(offsetAmount) {
