@@ -1,7 +1,7 @@
 هَٰذَا = This
 ذَٰلِكَ = That
 هَٰذِهِ = This
-تِلْكَ = That
+تِلْكَ = That (Feminine)
 هَٰؤُلَاءِ = These
 أُولَٰئِكَ = Those
 الَّذِي = He/Who
