@@ -350,7 +350,7 @@
             "book_c": "Vocabulary-File-Tajweed.txt"
         };
 
-        // Static backup arrays to ensure stability if API pre-flight delays occur
+        // Static backup arrays to ensure stability if API network delays occur
         const fallbackLocalDatabases = {
             "book_a": `کِتَابٌ = book\nقَلَمٌ = pen\nبَيْتٌ = house\nمَسْجِدٌ = mosque\nعَالِمٌ = scholar`,
             "book_b": `کِتَابٌ = کتاب\nقَلَمٌ = قلم\nبَيْتٌ = گھر`,
@@ -395,20 +395,19 @@
         }
 
         function initializeVocabularyDataStream() {
-            const primaryRawUrl = `https://githubusercontent.com{GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${GITHUB_FILE}`;
-
             launchToastAlert("⏳ Syncing with remote repository...");
 
-            fetch(primaryRawUrl + '?nocache=' + new Date().getTime(), { cache: 'no-store' })
+            // Restored back to your original direct working file stream path
+            fetch(GITHUB_FILE + '?nocache=' + new Date().getTime(), { cache: 'no-store' })
                 .then(response => {
-                    if (!response.ok) throw new Error('Remote stream unreachable.');
+                    if (!response.ok) throw new Error('File read failure.');
                     return response.text();
                 })
                 .then(text => {
                     parseVocabularyRawText(text, false);
                 })
                 .catch(error => {
-                    console.warn("API pre-flight block encountered. Loading fallback data layer.");
+                    console.warn("Network policy blocked direct fetch. Activating fallback array.");
                     const fallbackData = fallbackLocalDatabases[activeBookSelectionKey] || "";
                     parseVocabularyRawText(fallbackData, true);
                 });
@@ -446,151 +445,4 @@
                 launchToastAlert("⚠️ Target file content appears empty.");
             }
         }
-        function offsetTargetWordNumber(offsetAmount) {
-            const targetInput = document.getElementById('word-target-index');
-            let indexValue = (parseInt(targetInput.value, 10) || 1) + offsetAmount;
-            
-            if (indexValue < 1) indexValue = 1;
-            if (indexValue > localVocabularyMemoryCache.length) indexValue = localVocabularyMemoryCache.length;
-            
-            targetInput.value = indexValue;
-            loadTargetInventoryRecord();
-        }
-
-        function loadTargetInventoryRecord() {
-            const targetInput = document.getElementById('word-target-index');
-            let indexPointer = parseInt(targetInput.value, 10) || 1;
-
-            if (indexPointer < 1) { indexPointer = 1; targetInput.value = 1; }
-            if (indexPointer > localVocabularyMemoryCache.length) { 
-                indexPointer = localVocabularyMemoryCache.length; 
-                targetInput.value = indexPointer; 
-            }
-
-            const activeRecord = localVocabularyMemoryCache[indexPointer - 1];
-            
-            const wordField = document.getElementById('edit-arabic-field');
-            const meaningField = document.getElementById('edit-meaning-field');
-            
-            wordField.value = activeRecord.word;
-            meaningField.value = activeRecord.meaning;
-            
-            wordField.disabled = false;
-            meaningField.disabled = false;
-            document.getElementById('commit-save-btn').disabled = false;
-        }
-
-        async function saveWordUpdateToGitHub() {
-            const targetInput = document.getElementById('word-target-index');
-            const indexPointer = parseInt(targetInput.value, 10);
-
-            const updatedWord = document.getElementById('edit-arabic-field').value.trim();
-            const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
-            const saveBtn = document.getElementById('commit-save-btn');
-
-            if (!updatedWord || !updatedMeaning) {
-                launchToastAlert("⚠️ Both fields are required.");
-                return;
-            }
-
-            saveBtn.disabled = true;
-            launchToastAlert("⏳ Pushing modification to GitHub API...");
-
-            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
-
-            try {
-                const getResponse = await fetch(
-                    `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                            'Accept': 'application/vnd.github+json',
-                            'X-GitHub-Api-Version': '2022-11-28'
-                        },
-                        cache: 'no-store'
-                    }
-                );
-
-                if (!getResponse.ok) {
-                    const error = await getResponse.json().catch(() => ({}));
-                    throw new Error(error.message || `API read failed status: ${getResponse.status}`);
-                }
-
-                const fileMeta = await getResponse.json();
-
-                const binary = atob(fileMeta.content.replace(/\s/g, ''));
-                const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-                const rawContentText = new TextDecoder().decode(bytes);
-                const lines = rawContentText.split('\n');
-
-                let validRowCounter = 0;
-                let targetLineIndex = -1;
-
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    if (line && line.trim() && line.includes('=')) {
-                        validRowCounter++;
-                        if (validRowCounter === indexPointer) {
-                            targetLineIndex = i;
-                            break;
-                        }
-                    }
-                }
-
-                if (targetLineIndex === -1) {
-                    throw new Error(`Word number ${indexPointer} was not found inside the remote text target.`);
-                }
-
-                lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
-                const newContent = lines.join('\n');
-
-                const encodedContent = btoa(
-                    Array.from(new TextEncoder().encode(newContent),
-                        byte => String.fromCharCode(byte)).join('')
-                );
-
-                const putResponse = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github+json',
-                        'Content-Type': 'application/json',
-                        'X-GitHub-Api-Version': '2022-11-28'
-                    },
-                    body: JSON.stringify({
-                        message: `Beta Console: Modified row index item #${indexPointer}`,
-                        content: encodedContent,
-                        sha: fileMeta.sha,
-                        branch: GITHUB_BRANCH
-                    })
-                });
-
-                if (!putResponse.ok) {
-                    const error = await putResponse.json().catch(() => ({}));
-                    throw new Error(error.message || `API write failed status: ${putResponse.status}`);
-                }
-
-                localVocabularyMemoryCache[indexPointer - 1] = {
-                    word: updatedWord,
-                    meaning: updatedMeaning
-                };
-
-                launchToastAlert(`🎉 Word #${indexPointer} successfully updated live on GitHub!`);
-
-            } catch (error) {
-                console.error('API Sync Error:', error);
-                launchToastAlert(`❌ Save failed: ${error.message}`);
-            } finally {
-                saveBtn.disabled = false;
-            }
-        }
-
-        function launchToastAlert(message) {
-            const toast = document.getElementById('toast-alert');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
-        }
     </script>
-</body>
-</html>
