@@ -277,7 +277,7 @@
     <!-- Verification Lock Overlay Shield containing Book Selector -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
-            <h2>Admin Verification-BALAH</h2>
+            <h2>Admin Verification-Baluga</h2>
             <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
                 <select class="custom-select-menu" id="auth-book-selector">
@@ -297,6 +297,7 @@
         <h1>Word Editor</h1>
         <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
+        <!-- Target Word Number -> GO -> Prev -> Next Layout Matrix -->
         <div class="lookup-control-row">
             <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
@@ -414,7 +415,7 @@
             const encoded = btoa(
                 Array.from(new TextEncoder().encode(placeholderContent),
                     byte => String.fromCharCode(byte)).join('')
-                );
+            );
 
             try {
                 const response = await fetch(apiUrl, {
@@ -441,37 +442,49 @@
 
             } catch (err) {
                 console.error("Auto-provision block:", err);
-                launchToastAlert(`❌ Token Error: GitHub API rejected access. Check permissions or generate a new token.`);
+                launchToastAlert(`❌ Configuration/Token Error: Check repository paths or verify token validity.`);
             }
         }
 
+        // 🌟 INTEGRATED EXPERT PARSING LOGIC: Resolves the structural array .trim() method bug permanently
         function parseVocabularyRawText(text) {
-            const lines = text.split('\n');
             localVocabularyMemoryCache = [];
 
+            const lines = text.replace(/^\uFEFF/, '').split(\(/\r\)?\n/);
+
             lines.forEach(line => {
-                if (!line || !line.trim() || !line.includes('=')) return;
-                const parts = line.split('=');
-                if (parts.length >= 2) {
+                if (!line.trim() || !line.includes('=')) return;
+
+                const separatorIndex = line.indexOf('=');
+                const word = line.slice(0, separatorIndex).trim();
+                const meaning = line.slice(separatorIndex + 1).trim();
+
+                if (word && meaning) {
                     localVocabularyMemoryCache.push({
-                        word: parts.trim(),
-                        meaning: parts.trim()
+                        word: word,
+                        meaning: meaning
                     });
                 }
             });
 
             if (localVocabularyMemoryCache.length > 0) {
-                document.getElementById('word-target-index').disabled = false;
-                document.getElementById('word-target-index').max = localVocabularyMemoryCache.length;
+                const indexInput = document.getElementById('word-target-index');
+
+                indexInput.disabled = false;
+                indexInput.max = localVocabularyMemoryCache.length;
+                indexInput.value = 1;
+
                 document.getElementById('lookup-go-btn').disabled = false;
                 document.getElementById('lookup-prev-btn').disabled = false;
                 document.getElementById('lookup-next-btn').disabled = false;
-                
+
+                launchToastAlert("✅ Loaded vocabulary rows successfully.");
                 loadTargetInventoryRecord();
             } else {
-                launchToastAlert("⚠️ Error: Parsed file content layout is invalid or empty.");
+                launchToastAlert("Error: No valid vocabulary entries found in the TXT file.");
             }
         }
+    </script>
         function offsetTargetWordNumber(offsetAmount) {
             const targetInput = document.getElementById('word-target-index');
             let indexValue = (parseInt(targetInput.value, 10) || 1) + offsetAmount;
