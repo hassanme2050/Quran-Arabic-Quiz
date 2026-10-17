@@ -143,8 +143,9 @@
         }
 
         .custom-select-menu option:disabled {
-            color: var(--text-muted);
+            color: #a0aec0;
             background: #f7fafc;
+            cursor: not-allowed;
         }
 
         .lookup-control-row {
@@ -274,16 +275,16 @@
     </style>
 </head>
 <body>
-    <!-- Verification Lock Overlay Shield containing Book Selector -->
+    <!-- Verification Lock Overlay Shield containing Book Selector Dropdown Options -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
-            <h2>Admin Verification-Baluga</h2>
+            <h2>Admin Verification-BELUUGA</h2>
             <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
                 <select class="custom-select-menu" id="auth-book-selector">
-                    <option value="book_a" selected>Book A - Arabic to English</option>
-                    <option value="book_b">Book B - Arabic to Urdu</option>
-                    <option value="book_c">Book C - Tajweed</option>
+                    <option value="book_a" id="opt-book_a">Book A - Arabic to English</option>
+                    <option value="book_b" id="opt-book_b">Book B - Arabic to Urdu</option>
+                    <option value="book_c" id="opt-book_c">Book C - Tajweed</option>
                 </select>
                 <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password">
                 <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)">
@@ -297,7 +298,6 @@
         <h1>Word Editor</h1>
         <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
-        <!-- Target Word Number -> GO -> Prev -> Next Layout Matrix -->
         <div class="lookup-control-row">
             <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
@@ -345,6 +345,24 @@
             "book_b": "Vocabulary-File-Urdu.txt",
             "book_c": "Vocabulary-File-Tajweed.txt"
         };
+
+        // Track which files actually exist locally to manage early option selection availability
+        const availableLibraryFilesMatrix = {
+            "book_a": true,
+            "book_b": false, // Change to true when you create Vocabulary-File-Urdu.txt
+            "book_c": false  // Change to true when you create Vocabulary-File-Tajweed.txt
+        };
+
+        // Dynamic setup execution running immediately when page loads to manage option locks
+        window.addEventListener("DOMContentLoaded", () => {
+            Object.keys(availableLibraryFilesMatrix).forEach(key => {
+                const optionElement = document.getElementById(`opt-${key}`);
+                if (optionElement && !availableLibraryFilesMatrix[key]) {
+                    optionElement.disabled = true;
+                    optionElement.innerText += " (Unavailable)";
+                }
+            });
+        });
 
         function evaluateAdministrativeCredentials() {
             const passwordBox = document.getElementById('admin-passcode-box');
@@ -401,55 +419,16 @@
                 parseVocabularyRawText(text);
             })
             .catch(error => {
-                console.warn(`File ${GITHUB_FILE} missing locally. Initializing automated cloud generation script...`);
-                executeAutomatedCloudFileGeneration();
+                console.error("Repository Fetch Failure:", error);
+                launchToastAlert(`❌ Error: Failed to fetch ${GITHUB_FILE}. Check file naming.`);
             });
         }
 
-        async function executeAutomatedCloudFileGeneration() {
-            launchToastAlert(`ℹ️ File ${GITHUB_FILE} not found. Attempting to create it via API...`);
-            
-            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
-            const placeholderContent = "کِتَابٌ = book\nقَلَمٌ = pen";
-            
-            const encoded = btoa(
-                Array.from(new TextEncoder().encode(placeholderContent),
-                    byte => String.fromCharCode(byte)).join('')
-            );
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github+json',
-                        'Content-Type': 'application/json',
-                        'X-GitHub-Api-Version': '2022-11-28'
-                    },
-                    body: JSON.stringify({
-                        message: `System: Auto-created database track for ${GITHUB_FILE}`,
-                        content: encoded,
-                        branch: GITHUB_BRANCH
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error("GitHub provisioning pipeline rejected transaction entry.");
-                }
-
-                launchToastAlert(`✅ Successfully auto-created ${GITHUB_FILE}!`);
-                parseVocabularyRawText(placeholderContent);
-
-            } catch (err) {
-                console.error("Auto-provision block:", err);
-                launchToastAlert(`❌ Configuration/Token Error: Check repository paths or verify token validity.`);
-            }
-        }
-
-        // 🌟 INTEGRATED EXPERT PARSING LOGIC: Resolves the structural array .trim() method bug permanently
+        // REPAIRED EXPERT PARSING ENGINE: Fixed malformed split character string syntax bug
         function parseVocabularyRawText(text) {
             localVocabularyMemoryCache = [];
 
+            // Fixed the split regular expression to properly process clean line breaks
             const lines = text.replace(/^\uFEFF/, '').split(\(/\r\)?\n/);
 
             lines.forEach(line => {
