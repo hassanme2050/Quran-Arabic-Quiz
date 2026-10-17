@@ -379,7 +379,7 @@
         }
         function loadTargetInventoryRecord() {
             const targetInput = document.getElementById('word-target-index');
-            let indexPointer = parseInt(targetInput.value) || 1;
+            let indexPointer = parseInt(targetInput.value, 10) || 1;
 
             if (indexPointer < 1) { indexPointer = 1; targetInput.value = 1; }
             if (indexPointer > localVocabularyMemoryCache.length) { 
@@ -400,131 +400,132 @@
             document.getElementById('commit-save-btn').disabled = false;
         }
 
-async function saveWordUpdateToGitHub() {
-    const targetInput = document.getElementById('word-target-index');
-    const indexPointer = parseInt(targetInput.value, 10);
+        async function saveWordUpdateToGitHub() {
+            const targetInput = document.getElementById('word-target-index');
+            const indexPointer = parseInt(targetInput.value, 10);
 
-    const updatedWord = document.getElementById('edit-arabic-field').value.trim();
-    const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
-    const saveBtn = document.getElementById('commit-save-btn');
+            const updatedWord = document.getElementById('edit-arabic-field').value.trim();
+            const updatedMeaning = document.getElementById('edit-meaning-field').value.trim();
+            const saveBtn = document.getElementById('commit-save-btn');
 
-    if (!updatedWord || !updatedMeaning) {
-        launchToastAlert("⚠️ Both fields are required.");
-        return;
-    }
-
-    if (!GITHUB_TOKEN) {
-        launchToastAlert("❌ GitHub token is missing. Please log in again.");
-        return;
-    }
-
-    saveBtn.disabled = true;
-    launchToastAlert("⏳ Saving changes to GitHub...");
-
-    // Correct GitHub API URL
-    const apiUrl =
-        `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
-
-    try {
-        // 1. Get the latest file and its SHA
-        const getResponse = await fetch(
-            `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github+json',
-                    'X-GitHub-Api-Version': '2022-11-28'
-                },
-                cache: 'no-store'
+            if (!updatedWord || !updatedMeaning) {
+                launchToastAlert("⚠️ Both fields are required.");
+                return;
             }
-        );
 
-        if (!getResponse.ok) {
-            const error = await getResponse.json().catch(() => ({}));
-            throw new Error(
-                error.message || `GitHub read failed (${getResponse.status}).`
-            );
-        }
+            if (!GITHUB_TOKEN) {
+                launchToastAlert("❌ GitHub token is missing. Please log in again.");
+                return;
+            }
 
-        const fileMeta = await getResponse.json();
+            saveBtn.disabled = true;
+            launchToastAlert("⏳ Saving changes to GitHub...");
 
-        // Decode file content while preserving Arabic characters
-        const binary = atob(fileMeta.content.replace(/\s/g, ''));
-        const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-        const rawContentText = new TextDecoder().decode(bytes);
-        const lines = rawContentText.split('\n');
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
 
-        // Find the requested vocabulary entry
-        let validRowCounter = 0;
-        let targetLineIndex = -1;
+            try {
+                // 1. Get the latest file and its SHA
+                const getResponse = await fetch(
+                    `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        },
+                        cache: 'no-store'
+                    }
+                );
 
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-
-            if (line && line.trim() && line.includes('=')) {
-                validRowCounter++;
-
-                if (validRowCounter === indexPointer) {
-                    targetLineIndex = i;
-                    break;
+                if (!getResponse.ok) {
+                    const error = await getResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `GitHub read failed (${getResponse.status}).`);
                 }
+
+                const fileMeta = await getResponse.json();
+
+                // Decode file content while preserving Arabic characters cleanly
+                const binary = atob(fileMeta.content.replace(/\s/g, ''));
+                const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+                const rawContentText = new TextDecoder().decode(bytes);
+                const lines = rawContentText.split('\n');
+
+                // Find the requested vocabulary entry
+                let validRowCounter = 0;
+                let targetLineIndex = -1;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+
+                    if (line && line.trim() && line.includes('=')) {
+                        validRowCounter++;
+
+                        if (validRowCounter === indexPointer) {
+                            targetLineIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetLineIndex === -1) {
+                    throw new Error(`Word number ${indexPointer} was not found.`);
+                }
+
+                // Replace only the selected entry
+                lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
+
+                const newContent = lines.join('\n');
+
+                // Encode the complete file as UTF-8 Base64
+                const encodedContent = btoa(
+                    Array.from(new TextEncoder().encode(newContent),
+                        byte => String.fromCharCode(byte)).join('')
+                );
+
+                // 2. Save the updated file to the main branch
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        message: `Update vocabulary word #${indexPointer}`,
+                        content: encodedContent,
+                        sha: fileMeta.sha,
+                        branch: GITHUB_BRANCH
+                    })
+                });
+
+                if (!putResponse.ok) {
+                    const error = await putResponse.json().catch(() => ({}));
+                    throw new Error(error.message || `GitHub save failed (${putResponse.status}).`);
+                }
+
+                // Update the editor's local cache after GitHub confirms success
+                localVocabularyMemoryCache[indexPointer - 1] = {
+                    word: updatedWord,
+                    meaning: updatedMeaning
+                };
+
+                launchToastAlert(`✅ Word #${indexPointer} saved to GitHub!`);
+
+            } catch (error) {
+                console.error('GitHub save error:', error);
+                launchToastAlert(`❌ Save failed: ${error.message}`);
+            } finally {
+                saveBtn.disabled = false;
             }
         }
 
-        if (targetLineIndex === -1) {
-            throw new Error(`Word number ${indexPointer} was not found.`);
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
-
-        // Replace only the selected entry
-        lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
-
-        const newContent = lines.join('\n');
-
-        // Encode the complete file as UTF-8 Base64
-        const encodedContent = btoa(
-            Array.from(new TextEncoder().encode(newContent),
-                byte => String.fromCharCode(byte)).join('')
-        );
-
-        // 2. Save the updated file to the main branch
-        const putResponse = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github+json',
-                'Content-Type': 'application/json',
-                'X-GitHub-Api-Version': '2022-11-28'
-            },
-            body: JSON.stringify({
-                message: `Update vocabulary word #${indexPointer}`,
-                content: encodedContent,
-                sha: fileMeta.sha,
-                branch: GITHUB_BRANCH
-            })
-        });
-
-        if (!putResponse.ok) {
-            const error = await putResponse.json().catch(() => ({}));
-            throw new Error(
-                error.message || `GitHub save failed (${putResponse.status}).`
-            );
-        }
-
-        // Update the editor's local cache after GitHub confirms success
-        localVocabularyMemoryCache[indexPointer - 1] = {
-            word: updatedWord,
-            meaning: updatedMeaning
-        };
-
-        launchToastAlert(`✅ Word #${indexPointer} saved to GitHub!`);
-
-    } catch (error) {
-        console.error('GitHub save error:', error);
-        launchToastAlert(`❌ Save failed: ${error.message}`);
-    } finally {
-        saveBtn.disabled = false;
-    }
-}
-   </script>
+    </script>
 </body>
 </html>
