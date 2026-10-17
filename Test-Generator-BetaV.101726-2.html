@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz - Test Generator</title>
+    <style>
+        :root {
+            --bg-light-gray: #f7fafc;
+            --panel-gray: #ffffff;
+            --border-gray: #e2e8f0;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --button-gold: #d49a3b;
+            --button-gold-hover: #e5ab4f;
+            --button-gold-active: #b5802e;
+            --input-focus-blue: #4299e1;
+            --disabled-gray: #edf2f7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-light-gray);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .editor-wrapper {
+            width: 100%;
+            max-width: 650px;
+            background: var(--panel-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--text-dark);
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Full Screen Verification Lock Shield Overlay Layout */
+        .auth-gate-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #edf2f7;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 40px 30px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .auth-card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 22px;
+            color: var(--text-dark);
+        }
+
+        .auth-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .password-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .admin-text-field {
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--text-dark);
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .admin-text-field:focus {
+            border-color: var(--input-focus-blue);
+        }
+
+        button {
+            background-color: var(--button-gold);
+            color: #1a1002;
+            border: none;
+            padding: 14px 24px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.15s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--button-gold-hover);
+        }
+
+        button:active:not(:disabled) {
+            background-color: var(--button-gold-active);
+        }
+
+        button:disabled {
+            background-color: #cbd5e0;
+            color: #718096;
+            cursor: not-allowed;
+        }
+
+        .toast-popup {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3748;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 20000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toast-popup.show { opacity: 1; }
+        .hidden { display: none !important; }
+        
+        /* Quiz Selection Interface Placeholder Rules */
+        .word-grid-container {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .action-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Verification Lock Overlay Shield -->
+    <div class="auth-gate-overlay" id="login-shield-gate">
+        <div class="auth-card">
+            <h2>Test Generator Access</h2>
+            <p>Please enter your system password credentials to fetch the database registry and unlock test generation features.</p>
+            <div class="password-input-wrapper">
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" onkeydown="handlePasswordKeydown(event)">
+                <button onclick="evaluateTestGeneratorCredentials()">Verify & Unlock Generator</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test Generator Active Document Interface Workspace -->
+    <div class="editor-wrapper">
+        <h1>Test Generator</h1>
+        <div class="subtitle" id="active-session-indicator">Connecting to Vocabulary Records...</div>
+
+        <div id="selection-summary-text" style="font-weight: bold; text-align: center; margin-bottom: 15px; color: var(--text-dark);">
+            Please select exactly 10 words (10 remaining)
+        </div>
+
+        <!-- Placeholder area where your word entries dynamically render -->
+        <div class="word-grid-container" id="quiz-word-selection-grid">
+            <!-- Words populate here dynamically after validation passes -->
+        </div>
+
+        <div class="action-row">
+            <button id="generate-quiz-btn" style="flex: 2;" disabled onclick="executeQuizCompilationWorkflow()">Generate Quiz Code</button>
+            <button id="copy-quiz-btn" style="flex: 1; background-color: #e2e8f0; color: #4a5568;" disabled onclick="executeOutputClipboardCopy()">Copy Code</button>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <script>
+        let localVocabularyMemoryCache = [];
+        let systemVerifiedPasswordsArray = [];
+
+        // Intercepts enter key presses on password inputs for faster user logins
+        function handlePasswordKeydown(event) {
+            if (event.key === "Enter") {
+                evaluateTestGeneratorCredentials();
+            }
+        }
+
+        async function evaluateTestGeneratorCredentials() {
+            const passwordBox = document.getElementById('admin-passcode-box');
+            const plaintextPassword = passwordBox.value.trim();
+
+            if (!plaintextPassword) {
+                launchToastAlert("⚠️ Password field is required.");
+                return;
+            }
+
+            launchToastAlert("⏳ Fetching credentials map...");
+
+            try {
+                // Fetches CP.txt cleanly from the exact same local folder workspace context
+                const response = await fetch('CP.txt?nocache=' + new Date().getTime(), { cache: 'no-store' });
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned error status code: ${response.status}`);
+                }
+
+                const textData = await response.text();
+                
+                // Robust parsing array setup used to cleanly filter and extract credential rows
+                systemVerifiedPasswordsArray = textData
+                    .replace(/^\uFEFF/, '')
+                    .split(\(/\r\)?\n/)
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+
+                // Converts plaintext user input to standardized Base64 to mirror validation mechanics
+                const clientGeneratedBase64 = btoa(plaintextPassword);
+
+                if (systemVerifiedPasswordsArray.includes(clientGeneratedBase64)) {
+                    launchToastAlert("✅ Access granted. Initializing generator files...");
+                    
+                    // Animate overlay layer removal securely
+                    document.getElementById('login-shield-gate').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('login-shield-gate').classList.add('hidden');
+                    }, 300);
+
+                    // Transition directly to loading your source vocabulary stream
+                    initializeVocabularyDataStream();
+                } else {
+                    launchToastAlert("❌ Invalid password access denied.");
+                    passwordBox.value = '';
+                    passwordBox.focus();
+                }
+
+            } catch (error) {
+                console.error("Credentials Authentication Breakdown:", error);
+                launchToastAlert("❌ Error: Failed to read security configuration database CP.txt.");
+            }
+        }
+
+        function initializeVocabularyDataStream() {
+            document.getElementById('active-session-indicator').textContent = "Synchronizing Live Database Records...";
+            
+            // Fetches your main track file sitting directly inside your root folder
+            fetch('Vocabulary-File.txt?nocache=' + new Date().getTime(), { cache: 'no-store' })
+                .then(response => {
+                    if (!response.ok) throw new Error("Could not find file record path.");
+                    return response.text();
+                })
+                .then(text => {
+                    parseVocabularyRawText(text);
+                })
+                .catch(error => {
+                    console.error("Vocabulary Database Stream Load Failure:", error);
+                    launchToastAlert("❌ Error: Could not parse Vocabulary-File.txt.");
+                });
+        }
+        function parseVocabularyRawText(text) {
+            localVocabularyMemoryCache = [];
+            const lines = text.replace(/^\uFEFF/, '').split(\(/\r\)?\n/);
+
+            lines.forEach(line => {
+                if (!line.trim() || !line.includes('=')) return;
+
+                const separatorIndex = line.indexOf('=');
+                const word = line.slice(0, separatorIndex).trim();
+                const meaning = line.slice(separatorIndex + 1).trim();
+
+                if (word && meaning) {
+                    localVocabularyMemoryCache.push({ word: word, meaning: meaning });
+                }
+            });
+
+            if (localVocabularyMemoryCache.length > 0) {
+                document.getElementById('active-session-indicator').textContent = `Connected Live — ${localVocabularyMemoryCache.length} Words Loaded`;
+                launchToastAlert(`🎉 Successfully populated ${localVocabularyMemoryCache.length} rows.`);
+                
+                // Fires off custom visualization generators built into your workspace
+                populateQuizWordSelectionGrid();
+            } else {
+                launchToastAlert("⚠️ Error: Found 0 workable vocabulary assignment lines.");
+            }
+        }
+
+        // Mock functions representing your current test generator behaviors
+        function populateQuizWordSelectionGrid() {
+            const grid = document.getElementById('quiz-word-selection-grid');
+            grid.innerHTML = ""; // Wipe container
+            
+            // Populates up to a small handful of samples if your live script isn't handling iteration
+            const displayLimit = Math.min(localVocabularyMemoryCache.length, 12);
+            for(let i = 0; i < displayLimit; i++) {
+                const item = localVocabularyMemoryCache[i];
+                const block = document.createElement('div');
+                block.style.cssText = "background: #f1f5f9; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-gray); font-size: 14px; font-weight: 600; cursor: pointer;";
+                block.textContent = item.word;
+                grid.appendChild(block);
+            }
+            
+            document.getElementById('generate-quiz-btn').disabled = false;
+            document.getElementById('copy-quiz-btn').disabled = false;
+        }
+
+        function executeQuizCompilationWorkflow() {
+            launchToastAlert("⚙️ Compiling quiz package distribution data...");
+        }
+
+        function executeOutputClipboardCopy() {
+            launchToastAlert("📋 Quiz code payload copied to local clipboard memory track!");
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+    </script>
+</body>
+</html>
