@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quran Arabic Quiz - Test Generator</title>
     <style>
-        /* Base Dark Theme Elements */
+        /* Base Dark Theme Layout Elements */
         body {
             background-color: #1e1e1e;
             color: #e0e0e0;
@@ -84,7 +84,7 @@
             cursor: not-allowed;
         }
 
-        /* Visibility Screen Toggles */
+        /* Visibility Screen Layout Switches */
         #login-screen {
             display: block;
         }
@@ -93,7 +93,7 @@
             display: none;
         }
 
-        /* App UI Specifics */
+        /* Test Generator App Metrics */
         .word-counter {
             text-align: center;
             font-size: 1.1em;
@@ -101,7 +101,7 @@
             color: #4a90e2;
         }
 
-        /* Notification Box */
+        /* Status Toast Alerts */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -123,7 +123,7 @@
 <body>
     <!-- SCREEN 1: ADMIN VERIFICATION LAYOUT -->
     <div id="login-screen" class="container">
-        <h2>Admin Verification-Balugi</h2>
+        <h2>Admin Verification-Balugus</h2>
         <p style="text-align: center; color: #aaa; font-size: 0.9em; margin-bottom: 20px;">
             Select the vocabulary book and enter your security password.
         </p>
@@ -169,16 +169,16 @@
         </div>
     </div>
 
-    <!-- NOTIFICATION ALERTS -->
+    <!-- SYSTEM ALERTS CONTAINER -->
     <div id="notification-popup" class="notification">Notification Popup</div>
     <script>
-        // Global system memory configurations mapping to Editor-Beta state hooks
+        // Global configuration variables mirroring Editor-Beta parameters
         const AppConfig = {
             selectedBook: 'book_a',
             isAuthenticated: false
         };
 
-        // Custom notification component logic
+        // Standard notification element populator
         function showNotification(message, isSuccess = false) {
             const popup = document.getElementById('notification-popup');
             popup.innerText = message;
@@ -191,7 +191,7 @@
             setTimeout(() => { popup.style.display = 'none'; }, 3000);
         }
 
-        // Automatic fetch verification engine
+        // Live Repository Database Authentication Controller
         async function handleVerification() {
             const passwordInput = document.getElementById('system-password').value;
             const selectedBook = document.getElementById('book-selector').value;
@@ -206,22 +206,22 @@
             verifyBtn.innerText = "Verifying...";
 
             try {
-                // Reads CP.TXT directly from the same directory level
+                // Accesses CP.TXT relative to the repository path URL natively
                 const response = await fetch('CP.TXT');
                 if (!response.ok) {
-                    throw new Error("Could not automatically read CP.TXT from this directory layer.");
+                    throw new Error("Could not read CP.TXT from the repository folder directory.");
                 }
                 
                 const textData = await response.text();
                 
-                // Cleans text breaks and empty line allocations
+                // Trims out carriage returns (\r) and trailing space lines
                 const validHashes = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
                 
-                // Base64 calculation match check
+                // Matches standard browser input string encoding criteria
                 const encodedInput = btoa(passwordInput);
 
                 if (validHashes.includes(encodedInput)) {
-                    // Update layout parameters and state tracking
+                    // Update global configurations tracking mapping systems
                     AppConfig.selectedBook = selectedBook;
                     localStorage.setItem('quran_quiz_active_book', selectedBook);
 
@@ -238,12 +238,12 @@
                 }
 
             } catch (error) {
-                showNotification(error.message || "An authentication error occurred.");
+                showNotification(error.message || "An initialization error occurred.");
                 verifyBtn.disabled = false;
                 verifyBtn.innerText = "Verify & Open Generator";
             }
         }
-        // Core application layout startup hook
+        // Core application initialization callback loop
         function initializeTestGenerator() {
             const statusMsg = document.getElementById('status-message');
             
@@ -260,7 +260,7 @@
             showNotification("Quiz Code copied to clipboard!", true);
         }
 
-        // Action keystroke handling utilities for easy submissions
+        // Action keystroke handling utilities for fast enter form submission
         document.getElementById('system-password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 handleVerification();
