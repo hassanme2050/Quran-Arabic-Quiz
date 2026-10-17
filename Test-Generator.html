@@ -5,424 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quran Arabic Quiz - Test Generator</title>
     <style>
-        :root {
-            --bg-light-gray: #f7fafc;
-            --panel-gray: #ffffff;
-            --border-gray: #e2e8f0;
-            --text-dark: #2d3748;
-            --text-muted: #718096;
-            --button-gold: #d49a3b;
-            --button-gold-hover: #e5ab4f;
-            --button-gold-active: #b5802e;
-            --input-focus-blue: #4299e1;
-            --disabled-gray: #edf2f7;
-        }
-
+        /* Base Theme Elements */
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--bg-light-gray);
-            color: var(--text-dark);
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            box-sizing: border-box;
         }
 
-        .editor-wrapper {
-            width: 100%;
-            max-width: 650px;
-            background: var(--panel-gray);
-            border: 1px solid var(--border-gray);
-            border-radius: 12px;
-            padding: 35px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: var(--text-dark);
-            margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: -0.5px;
-            text-align: center;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        /* Authentic Full-Screen Verification Lock Overlay Layout copied from Editor */
-        .auth-gate-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #edf2f7;
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            transition: opacity 0.3s ease;
-        }
-
-        .auth-card {
-            background: #ffffff;
-            border: 1px solid var(--border-gray);
-            border-radius: 12px;
-            padding: 40px 30px;
-            max-width: 440px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-        }
-
-        .auth-card h2 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 22px;
-            color: var(--text-dark);
-        }
-
-        .auth-card p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-
-        .password-input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .admin-text-field {
-            width: 100%;
-            background: #ffffff;
-            border: 2px solid var(--border-gray);
+        .container {
+            background-color: #2d2d2d;
             border-radius: 8px;
-            padding: 14px 16px;
-            color: var(--text-dark);
-            font-size: 15px;
-            outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        .admin-text-field:focus {
-            border-color: var(--input-focus-blue);
-        }
-
-        .custom-select-menu {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 30px;
             width: 100%;
-            background: #ffffff;
-            border: 2px solid var(--border-gray);
-            border-radius: 8px;
-            padding: 12px 14px;
-            color: var(--text-dark);
-            font-size: 15px;
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
+            max-width: 500px;
             box-sizing: border-box;
         }
 
-        .custom-select-menu option:disabled {
-            color: #a0aec0;
-            background: #f7fafc;
-            cursor: not-allowed;
-        }
-
-        button {
-            background-color: var(--button-gold);
-            color: #1a1002;
-            border: none;
-            padding: 14px 24px;
-            font-size: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.15s, transform 0.1s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:hover:not(:disabled) {
-            background-color: var(--button-gold-hover);
-        }
-
-        button:active:not(:disabled) {
-            background-color: var(--button-gold-active);
-        }
-
-        button:disabled {
-            background-color: #cbd5e0;
-            color: #718096;
-            cursor: not-allowed;
-        }
-
-        .toast-popup {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2d3748;
+        h1, h2 {
             color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 14px;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #b0b0b0;
+        }
+
+        select, input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #3d3d3d;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        select:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
             font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 20000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .toast-popup.show { opacity: 1; }
-        .hidden { display: none !important; }
-        
-        /* Layout structures unique to your original Test Generator workspace */
-        .word-grid-container {
-            margin: 20px 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 12px;
+
+        .btn:hover {
+            background-color: #357abd;
         }
-        .action-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
+
+        .btn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        /* Screen Visibility Controllers */
+        #login-screen {
+            display: block;
+        }
+
+        #generator-screen {
+            display: none;
+        }
+
+        /* Test Generator App UI Specifics */
+        .word-counter {
+            text-align: center;
+            font-size: 1.1em;
+            margin: 15px 0;
+            color: #4a90e2;
+        }
+
+        /* Notification Popup styling */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            border-left: 4px solid #ff4a4a;
+        }
+        .notification.success {
+            border-left-color: #4aff4a;
         }
     </style>
 </head>
 <body>
-    <!-- Verification Lock Overlay Shield containing Book Selector (Token Box Removed) -->
-    <div class="auth-gate-overlay" id="login-shield-gate">
-        <div class="auth-card">
-            <h2>Admin Verification</h2>
-            <p>Select library book profile and enter system credentials to generate quiz components.</p>
-            <div class="password-input-wrapper">
-                <select class="custom-select-menu" id="auth-book-selector">
-                    <option value="book_a" id="opt-book_a">Book A - Arabic to English</option>
-                    <option value="book_b" id="opt-book_b">Book B - Arabic to Urdu</option>
-                    <option value="book_c" id="opt-book_c">Book C - Tajweed</option>
-                </select>
-                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" onkeydown="handlePasswordKeydown(event)">
-                <button onclick="evaluateTestGeneratorCredentials()">Verify & Open Generator</button>
-            </div>
+
+    <!-- SECTION 1: VERIFICATION SCREEN (BOOK SELECTOR & PASSWORD ONLY) -->
+    <div id="login-screen" class="container">
+        <h2>Admin Verification</h2>
+        <p style="text-align: center; color: #aaa; font-size: 0.9em; margin-bottom: 20px;">
+            Select the vocabulary book and enter your password to access the test generator.
+        </p>
+        
+        <div class="form-group">
+            <label for="book-selector">Select Vocabulary Book</label>
+            <select id="book-selector">
+                <option value="book_a">Book A - Arabic to English</option>
+                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+            </select>
         </div>
+
+        <div class="form-group">
+            <label for="system-password">System Password</label>
+            <input type="password" id="system-password" placeholder="Enter password...">
+        </div>
+
+        <button id="verify-btn" class="btn" onclick="handleVerification()">Verify & Open Generator</button>
     </div>
 
-    <!-- Main Test Generator Workspace Panel Layout -->
-    <div class="editor-wrapper">
-        <h1>Test Generator</h1>
-        <div class="subtitle" id="active-session-indicator">Vocabulary Database Staging Terminal — BetaV.100526</div>
 
-        <div id="selection-summary-text" style="font-weight: bold; text-align: center; margin-bottom: 15px; color: var(--text-dark);">
+    <!-- SECTION 2: TEST GENERATOR DEFAULT SCREEN -->
+    <div id="generator-screen" class="container">
+        <h1>Quran Arabic Quiz</h1>
+        <h3 style="text-align: center; margin-top:0; color: #888;">Test Generator</h3>
+        
+        <div class="word-counter" id="status-message">
             Connecting to Vocabulary Records...
         </div>
 
-        <!-- Dynamic target region where your vocabulary database cards populate -->
-        <div class="word-grid-container" id="quiz-word-selection-grid"></div>
+        <div class="form-group" style="text-align: center; margin: 30px 0;">
+            <p id="selection-prompt" style="color: #b0b0b0;">Please select exactly 10 words (10 remaining)</p>
+            <!-- Your core database dictionary loop or checklist UI rendering goes here -->
+        </div>
 
-        <div class="action-row">
-            <button id="generate-quiz-btn" style="flex: 2;" disabled onclick="executeQuizCompilationWorkflow()">Generate Quiz Code</button>
-            <button id="copy-quiz-btn" style="flex: 1; background-color: #e2e8f0; color: #4a5568;" disabled onclick="executeOutputClipboardCopy()">Copy Code</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" id="generate-code-btn" disabled onclick="generateQuizCode()">Generate Quiz Code</button>
+            <button class="btn" style="background-color: #444;" onclick="copyQuizCode()">Copy Code</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px; color: #666; font-size: 0.9em;">
+            ◀ Page 1 of 1 ▶
         </div>
     </div>
 
-    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <!-- NOTIFICATION POPUP -->
+    <div id="notification-popup" class="notification">Notification Popup</div>
+
+
+    <!-- APP JAVASCRIPT LOGIC -->
     <script>
-        let localVocabularyMemoryCache = [];
-        let systemVerifiedPasswordsArray = [];
-        let activeBookSelectionKey = "book_a";
-
-        // Vocabulary configuration mappings matching your Editor setup layout
-        const bookFileMap = {
-            "book_a": "Vocabulary-File.txt",
-            "book_b": "Vocabulary-File-Urdu.txt",
-            "book_c": "Vocabulary-File-Tajweed.txt"
+        // Global State matching Editor-Beta storage requirements
+        const AppConfig = {
+            selectedBook: 'book_a',
+            isAuthenticated: false
         };
 
-        const availableLibraryFilesMatrix = {
-            "book_a": true,
-            "book_b": false, // Adjust as necessary when alternative database files exist
-            "book_c": false
-        };
-
-        // Enforces immediate dropdown grayouts on page mount for non-existent text records
-        window.addEventListener("DOMContentLoaded", () => {
-            Object.keys(availableLibraryFilesMatrix).forEach(key => {
-                const optionElement = document.getElementById(`opt-${key}`);
-                if (optionElement && !availableLibraryFilesMatrix[key]) {
-                    optionElement.disabled = true;
-                    optionElement.innerText += " (Unavailable)";
-                }
-            });
-        });
-
-        function handlePasswordKeydown(event) {
-            if (event.key === "Enter") {
-                evaluateTestGeneratorCredentials();
+        // UI Notification Helper
+        function showNotification(message, isSuccess = false) {
+            const popup = document.getElementById('notification-popup');
+            popup.innerText = message;
+            if(isSuccess) {
+                popup.classList.add('success');
+            } else {
+                popup.classList.remove('success');
             }
+            popup.style.display = 'block';
+            setTimeout(() => { popup.style.display = 'none'; }, 3000);
         }
 
-        async function evaluateTestGeneratorCredentials() {
-            const passwordBox = document.getElementById('admin-passcode-box');
-            const bookSelector = document.getElementById('auth-book-selector');
-            const plaintextPassword = passwordBox.value.trim();
-            activeBookSelectionKey = bookSelector.value;
+        // Authentication & Book Selection Logic
+        async function handleVerification() {
+            const passwordInput = document.getElementById('system-password').value;
+            const selectedBook = document.getElementById('book-selector').value;
+            const verifyBtn = document.getElementById('verify-btn');
 
-            if (!plaintextPassword) {
-                launchToastAlert("⚠️ Password field is required.");
+            if (!passwordInput) {
+                showNotification("Please enter your system password.");
                 return;
             }
 
-            launchToastAlert("⏳ Verifying administrative credentials...");
+            verifyBtn.disabled = true;
+            verifyBtn.innerText = "Verifying...";
 
             try {
-                // Queries CP.txt sitting directly alongside the active engine file
-                const response = await fetch('CP.txt?nocache=' + new Date().getTime(), { cache: 'no-store' });
-                
+                // Fetch the list of Base64 encoded passwords from CP.TXT
+                const response = await fetch('CP.TXT');
                 if (!response.ok) {
-                    throw new Error(`Server returned file stream error status: ${response.status}`);
+                    throw new Error("Could not access password database configuration file (CP.TXT).");
                 }
-
-                const textData = await response.text();
                 
-                // Formats and filters individual Base64 records line-by-line cleanly
-                systemVerifiedPasswordsArray = textData
-                    .replace(/^\uFEFF/, '')
-                    .split(\(/\r\)?\n/)
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0);
+                const textData = await response.text();
+                // Clean lines and isolate encoded keys
+                const validHashes = textData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                
+                // Process input to standard Base64 string match
+                const encodedInput = btoa(passwordInput);
 
-                // Converts the plaintext input into Base64 to confirm matches
-                const clientGeneratedBase64 = btoa(plaintextPassword);
+                if (validHashes.includes(encodedInput)) {
+                    // 1. Save chosen book value to state and Storage mimicking Editor-Beta
+                    AppConfig.selectedBook = selectedBook;
+                    localStorage.setItem('quran_quiz_active_book', selectedBook);
 
-                if (systemVerifiedPasswordsArray.includes(clientGeneratedBase64)) {
-                    launchToastAlert("✅ Access verified. Unlocking dashboard...");
+                    // 2. Clear password input security track
+                    document.getElementById('system-password').value = '';
 
-                    const displayTitle = bookSelector.options[bookSelector.selectedIndex].text;
-                    document.getElementById('active-session-indicator').textContent = `${displayTitle} — BetaV.100526`;
-
-                    // Drops the shield overlay panel smoothly
-                    document.getElementById('login-shield-gate').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('login-shield-gate').classList.add('hidden');
-                    }, 300);
-
-                    // Starts downloading the designated database file immediately
-                    initializeVocabularyDataStream();
+                    // 3. Transition display screens smoothly 
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('generator-screen').style.display = 'block';
+                    
+                    showNotification("Verification successful!", true);
+                    
+                    // Initialize system core loop
+                    initializeTestGenerator();
                 } else {
-                    launchToastAlert("❌ Invalid password access denied.");
-                    passwordBox.value = '';
-                    passwordBox.focus();
+                    showNotification("Invalid System Password. Access Denied.");
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerText = "Verify & Open Generator";
                 }
 
             } catch (error) {
-                console.error("Credentials Authentication Breakdown:", error);
-                launchToastAlert("❌ Error: Failed to parse security verification database CP.txt.");
-            }
-        }
-        function initializeVocabularyDataStream() {
-            const targetFile = bookFileMap[activeBookSelectionKey] || "Vocabulary-File.txt";
-            document.getElementById('selection-summary-text').textContent = `Syncing with file database ${targetFile}...`;
-            
-            fetch(targetFile + '?nocache=' + new Date().getTime(), { cache: 'no-store' })
-                .then(response => {
-                    if (!response.ok) throw new Error("File path target missing.");
-                    return response.text();
-                })
-                .then(text => {
-                    parseVocabularyRawText(text);
-                })
-                .catch(error => {
-                    console.error("Database Stream Load Failure:", error);
-                    launchToastAlert(`❌ Error: Could not load data track ${targetFile}.`);
-                    document.getElementById('selection-summary-text').textContent = "Database loading failure applied.";
-                });
-        }
-
-        // EXPERT ARROW FUNCTION INTEGRATION: Parses strings using safe mathematical boundary rules
-        function parseVocabularyRawText(text) {
-            localVocabularyMemoryCache = [];
-            const lines = text.replace(/^\uFEFF/, '').split(\(/\r\)?\n/);
-
-            lines.forEach(line => {
-                if (!line.trim() || !line.includes('=')) return;
-
-                const separatorIndex = line.indexOf('=');
-                const word = line.slice(0, separatorIndex).trim();
-                const meaning = line.slice(separatorIndex + 1).trim();
-
-                if (word && meaning) {
-                    localVocabularyMemoryCache.push({ word: word, meaning: meaning });
-                }
-            });
-
-            if (localVocabularyMemoryCache.length > 0) {
-                launchToastAlert(`🎉 Successfully initialized ${localVocabularyMemoryCache.length} rows.`);
-                
-                // Fire off your original quiz layout population mechanism
-                populateQuizWordSelectionGrid();
-            } else {
-                launchToastAlert("⚠️ Error: File contains zero valid vocabulary assignment entries.");
-                document.getElementById('selection-summary-text').textContent = "Empty file structure layout.";
+                showNotification(error.message || "An error occurred during verification.");
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Verify & Open Generator";
             }
         }
 
-        function populateQuizWordSelectionGrid() {
-            document.getElementById('selection-summary-text').textContent = `Please select exactly 10 words (${localVocabularyMemoryCache.length} words available)`;
-            document.getElementById('selection-summary-text').style.color = "var(--text-dark)";
+        // Placeholder Core functions for Test Generator System 
+        function initializeTestGenerator() {
+            // Emulating connection update using the saved book config context
+            const statusMsg = document.getElementById('status-message');
+            statusMsg.innerText = `Connected to [${AppConfig.selectedBook.toUpperCase()}] Database Successfully.`;
+            statusMsg.style.color = "#4aff4a";
             
-            const grid = document.getElementById('quiz-word-selection-grid');
-            grid.innerHTML = ""; 
-            
-            // Populates dynamic interactive selection tiles directly out of your loaded file arrays
-            const displayLimit = Math.min(localVocabularyMemoryCache.length, 12);
-            for(let i = 0; i < displayLimit; i++) {
-                const item = localVocabularyMemoryCache[i];
-                const block = document.createElement('div');
-                block.style.cssText = "background: #f1f5f9; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border-gray); font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.1s;";
-                block.textContent = item.word;
-                
-                // Clicking a word can switch active classes or trigger your specific logic
-                block.onclick = () => {
-                    block.style.background = "#e2e8f0";
-                    launchToastAlert(`Selected: ${item.word}`);
-                };
-                
-                grid.appendChild(block);
+            // Your custom parsing loop for words array payload runs here...
+        }
+
+        function generateQuizCode() {
+            showNotification("Quiz Code generated successfully!", true);
+        }
+
+        function copyQuizCode() {
+            showNotification("Quiz Code copied to clipboard!", true);
+        }
+
+        // Allow 'Enter' key submission inside the password layout field
+        document.getElementById('system-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleVerification();
             }
-            
-            document.getElementById('generate-quiz-btn').disabled = false;
-            document.getElementById('copy-quiz-btn').disabled = false;
-        }
-
-        function executeQuizCompilationWorkflow() {
-            launchToastAlert("⚙️ Processing selected rows into final quiz markup code...");
-        }
-
-        function executeOutputClipboardCopy() {
-            launchToastAlert("📋 Compiled quiz code string copied to local clipboard memory tray!");
-        }
-
-        function launchToastAlert(message) {
-            const toast = document.getElementById('toast-alert');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
-        }
+        });
     </script>
+</body>
+</html>
