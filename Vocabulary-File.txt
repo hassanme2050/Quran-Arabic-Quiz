@@ -1,5 +1,5 @@
 هَٰذَا = This
-ذَٰلِكَ = That
+ذَٰلِكَ = That (Masculine)
 هَٰذِهِ = This
 تِلْكَ = That (Feminine)
 هَٰؤُلَاءِ = These
