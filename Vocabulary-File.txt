@@ -1,4 +1,4 @@
-هَٰذَا = ThisA
+هَٰذَا = This
 ذَٰلِكَ = That
 هَٰذِهِ = This
 تِلْكَ = That (Feminine)
