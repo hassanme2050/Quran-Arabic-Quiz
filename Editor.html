@@ -15,8 +15,6 @@
             --button-gold-hover: #e5ab4f;
             --button-gold-active: #b5802e;
             --input-focus-blue: #4299e1;
-            --danger-red: #e53e3e;
-            --success-green: #38a169;
             --disabled-gray: #edf2f7;
         }
 
@@ -51,6 +49,7 @@
             font-size: 28px;
             font-weight: bold;
             letter-spacing: -0.5px;
+            text-align: center;
         }
 
         .subtitle {
@@ -58,6 +57,7 @@
             font-size: 14px;
             margin-bottom: 30px;
             font-weight: 500;
+            text-align: center;
         }
 
         .auth-gate-overlay {
@@ -81,7 +81,7 @@
             border: 1px solid var(--border-gray);
             border-radius: 12px;
             padding: 40px 30px;
-            max-width: 420px;
+            max-width: 440px;
             width: 100%;
             text-align: center;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
@@ -138,7 +138,6 @@
             font-size: 15px;
             font-weight: 600;
             outline: none;
-            margin-bottom: 25px;
             cursor: pointer;
             box-sizing: border-box;
         }
@@ -148,18 +147,41 @@
             background: #f7fafc;
         }
 
+        /* Grouped Navigation Layout Segment matching Specification #2 */
         .lookup-control-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 30px;
-            align-items: center;
+            align-items: flex-end;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-gray);
+        }
+
+        .control-input-block {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .index-numeric-input {
-            width: 100px;
+            width: 100%;
             text-align: center;
             font-size: 16px;
             font-weight: bold;
+            height: 48px;
+        }
+
+        .nav-btn-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-btn {
+            height: 48px;
+            padding: 0 16px;
+            font-size: 16px;
         }
 
         .workspace-editing-panel {
@@ -167,7 +189,7 @@
             padding-top: 30px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
             text-align: left;
         }
 
@@ -180,19 +202,24 @@
             margin-bottom: 8px;
         }
 
+        /* Maximized Arabic Font parameters matching Specification #3 */
         .large-arabic-input {
             font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
-            font-size: 36px;
+            font-size: 72px; /* ~3x larger than previous baseline */
             font-weight: bold;
             color: #0c4d4d;
             text-align: right;
             direction: rtl;
+            padding: 10px 20px;
+            height: auto;
+            line-height: 1.3;
         }
 
         .large-meaning-input {
             font-size: 20px;
             font-weight: 600;
             color: #2c3e50;
+            height: 54px;
         }
 
         button {
@@ -205,6 +232,9 @@
             cursor: pointer;
             font-weight: bold;
             transition: background-color 0.15s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover:not(:disabled) {
@@ -243,12 +273,17 @@
     </style>
 </head>
 <body>
-    <!-- Dual-Authentication Admin Access Overlay Shield -->
+    <!-- Verification Lock Overlay Shield containing Book Selector matching Specification #1 -->
     <div class="auth-gate-overlay" id="login-shield-gate">
         <div class="auth-card">
             <h2>Admin Verification</h2>
-            <p>Enter your system password and fresh GitHub Classic Token to access live modifications securely.</p>
+            <p>Select library book profile and enter system credentials to begin editing database rows.</p>
             <div class="password-input-wrapper">
+                <select class="custom-select-menu" id="auth-book-selector">
+                    <option value="book_a" selected>Book A - Arabic to English</option>
+                    <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                    <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+                </select>
                 <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password">
                 <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)">
                 <button onclick="evaluateAdministrativeCredentials()">Verify & Open Editor</button>
@@ -256,28 +291,29 @@
         </div>
     </div>
 
-    <!-- Interface Panel -->
+    <!-- Active Working Workspace Document Container Panel -->
     <div class="editor-wrapper">
         <h1>Word Editor</h1>
-        <div class="subtitle">Vocabulary Database Modification Console — BetaV.100526</div>
+        <div class="subtitle" id="active-session-indicator">Vocabulary Database Modification Console — BetaV.100526</div>
 
-        <select class="custom-select-menu" id="editor-book-selector">
-            <option value="book_a" selected>Book A - Arabic to English</option>
-            <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
-            <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
-        </select>
-
+        <!-- Integrated Grouped Custom Selection Row Panel matching Specification #2 -->
         <div class="lookup-control-row">
-            <div style="flex: 1; text-align: left;">
+            <div class="control-input-block">
                 <div class="field-label-header">Target Word Number</div>
                 <input type="number" class="admin-text-field index-numeric-input" id="word-target-index" value="1" min="1" disabled>
             </div>
-            <button id="lookup-go-btn" style="margin-top: 20px;" onclick="loadTargetInventoryRecord()" disabled>GO</button>
+            <div class="nav-btn-group">
+                <button id="lookup-prev-btn" class="nav-btn" style="background-color: #cbd5e1; color: #334155;" onclick="offsetTargetWordNumber(-1)" disabled>◀ Prev</button>
+                <button id="lookup-go-btn" class="nav-btn" onclick="loadTargetInventoryRecord()" disabled>GO</button>
+                <button id="lookup-next-btn" class="nav-btn" style="background-color: #cbd5e1; color: #334155;" onclick="offsetTargetWordNumber(1)" disabled>Next ▶</button>
+            </div>
         </div>
 
+        <!-- Working Workspace Input Management Frame Container -->
         <div class="workspace-editing-panel">
             <div>
-                <div class="field-label-header">Arabic Vocabulary Phrase</div>
+                <!-- Relabeled descriptive caption matching Specification #3 -->
+                <div class="field-label-header">Arabic Vocabulary Word</div>
                 <input type="text" class="admin-text-field large-arabic-input" id="edit-arabic-field" placeholder="—" disabled>
             </div>
             
@@ -297,19 +333,28 @@
         // ==========================================
         const GITHUB_USER = "hassanme2050"; 
         const GITHUB_REPO = "Quran-Arabic-Quiz";
-        const GITHUB_FILE = "Vocabulary-File.txt";
         const GITHUB_BRANCH = "main"; 
         // ==========================================
 
-        let GITHUB_TOKEN = ""; // Captured safely from user inputs during login steps
+        let GITHUB_FILE = "Vocabulary-File.txt"; // Altered dynamically via select input menu
+        let GITHUB_TOKEN = ""; 
         let localVocabularyMemoryCache = []; 
+
+        // Dynamic book tracking matrix template assignment loop matching Specification #1
+        const bookFileMap = {
+            "book_a": "Vocabulary-File.txt",
+            "book_b": "Vocabulary-File-Urdu.txt",
+            "book_c": "Vocabulary-File-Tajweed.txt"
+        };
 
         function evaluateAdministrativeCredentials() {
             const passwordBox = document.getElementById('admin-passcode-box');
             const tokenBox = document.getElementById('admin-token-box');
+            const bookSelector = document.getElementById('auth-book-selector');
             
             const plaintextPassword = passwordBox.value.trim();
             const inputToken = tokenBox.value.trim();
+            const selectedBookKey = bookSelector.value;
 
             if (!plaintextPassword || !inputToken) {
                 launchToastAlert("⚠️ Both password and GitHub token fields are required.");
@@ -320,8 +365,14 @@
             const verifiedPayloadOptions = ["QWxsYWg=", "U2VjcmV0", "QWRtaW4="];
 
             if (verifiedPayloadOptions.includes(clientGeneratedBase64)) {
-                // Store input token dynamically into memory space
                 GITHUB_TOKEN = inputToken;
+                
+                // Maps the active database target filename matching selection settings
+                GITHUB_FILE = bookFileMap[selectedBookKey] || "Vocabulary-File.txt";
+
+                // Cleanly updates header layout text strings
+                const displayTitle = bookSelector.options[bookSelector.selectedIndex].text;
+                document.getElementById('active-session-indicator').textContent = `${displayTitle} — BetaV.100526`;
 
                 document.getElementById('login-shield-gate').style.opacity = '0';
                 setTimeout(() => {
@@ -347,7 +398,7 @@
                 })
                 .catch(error => {
                     console.error(error);
-                    launchToastAlert("⚠️ Failed to load raw vocabulary records repository.");
+                    launchToastAlert(`⚠️ Failed to load repository file: ${GITHUB_FILE}`);
                 });
         }
 
@@ -370,13 +421,27 @@
                 document.getElementById('word-target-index').disabled = false;
                 document.getElementById('word-target-index').max = localVocabularyMemoryCache.length;
                 document.getElementById('lookup-go-btn').disabled = false;
+                document.getElementById('lookup-prev-btn').disabled = false;
+                document.getElementById('lookup-next-btn').disabled = false;
                 
-                launchToastAlert("✅ Loaded " + localVocabularyMemoryCache.length + " total rows successfully.");
+                launchToastAlert("✅ Loaded vocabulary rows successfully.");
                 loadTargetInventoryRecord();
             } else {
-                launchToastAlert("⚠️ Target data repository file appears empty.");
+                launchToastAlert("⚠️ Target repository file layout appears empty.");
             }
         }
+        // Sequential index offset handler engine matching Specification #2
+        function offsetTargetWordNumber(offsetAmount) {
+            const targetInput = document.getElementById('word-target-index');
+            let indexValue = (parseInt(targetInput.value, 10) || 1) + offsetAmount;
+            
+            if (indexValue < 1) indexValue = 1;
+            if (indexValue > localVocabularyMemoryCache.length) indexValue = localVocabularyMemoryCache.length;
+            
+            targetInput.value = indexValue;
+            loadTargetInventoryRecord();
+        }
+
         function loadTargetInventoryRecord() {
             const targetInput = document.getElementById('word-target-index');
             let indexPointer = parseInt(targetInput.value, 10) || 1;
@@ -421,10 +486,10 @@
             saveBtn.disabled = true;
             launchToastAlert("⏳ Saving changes to GitHub...");
 
-            const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+            const apiUrl = `https://github.com{GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
 
             try {
-                // 1. Get the latest file and its SHA
+                // 1. Get the latest file state and its structural SHA identity signature hash
                 const getResponse = await fetch(
                     `${apiUrl}?ref=${encodeURIComponent(GITHUB_BRANCH)}`,
                     {
@@ -444,22 +509,19 @@
 
                 const fileMeta = await getResponse.json();
 
-                // Decode file content while preserving Arabic characters cleanly
+                // Decode remote payload file content while maintaining clean structural Arabic diacritics
                 const binary = atob(fileMeta.content.replace(/\s/g, ''));
                 const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
                 const rawContentText = new TextDecoder().decode(bytes);
                 const lines = rawContentText.split('\n');
 
-                // Find the requested vocabulary entry
                 let validRowCounter = 0;
                 let targetLineIndex = -1;
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i];
-
                     if (line && line.trim() && line.includes('=')) {
                         validRowCounter++;
-
                         if (validRowCounter === indexPointer) {
                             targetLineIndex = i;
                             break;
@@ -471,18 +533,17 @@
                     throw new Error(`Word number ${indexPointer} was not found.`);
                 }
 
-                // Replace only the selected entry
+                // Rewrite specific targeted data item matching dictionary indices
                 lines[targetLineIndex] = `${updatedWord} = ${updatedMeaning}`;
-
                 const newContent = lines.join('\n');
 
-                // Encode the complete file as UTF-8 Base64
+                // Encodes new file sequence strings back into unified Base64 formatting layouts
                 const encodedContent = btoa(
                     Array.from(new TextEncoder().encode(newContent),
                         byte => String.fromCharCode(byte)).join('')
                 );
 
-                // 2. Save the updated file to the main branch
+                // 2. Commit transaction updates straight up to your active repository branch 
                 const putResponse = await fetch(apiUrl, {
                     method: 'PUT',
                     headers: {
@@ -504,7 +565,6 @@
                     throw new Error(error.message || `GitHub save failed (${putResponse.status}).`);
                 }
 
-                // Update the editor's local cache after GitHub confirms success
                 localVocabularyMemoryCache[indexPointer - 1] = {
                     word: updatedWord,
                     meaning: updatedMeaning
