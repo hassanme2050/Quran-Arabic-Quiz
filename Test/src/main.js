@@ -1,7 +1,16 @@
 import { state } from './state.js';
 import { showToast } from './utils.js';
 import { decodeTeacherQuizCode, loadVocabulary, parseVocabulary, switchView } from './vocabulary.js';
-import { updateSegmentSelection, triggerSelectedSession, startSession, showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression, exitToHome, showQuizQuestion, evaluateQuizAnswer } from './quiz.js';
+import {
+    updateSegmentSelection,
+    triggerSelectedSession,
+    handleEyeToggleIntercept,
+    handleFlashCardBodyClick,
+    handleCardProgression,
+    showQuizQuestion,
+    validateLiveCustomBounds,
+    exitToHome,
+} from './quiz.js';
 
 function clearQuizCodeError() {
     const errorBox = document.getElementById('quiz-code-error');
@@ -101,26 +110,9 @@ function bindGlobalEvents() {
     });
 }
 
-function validateLiveCustomBounds() {
-    if (state.vocabularyList.length === 0) return;
-    const startInp = document.getElementById('range-input-start');
-    const endInp = document.getElementById('range-input-end');
-    const startVal = parseInt(startInp.value, 10);
-    const endVal = parseInt(endInp.value, 10);
-
-    if (Number.isNaN(startVal) || startVal < 1) {
-        startInp.value = 1;
-        showToast('⚠️ Range must start at 1. Corrected automatically!');
-        return;
-    }
-
-    if (Number.isNaN(endVal) || endVal > state.vocabularyList.length) {
-        endInp.value = state.vocabularyList.length;
-        showToast('⚠️ Range cannot exceed ' + state.vocabularyList.length + ' words. Corrected automatically!');
-    }
-}
-
 export function initApp() {
     bindGlobalEvents();
     loadVocabulary();
 }
+
+initApp();
