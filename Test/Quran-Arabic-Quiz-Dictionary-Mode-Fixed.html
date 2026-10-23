@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz</title>
+    <!-- Library required to screenshot only the targeted scorecard component -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root {
+            --primary-teal: #0c4d4d;
+            --button-gold: #d49a3b;
+            --button-gold-hover: #e5ab4f;
+            --button-gold-active: #b5802e;
+            --exit-btn-color: rgba(255, 255, 255, 0.12);
+            --exit-btn-hover: rgba(255, 255, 255, 0.2);
+            --counter-teal: #a2cbcb;
+            --white: #ffffff;
+            --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
+            --disabled-gray: rgba(255, 255, 255, 0.15);
+            --disabled-text: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #073636 0%, #0d5454 50%, #083c3c 100%);
+            color: var(--white);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--button-gold);
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .status-banner {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #b3dfdf;
+            margin-bottom: 30px;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: 500;
+        }
+
+        .menu-action-layout, .quiz-options, .navigation-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 25px;
+        }
+
+        .segmented-slider-container {
+            display: flex;
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 4px;
+            border-radius: 12px;
+            margin: 25px auto 15px auto;
+            max-width: 480px;
+            user-select: none;
+        }
+
+        .segment-option {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--counter-teal);
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.25s ease;
+        }
+
+        .segment-option.active {
+            color: #1a1002;
+        }
+
+        .slider-pill {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(33.333% - 4px);
+            height: calc(100% - 8px);
+            background: var(--button-gold);
+            border-radius: 9px;
+            z-index: 1;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .range-drawer-panel {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            padding: 0 15px;
+            max-width: 480px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .range-drawer-panel.open {
+            max-height: 120px;
+            opacity: 1;
+            margin-top: 15px;
+            border-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+        }
+
+        .range-flex-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: bold;
+            color: var(--counter-teal);
+        }
+
+        .range-flex-row input {
+            width: 85px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px;
+            color: #ffffff;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .range-flex-row input:focus {
+            border-color: var(--button-gold);
+        }
+
+        .custom-input-field-group {
+            display: flex;
+            gap: 10px;
+            max-width: 480px;
+            margin: 15px auto 0 auto;
+            width: 100%;
+        }
+
+        .custom-text-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--white);
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .custom-text-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-text-input:disabled {
+            background: var(--disabled-gray);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            border-color: transparent;
+        }
+
+        .custom-select-menu {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            margin: 25px auto 5px auto;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .custom-select-menu option {
+            background: #073636;
+            color: var(--white);
+        }
+
+        .custom-select-menu option:disabled {
+            color: rgba(255, 255, 255, 0.25);
+            background: #052626;
+        }
+
+        button {
+            background-color: var(--button-gold);
+            color: #1a1002;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--button-gold-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--gold-glow), 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        button:active:not(:disabled) {
+            background-color: var(--button-gold-active);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: var(--disabled-gray);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        button.exit-btn {
+            background-color: var(--exit-btn-color);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+        }
+
+        button.exit-btn:hover {
+            background-color: var(--exit-btn-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        .display-card-frame {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 35px 25px;
+            margin: 25px 0;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #1e2d2d;
+            border: 3px solid var(--button-gold);
+            box-shadow: var(--gold-glow), 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card-eye-toggle-overlay {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            transition: color 0.2s, transform 0.1s;
+            z-index: 10;
+        }
+
+        .card-eye-toggle-overlay:hover {
+            color: #0c4d4d;
+            transform: scale(1.1);
+        }
+
+        .card-eye-toggle-overlay.visible-state {
+            color: var(--button-gold);
+        }
+
+        .card-eye-toggle-overlay .eye-slash-path {
+            display: block;
+        }
+        .card-eye-toggle-overlay.visible-state .eye-slash-path {
+            display: none;
+        }
+
+        .counter-label-text {
+            font-size: 13px;
+            color: var(--counter-teal);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .arabic-text-render {
+            font-size: 64px;
+            font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #0c4d4d;
+        }
+
+        .meaning-text-render {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 10px;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 20px;
+            width: 100%;
+        }
+
+        .quiz-options button {
+            background-color: #ffffff;
+            color: #1e2d2d;
+            text-align: center;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .quiz-options button:hover {
+            background-color: #ffffff;
+            border-color: var(--button-gold);
+            transform: translateY(-3px);
+            box-shadow: var(--gold-glow), 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .quiz-options button.correct-choice {
+            background-color: #10b981 !important;
+            color: white !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .quiz-options button.wrong-choice {
+            background-color: #ef4444 !important;
+            color: white !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+        }
+
+        #screenshot-target-scorecard {
+            background: #ffffff;
+            color: #073636;
+            padding: 35px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 3px solid var(--button-gold);
+            box-shadow: var(--gold-glow), 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .summary-metric-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #0d5454;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            border: 4px solid var(--button-gold);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .summary-score-big {
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .summary-percent-small {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 1px;
+            font-weight: 600;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            color: #1e2d2d;
+            border-radius: 10px;
+            overflow: hidden;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .summary-table th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        .large-bold-cell {
+            font-size: 22px;
+            font-weight: bold;
+            font-style: normal !important;
+        }
+        
+        .large-arabic-cell {
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            color: #0d5454;
+        }
+
+        .small-choice-cell {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .classic-indicator-pass {
+            font-size: 24px; 
+            font-weight: bold;
+            color: #10b981;
+            font-style: normal !important;
+            display: inline-block;
+        }
+
+        .classic-indicator-fail {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ef4444;
+            font-style: normal !important;
+            display: inline-block;
+        }
+
+        .hidden { display: none !important; }
+        
+        .toast-popup {
+            position: fixed;
+            bottom: 30px;
+            background: var(--button-gold);
+            color: #1a1002;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 2500;
+            box-shadow: var(--gold-glow), 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .toast-popup.show { opacity: 1; }
+
+        /* Dictionary Mode */
+        #dictionary-view { text-align: left; }
+        .dictionary-toolbar { display:flex; gap:8px; margin: 18px 0 12px; }
+        .dictionary-toolbar select { margin:0; max-width:none; flex:1; min-width:0; }
+        .dictionary-list { background:#fff; color:#1e2d2d; border-radius:14px; height:min(65vh,680px); min-height:300px; overflow-y:auto; overflow-x:hidden; padding:8px 12px; box-sizing:border-box; scrollbar-width:none; -ms-overflow-style:none; }
+        .dictionary-list::-webkit-scrollbar { display:none; }
+        .dictionary-entry { display:grid; grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr); align-items:center; gap:5px; min-height:48px; padding:5px 4px; box-sizing:border-box; border:0; }
+        .dictionary-meaning { grid-column:1; text-align:right; direction:ltr; font-size:17px; color:#263746; overflow-wrap:anywhere; }
+        .dictionary-separator { grid-column:2; text-align:center; color:var(--button-gold); font-weight:bold; }
+        .dictionary-word { grid-column:3; text-align:left; direction:rtl; font-family:'Traditional Arabic','Amiri',Georgia,serif; font-size:29px; color:#0c4d4d; overflow-wrap:anywhere; }
+        .dictionary-ten-divider { position:relative; display:flex; align-items:center; justify-content:center; height:20px; margin:2px 0; color:#718181; font-size:11px; font-weight:400; }
+        .dictionary-ten-divider:before { content:''; position:absolute; left:0; right:0; top:50%; border-top:1px solid #e3e8e8; }
+        .dictionary-ten-divider span { position:relative; background:#fff; padding:0 8px; }
+        .dictionary-jump { display:flex; gap:3px; overflow-x:auto; padding:7px 2px; margin:0 0 7px; scrollbar-width:none; }
+        .dictionary-jump::-webkit-scrollbar { display:none; }
+        .dictionary-jump button { flex:0 0 auto; padding:7px 10px; font-size:14px; border-radius:8px; box-shadow:none; }
+        .dictionary-jump button.active { background:#0c4d4d; color:#fff; }
+        .dictionary-status { text-align:center; color:#b3dfdf; font-size:13px; margin:10px 0; }
+        @media(max-width:420px) { .dictionary-list { padding:6px 8px; } .dictionary-entry { grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr); gap:3px; } .dictionary-meaning { font-size:15px; } .dictionary-word { font-size:27px; } }
+
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <h1 id="app-title">Quran Arabic Quiz</h1>
+        
+        <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
+
+        <!-- Dashboard View Framework Layout -->
+        <div id="menu-view" class="hidden">
+            <div class="segmented-slider-container">
+                <div class="slider-pill" id="active-slider-pill"></div>
+                <div class="segment-option active" id="opt-all" onclick="updateSegmentSelection('all')">All Words</div>
+                <div class="segment-option" id="opt-last" onclick="updateSegmentSelection('last')">Last 10 Words</div>
+                <div class="segment-option" id="opt-custom" onclick="updateSegmentSelection('custom')">Custom Range</div>
+            </div>
+
+            <div class="range-drawer-panel" id="range-drawer-box">
+                <div class="range-flex-row">
+                    <span>From</span>
+                    <input type="number" id="range-input-start" value="1" min="1" onchange="validateLiveCustomBounds(this, 'start')">
+                    <span>To</span>
+                    <input type="number" id="range-input-end" value="10" min="1" onchange="validateLiveCustomBounds(this, 'end')">
+                </div>
+            </div>
+
+            <div class="menu-action-layout">
+                <button onclick="triggerSelectedSession('flashcard')">Review Mode</button>
+                <button onclick="triggerSelectedSession('quiz')">Quiz Mode</button>
+                <button onclick="openDictionaryMode()">Dictionary Mode</button>
+            </div>
+
+            <!-- Book Selection Dropdown element positioned under Quiz Mode -->
+            <select class="custom-select-menu" id="vocabulary-book-selector">
+                <option value="book_a" selected>Book A - Arabic to English</option>
+                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+            </select>
+
+            <!-- Student quiz-code entry -->
+            <div class="custom-input-field-group">
+                <input type="text" class="custom-text-input" id="quiz-code-field" placeholder="I have a quiz code" aria-label="Enter quiz code" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <button id="quiz-code-btn" style="padding: 14px 22px;" type="button" onclick="startQuizWithCode()">GO</button>
+            </div>
+            <div id="quiz-code-error" class="quiz-code-error hidden" role="alert" aria-live="polite"></div>
+        </div>
+
+        <!-- Flashcard Session Module Display Box Container -->
+        <div id="flashcard-view" class="hidden">
+            <div class="counter-label-text" id="card-counter"></div>
+            <div class="display-card-frame" id="review-card-frame" onclick="handleFlashCardBodyClick()">
+                <div class="card-eye-toggle-overlay" id="card-eye-toggle" onclick="handleEyeToggleIntercept(event)" title="Show Meaning Permanently">
+                    <svg xmlns="http://w3.org" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <line class="eye-slash-path" x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2.5"></line>
+                    </svg>
+                </div>
+                <div class="arabic-text-render" id="card-arabic-field">-</div>
+                <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
+            </div>
+            <div class="navigation-buttons">
+                <button id="card-action-btn" onclick="handleCardProgression()">Show Meaning</button>
+                <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <div id="quiz-view" class="hidden">
+            <div class="counter-label-text" id="quiz-counter"></div>
+            <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
+                <div class="arabic-text-render" id="quiz-arabic-field">-</div>
+            </div>
+            <div class="quiz-options" id="quiz-options-box"></div>
+            <div class="navigation-buttons" style="margin-top: 20px;">
+                <button class="exit-btn" onclick="exitToHome()">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <!-- Reordered Quiz Summary Screen Layout Panels -->
+        <div id="quiz-finished-view" class="hidden">
+            <div id="screenshot-target-scorecard">
+                <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
+                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
+                <div class="summary-metric-circle">
+                    <div class="summary-score-big" id="score-text-value">0/10</div>
+                    <div class="summary-percent-small" id="percent-text-value">0%</div>
+                </div>
+            </div>
+            
+            <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" onclick="toggleSummaryTableVisibility()">📊 Show Performance Summary</button>
+            <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
+
+            <div class="navigation-buttons">
+                <button onclick="copyScreenshotToClipboard()">📋 Copy Screenshot to Clipboard</button>
+                <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+        </div>
+
+        <div id="review-finished-view" class="hidden">
+            <div class="display-card-frame" style="cursor: default;">
+                <h2 style="margin-top:0; color: #0c4d4d; font-weight: bold;">Session Finished!</h2>
+                <p style="margin: 0; color: #334155; font-size: 16px; font-weight: 500;">Excellent job completing your vocabulary review.</p>
+            </div>
+            <div class="navigation-buttons">
+                <button class="exit-btn" onclick="exitToHome()">🏠 Go to Home</button>
+            </div>
+        </div>
+    </div>
+
+
+        <div id="dictionary-view" class="hidden">
+            <div class="dictionary-toolbar">
+                <select class="custom-select-menu" id="dictionary-sort" aria-label="Sort dictionary" onchange="renderDictionary()">
+                    <option value="original">Original word order</option>
+                    <option value="english">English Alphabet</option>
+                    <option value="arabic">Arabic Alphabet</option>
+                </select>
+            </div>
+            <div class="dictionary-jump" id="dictionary-jump" aria-label="Quick jump by letter"></div>
+            <div class="dictionary-list" id="dictionary-list"></div>
+            <div class="dictionary-status" id="dictionary-status">Original word order</div>
+            <div class="navigation-buttons" style="margin-top:12px;">
+                <button class="exit-btn" onclick="exitToHome()">Go to Home</button>
+            </div>
+        </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <script>
+        let vocabularyList = [];
+        let currentPool = [];
+        let sessionWords = [];
+        let currentIndex = 0;
+        let isMeaningVisible = false;
+        let currentMode = 'flashcard'; 
+        let quizHistory = [];
+        let activeStrategySetting = 'all'; 
+        let globalPersistentEyeToggleStatus = false;
+        let dictionaryEntries = [];
+        let dictionaryJumpLetters = [];
+
+        // Quiz codes are generated by Test-Generator.html:
+        // sort 10 question numbers, pad each to 3 digits, concatenate, then convert to HEX.
+        // Decode the same format here so teachers can create new codes without editing this file.
+        function decodeTeacherQuizCode(code) {
+            if (!/^[0-9A-F]+$/i.test(code)) return null;
+            try {
+                const decimalSequence = BigInt('0x' + code).toString(10).padStart(30, '0');
+                if (decimalSequence.length !== 30) return null;
+                const questionNumbers = [];
+                for (let i = 0; i < 30; i += 3) {
+                    const number = Number(decimalSequence.slice(i, i + 3));
+                    if (!Number.isInteger(number) || number < 1) return null;
+                    questionNumbers.push(number);
+                }
+                if (questionNumbers.length !== 10 || new Set(questionNumbers).size !== 10) return null;
+                return questionNumbers;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        window.onload = function() {
+            const quizCodeInput = document.getElementById('quiz-code-field');
+            const quizCodeButton = document.getElementById('quiz-code-btn');
+            quizCodeButton.disabled = false;
+            quizCodeInput.disabled = false;
+            quizCodeInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') startQuizWithCode();
+            });
+            quizCodeInput.addEventListener('input', clearQuizCodeError);
+
+
+            fetch('Vocabulary-File.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network file access error.');
+                    return response.text();
+                })
+                .then(text => { parseVocabulary(text); })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById('status-message').textContent = '⚠️ Failed to read Vocabulary-File.txt. Check folder files.';
+                });
+        };
+
+        function parseVocabulary(text) {
+            if (!text) {
+                document.getElementById('status-message').textContent = '⚠️ Vocabulary-File.txt is empty.';
+                return;
+            }
+
+            const lines = text.split('\n');
+            vocabularyList = [];
+            
+            lines.forEach(line => {
+                if (!line || !line.trim() || !line.includes('=')) return;
+                
+                const parts = line.split('=');
+                if (parts.length >= 2) {
+                    // FIXED: Re-added precise explicit array indices assignment parameters
+                    const word = parts[0].trim();
+                    const meaning = parts[1].trim();
+                    if (word && meaning) {
+                        vocabularyList.push({ word: word, meaning: meaning });
+                    }
+                }
+            });
+
+            if (vocabularyList.length === 0) {
+                document.getElementById('status-message').textContent = '⚠️ Loaded file, but found no matching "word = meaning" formats.';
+            } else {
+                document.getElementById('status-message').textContent = '✅ Success: Loaded ' + vocabularyList.length + ' total words';
+                
+                document.getElementById('range-input-start').value = 1;
+                document.getElementById('range-input-end').value = vocabularyList.length;
+                document.getElementById('range-input-end').max = vocabularyList.length;
+                
+                switchView('menu-view');
+            }
+        }
+
+        function updateSegmentSelection(targetStrategy) {
+            activeStrategySetting = targetStrategy;
+            const pill = document.getElementById('active-slider-pill');
+            const optAll = document.getElementById('opt-all');
+            const optLast = document.getElementById('opt-last');
+            const optCustom = document.getElementById('opt-custom');
+            const drawer = document.getElementById('range-drawer-box');
+            
+            optAll.classList.remove('active');
+            optLast.classList.remove('active');
+            optCustom.classList.remove('active');
+            
+            if (targetStrategy === 'all') {
+                pill.style.transform = 'translateX(0%)';
+                optAll.classList.add('active');
+                drawer.classList.remove('open');
+            } else if (targetStrategy === 'last') {
+                pill.style.transform = 'translateX(100%)';
+                optLast.classList.add('active');
+                drawer.classList.remove('open');
+            } else if (targetStrategy === 'custom') {
+                pill.style.transform = 'translateX(200%)';
+                optCustom.classList.add('active');
+                drawer.classList.add('open');
+                
+                let startInp = document.getElementById('range-input-start');
+                validateLiveCustomBounds(startInp, 'start');
+            }
+        }
+
+        function validateLiveCustomBounds(inputElement, sourceField) {
+            if (vocabularyList.length === 0) return;
+
+            let startInp = document.getElementById('range-input-start');
+            let endInp = document.getElementById('range-input-end');
+            
+            let startVal = parseInt(startInp.value);
+            let endVal = parseInt(endInp.value);
+
+            if (sourceField === 'start' && (isNaN(startVal) || startVal < 1)) {
+                startInp.value = 1;
+                launchToastAlert("⚠️ Range must start at 1. Corrected automatically!");
+                return;
+            }
+
+            if (sourceField === 'end' && (isNaN(endVal) || endVal > vocabularyList.length)) {
+                endInp.value = vocabularyList.length;
+                launchToastAlert("⚠️ Range cannot exceed " + vocabularyList.length + " words. Corrected automatically!");
+                return;
+            }
+        }
+        function triggerSelectedSession(mode) {
+            if (activeStrategySetting === 'custom') {
+                let startInp = document.getElementById('range-input-start');
+                let endInp = document.getElementById('range-input-end');
+                
+                let startVal = parseInt(startInp.value) || 1;
+                let endVal = parseInt(endInp.value) || vocabularyList.length;
+
+                if (startVal < 1) startVal = 1;
+                if (endVal > vocabularyList.length) endVal = vocabularyList.length;
+                
+                if (startVal > endVal) {
+                    let temp = startVal;
+                    startVal = endVal;
+                    endVal = temp;
+                }
+
+                let totalSpan = (endVal - startVal) + 1;
+
+                if (totalSpan < 10) {
+                    launchToastAlert("⚠️ Custom range requires 10 words at least. Adjusting automatically!");
+                    if (startVal + 9 <= vocabularyList.length) {
+                        endVal = startVal + 9;
+                    } else {
+                        endVal = vocabularyList.length;
+                        startVal = Math.max(1, endVal - 9);
+                    }
+                    startInp.value = startVal;
+                    endInp.value = endVal;
+                }
+            }
+            startSession(activeStrategySetting, mode);
+        }
+
+        function clearQuizCodeError() {
+            const errorBox = document.getElementById('quiz-code-error');
+            errorBox.textContent = '';
+            errorBox.classList.add('hidden');
+        }
+
+        function showQuizCodeError(message) {
+            const errorBox = document.getElementById('quiz-code-error');
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+        }
+
+        function startQuizWithCode() {
+            const input = document.getElementById('quiz-code-field');
+            const enteredCode = input.value.trim().toUpperCase().replace(/\s+/g, '');
+            clearQuizCodeError();
+
+            if (vocabularyList.length === 0) {
+                showQuizCodeError('Vocabulary is not loaded yet. Please wait and try again.');
+                return;
+            }
+
+            const selectedQuestionNumbers = enteredCode ? decodeTeacherQuizCode(enteredCode) : null;
+            if (!selectedQuestionNumbers) {
+                showQuizCodeError('Invalid quiz code. Please try again or check with your teacher.');
+                input.focus();
+                return;
+            }
+            const selectedWords = [];
+            for (const questionNumber of selectedQuestionNumbers) {
+                if (!Number.isInteger(questionNumber) || questionNumber < 1 || questionNumber > vocabularyList.length) {
+                    showQuizCodeError('This quiz code is not available with the current vocabulary file. Please check with your teacher.');
+                    return;
+                }
+                selectedWords.push(vocabularyList[questionNumber - 1]);
+            }
+
+            if (selectedWords.length === 0) {
+                showQuizCodeError('This quiz has no questions assigned. Please check with your teacher.');
+                return;
+            }
+
+            // Keep the teacher's exact selection, but randomize the order for each student.
+            sessionWords = [...selectedWords];
+            shuffleArray(sessionWords);
+            currentPool = [...vocabularyList];
+            currentMode = 'quiz';
+            currentIndex = 0;
+            quizHistory = [];
+            document.getElementById('status-message').classList.add('hidden');
+            document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
+            switchView('quiz-view');
+            showQuizQuestion();
+        }
+
+        function generateQuizChoices(correctItem) {
+            let choices = [correctItem];
+            const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
+
+            let validDistractors = vocabularyList.filter(item => {
+                if (item.word === correctItem.word) return false;
+                
+                const itemMeaningsLower = getMeaningTokens(item.meaning);
+                if (item.meaning.toLowerCase() === correctItem.meaning.toLowerCase()) return false;
+                
+                const hasOverlap = itemMeaningsLower.some(token => correctMeaningsLower.includes(token));
+                return !hasOverlap;
+            });
+
+            if (validDistractors.length < 3) {
+                validDistractors = vocabularyList.filter(item => item.word !== correctItem.word);
+            }
+
+            shuffleArray(validDistractors);
+
+            for (let i = 0; i < validDistractors.length; i++) {
+                if (choices.length >= 4) break;
+                if (!choices.some(c => c.meaning.toLowerCase() === validDistractors[i].meaning.toLowerCase())) {
+                    choices.push(validDistractors[i]);
+                }
+            }
+
+            while (choices.length < 4) {
+                choices.push({ word: '—', meaning: 'Alternative Choice Option ' + (choices.length + 1) });
+            }
+
+            shuffleArray(choices);
+            return choices;
+        }
+
+        function getMeaningTokens(meaningString) {
+            return meaningString.toLowerCase()
+                .replace(/[!.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                .split('/')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+        }
+
+        function startSession(strategy, mode) {
+            currentMode = mode;
+            quizHistory = [];
+            
+            document.getElementById('status-message').classList.add('hidden');
+            
+            if (strategy === 'all') {
+                currentPool = [...vocabularyList];
+                sessionWords = getRandomSubset(currentPool, 10);
+            } else if (strategy === 'last') {
+                currentPool = vocabularyList.slice(-10);
+                sessionWords = [...currentPool];
+                shuffleArray(sessionWords);
+            } else if (strategy === 'custom') {
+                let startIdx = parseInt(document.getElementById('range-input-start').value) - 1;
+                let endIdx = parseInt(document.getElementById('range-input-end').value) - 1;
+                currentPool = vocabularyList.slice(startIdx, endIdx + 1);
+                sessionWords = getRandomSubset(currentPool, 10);
+            }
+
+            currentIndex = 0;
+            
+            if (currentMode === 'flashcard') {
+                document.getElementById('app-title').textContent = "Quran Arabic Flashcards";
+                switchView('flashcard-view');
+                
+                const eyeNode = document.getElementById('card-eye-toggle');
+                if (globalPersistentEyeToggleStatus) {
+                    eyeNode.classList.add('visible-state');
+                    eyeNode.setAttribute('title', 'Hide Meaning Permanently');
+                } else {
+                    eyeNode.classList.remove('visible-state');
+                    eyeNode.setAttribute('title', 'Show Meaning Permanently');
+                }
+                
+                showCard();
+            } else {
+                document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+                switchView('quiz-view');
+                showQuizQuestion();
+            }
+        }
+
+        function showCard() {
+            document.getElementById('card-counter').textContent = "Word " + (currentIndex + 1) + " of " + sessionWords.length;
+            document.getElementById('card-arabic-field').textContent = sessionWords[currentIndex].word;
+            document.getElementById('card-meaning-field').textContent = sessionWords[currentIndex].meaning;
+            
+            if (globalPersistentEyeToggleStatus) {
+                isMeaningVisible = true;
+                document.getElementById('card-meaning-field').classList.remove('hidden');
+                document.getElementById('card-action-btn').textContent = "Next Word";
+            } else {
+                isMeaningVisible = false;
+                document.getElementById('card-meaning-field').classList.add('hidden');
+                document.getElementById('card-action-btn').textContent = "Show Meaning";
+            }
+        }
+
+        function handleEyeToggleIntercept(event) {
+            event.stopPropagation(); 
+            
+            globalPersistentEyeToggleStatus = !globalPersistentEyeToggleStatus;
+            const eyeNode = document.getElementById('card-eye-toggle');
+            const meaningField = document.getElementById('card-meaning-field');
+            const actBtn = document.getElementById('card-action-btn');
+            
+            if (globalPersistentEyeToggleStatus) {
+                eyeNode.classList.add('visible-state');
+                eyeNode.setAttribute('title', 'Hide Meaning Permanently');
+                isMeaningVisible = true;
+                meaningField.classList.remove('hidden');
+                actBtn.textContent = "Next Word";
+            } else {
+                eyeNode.classList.remove('visible-state');
+                eyeNode.setAttribute('title', 'Show Meaning Permanently');
+                isMeaningVisible = false;
+                meaningField.classList.add('hidden');
+                actBtn.textContent = "Show Meaning";
+            }
+        }
+
+        function handleFlashCardBodyClick() {
+            if (globalPersistentEyeToggleStatus) return;
+            
+            isMeaningVisible = !isMeaningVisible;
+            const meaningField = document.getElementById('card-meaning-field');
+            const actBtn = document.getElementById('card-action-btn');
+            
+            if (isMeaningVisible) {
+                meaningField.classList.remove('hidden');
+                actBtn.textContent = "Next Word";
+            } else {
+                meaningField.classList.add('hidden');
+                actBtn.textContent = "Show Meaning";
+            }
+        }
+
+        function handleCardProgression() {
+            if (!isMeaningVisible) {
+                isMeaningVisible = true;
+                document.getElementById('card-meaning-field').classList.remove('hidden');
+                document.getElementById('card-action-btn').textContent = "Next Word";
+            } else {
+                currentIndex++;
+                if (currentIndex < sessionWords.length) {
+                    showCard();
+                } else {
+                    switchView('review-finished-view');
+                }
+            }
+        }
+        function showQuizQuestion() {
+            const currentItem = sessionWords[currentIndex];
+            document.getElementById('quiz-counter').textContent = "Question " + (currentIndex + 1) + " of " + sessionWords.length;
+            document.getElementById('quiz-arabic-field').textContent = currentItem.word;
+
+            const optionsBox = document.getElementById('quiz-options-box');
+            optionsBox.innerHTML = '';
+
+            const choices = generateQuizChoices(currentItem);
+            
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.textContent = choice.meaning;
+                btn.onclick = function() { evaluateQuizAnswer(btn, choice, currentItem); };
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
+            const optionsBox = document.getElementById('quiz-options-box');
+            const buttons = optionsBox.getElementsByTagName('button');
+            
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            const isCorrect = (chosenChoice.meaning === correctItem.meaning);
+            
+            quizHistory.push({
+                index: currentIndex + 1,
+                word: correctItem.word,
+                chosen: chosenChoice.meaning,
+                correct: correctItem.meaning,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct-choice');
+            } else {
+                selectedButton.classList.add('wrong-choice');
+                for (let btn of buttons) {
+                    if (btn.textContent === correctItem.meaning) {
+                        btn.classList.add('correct-choice');
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < sessionWords.length) {
+                    showQuizQuestion();
+                } else {
+                    displayQuizSummary();
+                }
+            }, 1200);
+        }
+
+        function displayQuizSummary() {
+            const totalCorrect = quizHistory.filter(h => h.isCorrect).length;
+            const percentage = Math.round((totalCorrect / sessionWords.length) * 100);
+            
+            document.getElementById('score-text-value').textContent = totalCorrect + "/" + sessionWords.length;
+            document.getElementById('percent-text-value').textContent = percentage + "%";
+
+            const tableContainer = document.getElementById('summary-table-container');
+            tableContainer.classList.add('hidden');
+            document.getElementById('toggle-table-btn').textContent = "📊 Show Performance Summary";
+
+            let tableHtml = '<table class="summary-table"><thead><tr>' +
+                '<th style="width: 8%;">#</th>' +
+                '<th style="width: 15%;">Result</th>' +
+                '<th style="width: 25%;">Word</th>' +
+                '<th style="width: 27%;">Correct Meaning</th>' +
+                '<th style="width: 25%;">Your Choice</th>' +
+                '</tr></thead><tbody>';
+
+            quizHistory.forEach(item => {
+                const classicSymbolToken = item.isCorrect ? 
+                    '<span class="classic-indicator-pass">✓</span>' : 
+                    '<span class="classic-indicator-fail">✗</span>';
+                
+                tableHtml += '<tr>' +
+                    '<td>' + item.index + '</td>' +
+                    '<td>' + classicSymbolToken + '</td>' +
+                    '<td class="large-bold-cell large-arabic-cell">' + item.word + '</td>' +
+                    '<td class="large-bold-cell" style="color:#0f172a;">' + item.correct + '</td>' +
+                    '<td class="small-choice-cell">' + item.chosen + '</td>' +
+                    '</tr>';
+            });
+
+            tableHtml += '</tbody></table>';
+            tableContainer.innerHTML = tableHtml;
+            switchView('quiz-finished-view');
+        }
+
+        function toggleSummaryTableVisibility() {
+            const tableContainer = document.getElementById('summary-table-container');
+            const toggleBtn = document.getElementById('toggle-table-btn');
+            
+            if (tableContainer.classList.contains('hidden')) {
+                tableContainer.classList.remove('hidden');
+                toggleBtn.textContent = "📊 Hide Performance Summary";
+            } else {
+                tableContainer.classList.add('hidden');
+                toggleBtn.textContent = "📊 Show Performance Summary";
+            }
+        }
+
+        function copyScreenshotToClipboard() {
+            const target = document.getElementById('screenshot-target-scorecard');
+            
+            html2canvas(target, {
+                scale: 2,
+                backgroundColor: "#ffffff",
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        launchToastAlert("⚠️ Rendering image profile failed.");
+                        return;
+                    }
+                    
+                    try {
+                        navigator.clipboard.write([
+                            new ClipboardItem({ [blob.type]: blob })
+                        ]).then(() => {
+                            launchToastAlert("📸 Scorecard copied! Paste (Ctrl+V) it into your chat.");
+                        }).catch(err => {
+                            console.error(err);
+                            fallbackDownloadMechanism(canvas);
+                        });
+                    } catch (clipboardError) {
+                        console.error(clipboardError);
+                        fallbackDownloadMechanism(canvas);
+                    }
+                }, 'image/png');
+            });
+        }
+
+        function fallbackDownloadMechanism(canvas) {
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.download = 'Quiz_Scorecard.png';
+            link.href = dataUrl;
+            link.click();
+            launchToastAlert("📥 Clipboard restricted. Scorecard saved as download!");
+        }
+
+        function getRandomSubset(arr, size) {
+            let shuffled = [...arr];
+            shuffleArray(shuffled);
+            return shuffled.slice(0, size);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+
+        function openDictionaryMode() {
+            if (!vocabularyList.length) {
+                launchToastAlert('Vocabulary has not loaded yet.');
+                return;
+            }
+            document.getElementById('app-title').textContent = 'Quran Arabic Dictionary';
+            document.getElementById('status-message').classList.add('hidden');
+            document.getElementById('dictionary-sort').value = 'original';
+            renderDictionary();
+            switchView('dictionary-view');
+        }
+
+        function renderDictionary() {
+            const list = document.getElementById('dictionary-list');
+            const sortMode = document.getElementById('dictionary-sort').value;
+            dictionaryEntries = vocabularyList.map((item, index) => ({...item, originalIndex:index, number:index+1}));
+            if (sortMode === 'english') dictionaryEntries.sort((a,b) => a.meaning.localeCompare(b.meaning, 'en', {sensitivity:'base'}) || a.number-b.number);
+            if (sortMode === 'arabic') dictionaryEntries.sort((a,b) => a.word.localeCompare(b.word, 'ar') || a.number-b.number);
+            list.innerHTML = '';
+            const jump = document.getElementById('dictionary-jump');
+            jump.innerHTML = '';
+            const letters = [];
+            dictionaryEntries.forEach(entry => {
+                const key = sortMode === 'english' ? (entry.meaning.trim()[0] || '#').toLocaleUpperCase() : sortMode === 'arabic' ? (entry.word.trim()[0] || '#') : '';
+                if (key && !letters.includes(key)) letters.push(key);
+            });
+            dictionaryJumpLetters = letters;
+            if (sortMode !== 'original') {
+                letters.forEach((letter, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button'; btn.textContent = letter;
+                    btn.onclick = () => {
+                        const target = list.querySelector('[data-jump="' + CSS.escape(letter) + '"]');
+                        if (target) { target.scrollIntoView({block:'start', behavior:'smooth'}); jump.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn)); }
+                    };
+                    jump.appendChild(btn);
+                });
+            }
+            let lastKey = null;
+            dictionaryEntries.forEach((entry, i) => {
+                const key = sortMode === 'english' ? (entry.meaning.trim()[0] || '#').toLocaleUpperCase() : sortMode === 'arabic' ? (entry.word.trim()[0] || '#') : '';
+                const row = document.createElement('div'); row.className='dictionary-entry';
+                if (sortMode !== 'original' && key && key !== lastKey) { row.dataset.jump = key; lastKey = key; }
+                const meaning = document.createElement('div'); meaning.className='dictionary-meaning'; meaning.textContent=entry.meaning;
+                const separator = document.createElement('div'); separator.className='dictionary-separator'; separator.textContent='◆';
+                const word = document.createElement('div'); word.className='dictionary-word'; word.textContent=entry.word;
+                row.append(meaning, separator, word); list.appendChild(row);
+                // Exactly one numbered divider after each 10 displayed entries.
+                if ((i + 1) % 10 === 0) {
+                    const divider = document.createElement('div'); divider.className='dictionary-ten-divider';
+                    divider.innerHTML='<span># '+(i + 1)+'</span>'; list.appendChild(divider);
+                }
+            });
+            const status = sortMode === 'english' ? 'Sorted by English Alphabet' : sortMode === 'arabic' ? 'Sorted by Arabic Alphabet' : 'Original word order';
+            document.getElementById('dictionary-status').textContent = status;
+        }
+
+        function escapeDictionaryText(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        function switchView(viewId) {
+            document.getElementById('menu-view').classList.add('hidden');
+            document.getElementById('flashcard-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('quiz-finished-view').classList.add('hidden');
+            document.getElementById('review-finished-view').classList.add('hidden');
+            document.getElementById('dictionary-view').classList.add('hidden');
+
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function exitToHome() {
+            document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+            document.getElementById('status-message').classList.remove('hidden');
+            document.getElementById('status-message').classList.remove('hidden');
+            clearQuizCodeError();
+            switchView('menu-view');
+        }
+
+        function launchToastAlert(message) {
+            const toast = document.getElementById('toast-alert');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
