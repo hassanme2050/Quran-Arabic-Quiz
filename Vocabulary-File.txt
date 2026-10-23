@@ -79,3 +79,10 @@
 مِثْلَ = The same/similar
 مَثَلَ = lesson-example
 مِمَّنْ = Than the one who; from those who
+قَبْلَ = Before
+بَعْدَ = After
+حِينَ = Time period at the time of
+إِذْ = When (for past)
+إِذَا = When (for future)
+ثُمَّ = Then
+فَ = Then, Thus, Therefore
