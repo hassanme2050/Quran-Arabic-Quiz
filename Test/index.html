@@ -32,6 +32,7 @@
             <div class="menu-action-layout">
                 <button type="button" data-action="start-flashcard">Review Mode</button>
                 <button type="button" data-action="start-quiz">Quiz Mode</button>
+                <button type="button" data-action="open-dictionary">Dictionary</button>
             </div>
 
             <select class="custom-select-menu" id="vocabulary-book-selector">
@@ -74,6 +75,28 @@
             <div class="quiz-options" id="quiz-options-box"></div>
             <div class="navigation-buttons" style="margin-top: 20px;">
                 <button class="exit-btn" type="button" data-action="exit-home">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <div id="dictionary-view" class="hidden">
+            <div class="dictionary-header">
+                <div class="segmented-slider-container dictionary-sorter">
+                    <div class="slider-pill dictionary-slider-pill" id="dictionary-slider-pill"></div>
+                    <div class="segment-option active" id="dict-sort-arabic" data-dictionary-sort="arabic">Arabic</div>
+                    <div class="segment-option" id="dict-sort-english" data-dictionary-sort="english">English</div>
+                    <div class="segment-option" id="dict-sort-number" data-dictionary-sort="number">By Number</div>
+                </div>
+            </div>
+
+            <div class="dictionary-view-panel">
+                <div class="dictionary-scroll-wrapper">
+                    <div class="dictionary-list" id="dictionary-list"></div>
+                </div>
+
+                <div class="dictionary-navigation">
+                    <button type="button" id="dictionary-prev-btn" class="exit-btn">← Prev</button>
+                    <button type="button" id="dictionary-next-btn">Next →</button>
+                </div>
             </div>
         </div>
 
