@@ -29,7 +29,7 @@ export function getMeaningTokens(meaningString) {
 
 export async function loadVocabulary() {
     try {
-        const response = await fetch('../Vocabulary-File.txt');
+        const response = await fetch('./Vocabulary-File.txt');
         if (!response.ok) throw new Error('Network file access error.');
         const text = await response.text();
         parseVocabulary(text);
@@ -79,7 +79,7 @@ export function parseVocabulary(text) {
 }
 
 export function switchView(viewId) {
-    const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-finished-view', 'review-finished-view'];
+    const views = ['menu-view', 'flashcard-view', 'quiz-view', 'dictionary-view', 'quiz-finished-view', 'review-finished-view'];
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
