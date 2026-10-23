@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { showToast } from './utils.js';
-import { decodeTeacherQuizCode, loadVocabulary, parseVocabulary, switchView } from './vocabulary.js';
+import { decodeTeacherQuizCode, loadVocabulary, switchView } from './vocabulary.js';
 import {
     updateSegmentSelection,
     triggerSelectedSession,
@@ -9,8 +9,8 @@ import {
     handleCardProgression,
     showQuizQuestion,
     validateLiveCustomBounds,
-    exitToHome,
 } from './quiz.js';
+import { openDictionary, initDictionaryControls } from './dictionary.js';
 
 function clearQuizCodeError() {
     const errorBox = document.getElementById('quiz-code-error');
@@ -88,6 +88,9 @@ function bindGlobalEvents() {
     document.querySelectorAll('[data-action="start-quiz"]').forEach(button => {
         button.addEventListener('click', () => triggerSelectedSession('quiz'));
     });
+    document.querySelectorAll('[data-action="open-dictionary"]').forEach(button => {
+        button.addEventListener('click', () => openDictionary());
+    });
     document.querySelectorAll('[data-action="exit-home"]').forEach(button => {
         button.addEventListener('click', () => {
             document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
@@ -112,6 +115,7 @@ function bindGlobalEvents() {
 
 export function initApp() {
     bindGlobalEvents();
+    initDictionaryControls();
     loadVocabulary();
 }
 
