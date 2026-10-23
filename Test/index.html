@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <h1 id="app-title">Quran Arabic Quiz</h1>
+
+        <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
+
+        <div id="menu-view" class="hidden">
+            <div class="segmented-slider-container">
+                <div class="slider-pill" id="active-slider-pill"></div>
+                <div class="segment-option active" id="opt-all">All Words</div>
+                <div class="segment-option" id="opt-last">Last 10 Words</div>
+                <div class="segment-option" id="opt-custom">Custom Range</div>
+            </div>
+
+            <div class="range-drawer-panel" id="range-drawer-box">
+                <div class="range-flex-row">
+                    <span>From</span>
+                    <input type="number" id="range-input-start" value="1" min="1">
+                    <span>To</span>
+                    <input type="number" id="range-input-end" value="10" min="1">
+                </div>
+            </div>
+
+            <div class="menu-action-layout">
+                <button type="button" data-action="start-flashcard">Review Mode</button>
+                <button type="button" data-action="start-quiz">Quiz Mode</button>
+            </div>
+
+            <select class="custom-select-menu" id="vocabulary-book-selector">
+                <option value="book_a" selected>Book A - Arabic to English</option>
+                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+            </select>
+
+            <div class="custom-input-field-group">
+                <input type="text" class="custom-text-input" id="quiz-code-field" placeholder="I have a quiz code" aria-label="Enter quiz code" autocomplete="off" autocapitalize="characters">
+                <button id="quiz-code-btn" style="padding: 14px 22px;" type="button">GO</button>
+            </div>
+            <div id="quiz-code-error" class="quiz-code-error hidden" role="alert" aria-live="polite"></div>
+        </div>
+
+        <div id="flashcard-view" class="hidden">
+            <div class="counter-label-text" id="card-counter"></div>
+            <div class="display-card-frame" id="review-card-frame">
+                <div class="card-eye-toggle-overlay" id="card-eye-toggle" title="Show Meaning Permanently">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <line class="eye-slash-path" x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2.5"></line>
+                    </svg>
+                </div>
+                <div class="arabic-text-render" id="card-arabic-field">-</div>
+                <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
+            </div>
+            <div class="navigation-buttons">
+                <button id="card-action-btn" type="button">Show Meaning</button>
+                <button class="exit-btn" type="button" data-action="exit-home">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <div id="quiz-view" class="hidden">
+            <div class="counter-label-text" id="quiz-counter"></div>
+            <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
+                <div class="arabic-text-render" id="quiz-arabic-field">-</div>
+            </div>
+            <div class="quiz-options" id="quiz-options-box"></div>
+            <div class="navigation-buttons" style="margin-top: 20px;">
+                <button class="exit-btn" type="button" data-action="exit-home">← Exit to Menu</button>
+            </div>
+        </div>
+
+        <div id="quiz-finished-view" class="hidden">
+            <div id="screenshot-target-scorecard">
+                <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
+                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
+                <div class="summary-metric-circle">
+                    <div class="summary-score-big" id="score-text-value">0/10</div>
+                    <div class="summary-percent-small" id="percent-text-value">0%</div>
+                </div>
+            </div>
+
+            <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" type="button">📊 Show Performance Summary</button>
+            <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
+
+            <div class="navigation-buttons">
+                <button type="button" data-action="copy-screenshot">📋 Copy Screenshot to Clipboard</button>
+                <button class="exit-btn" type="button" data-action="exit-home">🏠 Go to Home</button>
+            </div>
+        </div>
+
+        <div id="review-finished-view" class="hidden">
+            <div class="display-card-frame" style="cursor: default;">
+                <h2 style="margin-top:0; color: #0c4d4d; font-weight: bold;">Session Finished!</h2>
+                <p style="margin: 0; color: #334155; font-size: 16px; font-weight: 500;">Excellent job completing your vocabulary review.</p>
+            </div>
+            <div class="navigation-buttons">
+                <button class="exit-btn" type="button" data-action="exit-home">🏠 Go to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
