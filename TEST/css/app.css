@@ -487,11 +487,11 @@ button.exit-btn:hover {
 .dictionary-ten-divider { display:flex; align-items:center; gap:8px; color:#9aa5a5; font-size:10px; font-weight:400; padding:5px 5px; background:transparent; margin:1px 0; }
 .dictionary-ten-divider:before,.dictionary-ten-divider:after { content:''; height:1px; flex:1; background:#e2e8e8; }
 .dictionary-diamond { grid-column:2; grid-row:1; justify-self:center; width:6px; height:6px; background:var(--button-gold); transform:rotate(45deg); opacity:.9; }
-.dictionary-jump { position:absolute; right:1px; top:8px; bottom:8px; width:43px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; z-index:5; touch-action:none; user-select:none; cursor:ns-resize; }
+.dictionary-jump { position:absolute; right:1px; top:8px; bottom:8px; width:43px; display:grid; grid-template-rows:repeat(var(--dictionary-jump-count, 1),minmax(0,1fr)); justify-items:center; min-height:0; overflow:hidden; z-index:5; touch-action:none; user-select:none; cursor:ns-resize; }
 .dictionary-jump-track { position:absolute; inset:0; width:5px; left:17px; border-radius:5px; background:rgba(255,255,255,.45); }
-.dictionary-jump button { position:relative; z-index:1; padding:5px 0; width:41px; min-height:27px; border-radius:18px; background:transparent; color:#d7eeee; box-shadow:none; font-size:11px; line-height:1; touch-action:none; }
+.dictionary-jump button { position:relative; z-index:1; padding:0; width:41px; height:100%; min-height:0; box-sizing:border-box; border-radius:18px; background:transparent; color:#d7eeee; box-shadow:none; font-size:clamp(8px,calc(48vh / var(--dictionary-jump-count, 1)),11px); line-height:1; touch-action:none; }
 .dictionary-jump button:hover:not(:disabled) { transform:none; box-shadow:none; background:rgba(255,255,255,.12); }
-.dictionary-jump button.active { background:var(--button-gold); color:#fff; font-size:14px; min-height:32px; box-shadow:0 2px 7px rgba(0,0,0,.22); }
+.dictionary-jump button.active { background:var(--button-gold); color:#fff; font-size:clamp(9px,calc(54vh / var(--dictionary-jump-count, 1)),14px); min-height:0; box-shadow:0 2px 7px rgba(0,0,0,.22); }
 .dictionary-empty { padding:30px 10px; text-align:center; color:#64748b; }
 .dictionary-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; color:#c6e3e3; font-size:12px; margin:8px 4px 0; }
 #app-title.dictionary-title { font-size:28px; margin-bottom:20px; letter-spacing:0; }
