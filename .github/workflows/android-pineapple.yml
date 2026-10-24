@@ -6,7 +6,10 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/android-pineapple.yml'
-      - 'TEST/android/**'
+      - 'TEST/android/app/**'
+      - 'TEST/android/*.gradle'
+      - 'TEST/android/gradle.properties'
+      - 'TEST/android/prepare-assets.cjs'
 
 permissions:
   contents: read
@@ -25,6 +28,8 @@ jobs:
         with:
           gradle-version: '8.13'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
       - name: Prepare offline app assets
         run: |
           node TEST/android/prepare-assets.cjs TEST
