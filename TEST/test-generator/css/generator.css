@@ -101,12 +101,14 @@ h1 {
 .compact-word-tile.selected-state { border-color: var(--button-gold); background: #fdfbf7; }
 .tile-header-index { font-size: 10px; font-weight: 800; color: #718096; text-align: left; }
 .tile-arabic-text {
-    font-size: clamp(18px, 3.5vh, 26px);
-    font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
-    font-weight: bold;
+    font-size: clamp(16px, 2.8vh, 22px);
+    font-family: var(--arabic-font);
+    font-weight: 600;
     color: #2d3748;
     margin: 2px 0;
-    line-height: 1.1;
+    line-height: 1.65;
+    padding: 0.1em 0;
+    direction: rtl;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
