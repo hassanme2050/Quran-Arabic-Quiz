@@ -141,6 +141,7 @@ export function renderDictionary() {
 
 export function buildDictionaryJumpIndex() {
     const jump = document.getElementById('dictionary-jump');
+    jump.dataset.script = dictionarySortMode === 'arabic' ? 'arabic' : 'latin';
     jump.innerHTML = '<div class="dictionary-jump-track"></div>';
     const keys = [...jumpTargets.keys()];
     dictionaryJumpItems = keys;
