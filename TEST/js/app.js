@@ -4,7 +4,7 @@ import { shuffleArray, getRandomSubset } from './utils.js';
 import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
 import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js';
 import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js';
-import { openDictionaryMode, setDictionarySort } from './dictionary.js';
+import { openDictionaryMode, setDictionarySort } from './dictionary.js?v=20261024-layout1';
 import { copyScreenshotToClipboard } from './platform.js';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
