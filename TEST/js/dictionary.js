@@ -146,6 +146,7 @@ export function buildDictionaryJumpIndex() {
     dictionaryJumpItems = keys;
     let shownKeys = keys;
     if (keys.length > 30 && dictionarySortMode === 'english') shownKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(k => keys.includes(k)).concat(keys.includes('#') ? ['#'] : []);
+    jump.style.setProperty('--dictionary-jump-count', String(Math.max(1, shownKeys.length)));
     shownKeys.forEach(key => {
         const btn = document.createElement('button');
         btn.type = 'button';
