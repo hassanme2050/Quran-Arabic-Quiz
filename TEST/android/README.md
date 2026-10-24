@@ -8,4 +8,6 @@ Package: com.hassanme2050.quranaq.pineapple. Version: 1.0.1024.26-Pineapple-test
 
 The build workflow downloads dependencies on GitHub's runner, prepares an offline asset snapshot from TEST/, builds the APK, runs Android lint and verifies the APK signature. The output artifact contains the installable APK and its SHA-256 checksum. It does not request Internet or storage permissions. Rebuild to include future vocabulary updates; the APK does not automatically sync with the website.
 
+The first built APK is saved locally in output/QuranAQ-v1024.26-Pineapple.apk, with SHA256SUMS.txt beside it. Build and lint succeeded in GitHub Actions run 40143337739, and apksigner verified the debug signature. This is build verification only: installation, touch controls, rotation, Android Back and scorecard saving need testing on a phone. export-workflow.yml preserves the connector transfer method used when the laptop could not directly download the artifact.
+
 Local build needs Java 17, Gradle 8.13, Android SDK platform 36 and build tools 35.0.0. Run node prepare-assets.cjs from this directory, provide the Alexandria TTF/font license and html2canvas/license in generated assets, then run gradle assembleDebug lintDebug. The GitHub workflow automates these steps.
