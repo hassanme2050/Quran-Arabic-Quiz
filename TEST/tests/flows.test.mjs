@@ -17,7 +17,8 @@ const nativeFetch = globalThis.fetch;
 // Small DOM harness for behavior checks without a browser or third-party packages.
 class Element {
     constructor(tag = 'div') {
-        this.tagName = tag.toUpperCase(); this.children = []; this.dataset = {}; this.style = {};
+        this.tagName = tag.toUpperCase(); this.children = []; this.dataset = {};
+        this.style = { setProperty(name, value) { this[name] = value; } };
         this.attributes = {}; this.events = {}; this.className = ''; this.value = ''; this.disabled = false;
         this.textContent = ''; this.clientHeight = 400; this.offsetTop = 0; this.scrollTop = 0;
         this.classList = {
@@ -127,15 +128,19 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js');
         state.fullVocabularyInventory = records;
         renderInventoryTilesGrid();
+        assert.equal(state.totalCardsPerPageLimit,50);
+        assert.equal(el('tiles-matrix-box').children.length,50);
         const firstTile = el('tiles-matrix-box').children[0];
         for (let number=1; number<=10; number++) toggleWordSelection(number,el('tiles-matrix-box').children[number-1]);
         assert.equal(el('tiles-matrix-box').children[0],firstTile);
         assert(el('generate-code-btn').disabled);
         changeMatrixActivePage('1');
-        for (let number=41; number<=50; number++) toggleWordSelection(number,el('tiles-matrix-box').children[number-41]);
+        assert.equal(el('tiles-matrix-box').children.length,38);
+        assert.equal(el('tiles-matrix-box').children[0].dataset.number,'51');
+        for (let number=51; number<=60; number++) toggleWordSelection(number,el('tiles-matrix-box').children[number-51]);
         assert.equal(state.selected.size,20);
         assert(!el('generate-code-btn').disabled);
-        toggleWordSelection(51,el('tiles-matrix-box').children[10]);
+        toggleWordSelection(61,el('tiles-matrix-box').children[10]);
         assert.equal(state.selected.size,20);
         processSelectedHexadecimalQuizCode();
         assert.deepEqual(decodeTeacherQuizCode(el('quiz-code-output').value), [...state.selected].sort((a,b)=>a-b));
@@ -218,7 +223,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         const first = el('dictionary-list').children[0];
         dictionary.renderDictionary();
         assert.equal(el('dictionary-list').children[0],first);
-        for(const mode of ['number','english','arabic']) dictionary.setDictionarySort(mode);
+        for(const mode of ['number','english','arabic']) {
+            dictionary.setDictionarySort(mode);
+            assert.equal(Number(el('dictionary-jump').style['--dictionary-jump-count']), el('dictionary-jump').querySelectorAll('button').length);
+        }
         assert.deepEqual(vocabulary.vocabularyList,original);
     });
 
@@ -267,12 +275,12 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         function walk(directory) { return fs.readdirSync(directory,{withFileTypes:true}).flatMap(item=>item.isDirectory()?walk(path.join(directory,item.name)):[path.join(directory,item.name)]); }
         for(const file of walk(root).filter(file=>file.endsWith('.js'))) {
             const source = fs.readFileSync(file,'utf8');
-            for(const match of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) assert(fs.existsSync(path.resolve(path.dirname(file),match[1])),file+' imports missing '+match[1]);
+            for(const match of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) assert(fs.existsSync(path.resolve(path.dirname(file),match[1].split('?')[0])),file+' imports missing '+match[1]);
         }
         for(const file of ['index.html','editor/index.html','test-generator/index.html']) {
             const source=read(file);
             assert(!/\son(?:click|change)=/.test(source));
-            for(const match of source.matchAll(/(?:href|src)="([^":]+\.(?:js|css))"/g)) assert(fs.existsSync(path.resolve(root,path.dirname(file),match[1])));
+            for(const match of source.matchAll(/(?:href|src)="([^":]+\.(?:js|css)(?:\?[^\"]*)?)"/g)) assert(fs.existsSync(path.resolve(root,path.dirname(file),match[1].split('?')[0])));
         }
         assert(read('Editor.html').includes('url=editor/index.html'));
         assert(read('Test-Generator.html').includes('url=test-generator/index.html'));
