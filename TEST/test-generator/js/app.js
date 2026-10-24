@@ -3,7 +3,8 @@ import { bindActions } from '../../shared/ui.js';
 import { evaluateTeacherCredentials } from './auth.js';
 import { bindGridSelection, changeMatrixActivePage } from './grid.js';
 import { processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard, updateStickyCounterBanner } from './selection.js';
-state.totalCardsPerPageLimit = window.innerWidth <= 1200 ? 40 : 50;
+// Every page represents 50 consecutive book numbers, independent of viewport/zoom.
+state.totalCardsPerPageLimit = 50;
 bindActions({ evaluateTeacherCredentials, changeMatrixActivePage, processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard });
 bindGridSelection();
 updateStickyCounterBanner();
