@@ -311,9 +311,13 @@ button.exit-btn:hover {
 }
 
 .arabic-text-render {
-    font-size: 64px;
-    font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
-    font-weight: bold;
+    font-size: clamp(32px, 8vw, 52px);
+    font-family: var(--arabic-font);
+    font-weight: 600;
+    line-height: 1.8;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    direction: rtl;
     margin: 15px 0;
     color: #0c4d4d;
 }
@@ -426,7 +430,8 @@ button.exit-btn:hover {
 }
 
 .large-arabic-cell {
-    font-family: 'Traditional Arabic', 'Amiri', serif;
+    font-family: var(--arabic-font);
+    line-height: 1.8;
     color: #0d5454;
 }
 
@@ -482,7 +487,7 @@ button.exit-btn:hover {
 .dictionary-list::-webkit-scrollbar { display:none; }
 .dictionary-entry { display:grid; grid-template-columns:minmax(0,max-content) 12px minmax(0,max-content); justify-content:center; gap:10px; align-items:center; padding:12px 5px; border-bottom:1px solid #e2e8f0; min-height:64px; box-sizing:border-box; }
 .dictionary-entry:last-child, .dictionary-entry.before-ten-divider { border-bottom:0; }
-.dictionary-word { grid-column:3; grid-row:1; color:#0c4d4d; font-family:'Traditional Arabic','Amiri',Georgia,serif; font-size:29px; font-weight:bold; text-align:left; overflow-wrap:anywhere; direction:rtl; }
+.dictionary-word { grid-column:3; grid-row:1; color:#0c4d4d; font-family:var(--arabic-font); font-size:24px; font-weight:600; line-height:1.8; text-align:left; overflow-wrap:anywhere; direction:rtl; }
 .dictionary-meaning { grid-column:1; grid-row:1; color:#263746; font-size:17px; font-weight:600; text-align:right; overflow-wrap:anywhere; }
 .dictionary-ten-divider { display:flex; align-items:center; gap:8px; color:#9aa5a5; font-size:10px; font-weight:400; padding:5px 5px; background:transparent; margin:1px 0; }
 .dictionary-ten-divider:before,.dictionary-ten-divider:after { content:''; height:1px; flex:1; background:#e2e8e8; }
@@ -495,4 +500,4 @@ button.exit-btn:hover {
 .dictionary-empty { padding:30px 10px; text-align:center; color:#64748b; }
 .dictionary-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; color:#c6e3e3; font-size:12px; margin:8px 4px 0; }
 #app-title.dictionary-title { font-size:28px; margin-bottom:20px; letter-spacing:0; }
-@media(max-width:420px) { .dictionary-list { padding-left:8px; padding-right:43px; } .dictionary-entry { gap:6px; padding:10px 2px; grid-template-columns:minmax(0,max-content) 9px minmax(0,max-content); } .dictionary-word { font-size:26px; } .dictionary-meaning { font-size:15px; } .dictionary-jump { width:39px; } .dictionary-jump-track { left:17px; } .dictionary-jump button { width:37px; font-size:10px; } #app-title.dictionary-title { font-size:26px; } }
+@media(max-width:420px) { .dictionary-list { padding-left:8px; padding-right:43px; } .dictionary-entry { gap:6px; padding:10px 2px; grid-template-columns:minmax(0,max-content) 9px minmax(0,max-content); } .dictionary-word { font-size:22px; } .dictionary-meaning { font-size:15px; } .dictionary-jump { width:39px; } .dictionary-jump-track { left:17px; } .dictionary-jump button { width:37px; font-size:10px; } #app-title.dictionary-title { font-size:26px; } }
