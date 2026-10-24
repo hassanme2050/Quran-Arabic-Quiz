@@ -26,6 +26,8 @@ Update Vocabulary-File.txt in place. Existing book numbers, words and meanings m
 
 Scorecard export loads html2canvas 1.4.1 from jsDelivr only when requested and needs network access. Bundle this dependency when preparing an offline Android/iOS package. No mobile package is included yet.
 
+Arabic typography is shared in shared/typography.css and uses Alexandria from Google Fonts (weights 400, 600 and 700). Arabic words, result rows, dictionary letters, Generator tiles and Editor input use this family; English interface text retains its existing font. Google Fonts requires a network connection on first load; bundle the font when preparing offline mobile packages.
+
 ## Teacher tools
 
 - editor/index.html: Word Editor, with its own css and js folders.
