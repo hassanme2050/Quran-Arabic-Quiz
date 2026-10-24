@@ -186,11 +186,11 @@ h1 {
 }
 
 .large-arabic-input {
-    font-family: 'Traditional Arabic', 'Amiri', 'Noto Naskh Arabic', serif;
-    font-size: 112px;
-    line-height: 1.35;
+    font-family: var(--arabic-font);
+    font-size: clamp(40px, 7vw, 80px);
+    line-height: 1.8;
     min-height: 155px;
-    font-weight: bold;
+    font-weight: 600;
     color: #0c4d4d;
     text-align: center;
     direction: rtl;
@@ -255,7 +255,7 @@ button:disabled {
     .lookup-control-row { grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 6px; }
     .lookup-control-row button { padding: 10px 12px; font-size: 13px; }
     .nav-button { width: 42px; padding: 8px !important; }
-    .large-arabic-input { font-size: clamp(64px, 18vw, 100px); min-height: 120px; }
+    .large-arabic-input { font-size: clamp(36px, 11vw, 60px); min-height: 120px; }
     .large-meaning-input { font-size: 18px; }
     .field-label-header { font-size: 11px; }
 }
