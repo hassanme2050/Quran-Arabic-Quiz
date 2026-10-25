@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz - Word Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="../shared/typography.css?v=20261024-alexandria1">
+    <link rel="stylesheet" href="css/editor.css?v=20261024-alexandria1">
+</head>
+<body>
+    <!-- Book selection and authentication -->
+    <div class="auth-gate-overlay" id="login-shield-gate">
+        <div class="auth-card">
+            <h2>Admin Verification</h2>
+            <p>Select the vocabulary book, then enter your system password and GitHub token to access the editor.</p>
+
+            <div class="password-input-wrapper">
+                <select class="custom-select-menu" id="login-book-selector" aria-label="Select book">
+                    <option value="book_a" selected>Book A - Arabic to English</option>
+                    <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                    <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+                </select>
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" autocomplete="current-password">
+                <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)" autocomplete="off">
+                <button id="verify-open-btn" data-action="evaluateAdministrativeCredentials">Verify &amp; Open Editor</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor -->
+    <main class="editor-wrapper">
+        <h1>Word Editor</h1>
+        <div class="subtitle">Vocabulary Database Modification Console — BetaV.100526</div>
+
+        <div class="lookup-control-row" aria-label="Word navigation">
+            <div class="target-field-wrap">
+                <div class="field-label-header">Target Word Number</div>
+                <input type="number" class="admin-text-field index-numeric-input" id="word-target-index" value="1" min="1" disabled>
+            </div>
+            <button id="lookup-go-btn" data-action="loadTargetInventoryRecord" disabled>GO</button>
+            <button class="nav-button" id="lookup-prev-btn" type="button" data-action="navigateWord" data-value="-1" aria-label="Previous word" title="Previous word" disabled>&#8249;</button>
+            <button class="nav-button" id="lookup-next-btn" type="button" data-action="navigateWord" data-value="1" aria-label="Next word" title="Next word" disabled>&#8250;</button>
+        </div>
+
+        <div class="workspace-editing-panel">
+            <div>
+                <div class="field-label-header">Arabic Word</div>
+                <input type="text" class="admin-text-field large-arabic-input" id="edit-arabic-field" placeholder="—" disabled>
+            </div>
+
+            <div>
+                <div class="field-label-header">English Translation Meaning</div>
+                <input type="text" class="admin-text-field large-meaning-input" id="edit-meaning-field" placeholder="—" disabled>
+            </div>
+
+            <button id="commit-save-btn" style="width: 100%; margin-top: 8px;" data-action="saveWordUpdateToGitHub" disabled>Save Changes</button>
+        </div>
+    </main>
+
+    <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
