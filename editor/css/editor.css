@@ -1,0 +1,267 @@
+:root {
+    --bg-light-gray: #f7fafc;
+    --panel-gray: #ffffff;
+    --border-gray: #e2e8f0;
+    --text-dark: #2d3748;
+    --text-muted: #718096;
+    --button-gold: #d49a3b;
+    --button-gold-hover: #e5ab4f;
+    --button-gold-active: #b5802e;
+    --input-focus-blue: #4299e1;
+    --disabled-gray: #edf2f7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--bg-light-gray);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 30px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.editor-wrapper {
+    width: 100%;
+    max-width: 720px;
+    background: var(--panel-gray);
+    border: 1px solid var(--border-gray);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+h1 {
+    color: var(--text-dark);
+    margin: 0 0 5px;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    font-weight: 500;
+}
+
+.auth-gate-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #edf2f7;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+}
+
+.auth-card {
+    background: #ffffff;
+    border: 1px solid var(--border-gray);
+    border-radius: 12px;
+    padding: 34px 28px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+}
+
+.auth-card h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    color: var(--text-dark);
+}
+
+.auth-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 22px;
+}
+
+.password-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.admin-text-field {
+    width: 100%;
+    min-width: 0;
+    background: #ffffff;
+    border: 2px solid var(--border-gray);
+    border-radius: 8px;
+    padding: 13px 14px;
+    color: var(--text-dark);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.admin-text-field:focus { border-color: var(--input-focus-blue); }
+
+.admin-text-field:disabled {
+    background: var(--disabled-gray);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.custom-select-menu {
+    width: 100%;
+    background: #ffffff;
+    border: 2px solid var(--border-gray);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--text-dark);
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+.custom-select-menu:focus { border-color: var(--input-focus-blue); }
+.custom-select-menu option:disabled { color: var(--text-muted); background: #f7fafc; }
+
+.lookup-control-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 10px;
+    margin-bottom: 26px;
+    align-items: end;
+}
+
+.target-field-wrap { min-width: 0; }
+
+.index-numeric-input {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.lookup-control-row button {
+    min-height: 48px;
+    padding: 12px 17px;
+    white-space: nowrap;
+}
+
+.nav-button {
+    width: 48px;
+    padding: 10px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px !important;
+    line-height: 1;
+}
+
+.workspace-editing-panel {
+    border-top: 2px dashed var(--border-gray);
+    padding-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    text-align: left;
+}
+
+.field-label-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.large-arabic-input {
+    font-family: var(--arabic-font);
+    font-size: clamp(40px, 7vw, 80px);
+    line-height: 1.8;
+    min-height: 155px;
+    font-weight: 600;
+    color: #0c4d4d;
+    text-align: center;
+    direction: rtl;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.large-meaning-input {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: center;
+    width: 100%;
+}
+
+button {
+    background-color: var(--button-gold);
+    color: #1a1002;
+    border: none;
+    padding: 14px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+button:hover:not(:disabled) { background-color: var(--button-gold-hover); }
+button:active:not(:disabled) { background-color: var(--button-gold-active); }
+button:disabled {
+    background-color: #cbd5e0;
+    color: #718096;
+    cursor: not-allowed;
+}
+
+.toast-popup {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3748;
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    max-width: calc(100% - 32px);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 20000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.toast-popup.show { opacity: 1; }
+.hidden { display: none !important; }
+
+@media (max-width: 520px) {
+    .editor-wrapper { padding: 20px 15px; }
+    .auth-card { padding: 28px 20px; }
+    .lookup-control-row { grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 6px; }
+    .lookup-control-row button { padding: 10px 12px; font-size: 13px; }
+    .nav-button { width: 42px; padding: 8px !important; }
+    .large-arabic-input { font-size: clamp(36px, 11vw, 60px); min-height: 120px; }
+    .large-meaning-input { font-size: 18px; }
+    .field-label-header { font-size: 11px; }
+}
+
+@media (max-width: 360px) {
+    .lookup-control-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+    .lookup-control-row .nav-button { width: 38px; }
+    .lookup-control-row #lookup-next-btn { grid-column: 3; }
+}
