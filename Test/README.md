@@ -6,6 +6,7 @@ This version uses Pineapple as its web base and adds Quest Mode. No Android proj
 ## Quest Mode
 - Regular stages follow the original book order, with 10 words per stage. The last stage uses the remaining words.
 - Review cards show the word and meaning, one at a time, in book order. The same words are shuffled for the quiz.
+- Quiz questions advance automatically after 1.2 seconds of answer feedback, matching Quiz Mode. Leaving for the map cancels the pending transition; the answered question remains saved.
 - 60% earns one star, 80% two and 100% three. One star is required to unlock the next stop. Failed stages can be reviewed and retried; best stars and unlocked stages are retained.
 - A dragon checkpoint appears after every five regular stages and gates the next stage. It tests 25 unique previously learned words, prioritizing recent and repeated mistakes; remaining slots use the least-secure learned words. Dragon quizzes start directly without a review round.
 - Progress saves after every review step and answer using localStorage. It is local to this browser, device, book and app URL—not an account or cross-device sync.
