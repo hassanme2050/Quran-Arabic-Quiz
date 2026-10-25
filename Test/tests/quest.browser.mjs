@@ -30,6 +30,7 @@ try {
     await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();
     await page.locator('[data-action="openQuest"]').click();
     await page.locator('#quest-map-view:not(.hidden)').waitFor();
+    await page.clock.install();
     assert.equal(await page.locator('.quest-node').count(),10);
     assert(await page.locator('[data-node="stage-2"]').isDisabled());
     await page.evaluate(()=>document.fonts.ready);
@@ -64,7 +65,14 @@ try {
             if(resume&&i===0){
                 await page.reload();await page.locator('#menu-view:not(.hidden)').waitFor();
                 await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();
-            } else await page.locator('#quest-question-next').click();
+            } else {
+                assert(await page.locator('#quest-answer-options button').first().isDisabled());
+                if(i===0){
+                    await page.clock.fastForward(1199);
+                    assert.equal(await page.locator('#quest-question-counter').textContent(),'Question '+(i+1)+' of '+total);
+                    await page.clock.fastForward(1);
+                } else await page.clock.fastForward(1200);
+            }
         }
         await visible('quest-result-view');return asked;
     }
@@ -94,7 +102,10 @@ try {
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
     await page.locator('[data-node="stage-6"]').click();await review(6);
     await page.screenshot({path:path.join(qa,'mobile-quiz.jpg'),fullPage:true,type:'jpeg',quality:75});
+    await page.locator('#quest-answer-options button').first().click();
     await page.locator('#quest-quiz-view [data-quest-action="map"]').click();
+    await page.clock.fastForward(1200);
+    assert(await page.locator('#quest-map-view').isVisible());
     const downloadPromise=page.waitForEvent('download');await page.locator('#quest-export').click();
     const download=await downloadPromise,backup=await text(await download.createReadStream());
     const exported=JSON.parse(backup);
@@ -115,7 +126,7 @@ try {
     await blockedPage.locator('[data-node="stage-1"]').click();
     assert((await blockedPage.locator('#quest-review-view .quest-session-save').textContent()).includes('cannot be saved'));
     await blocked.close();assert.deepEqual(errors,[]);
-    console.log('PASS: Chromium desktop/mobile flow, failure/retry, stars, 25-word dragon, resume, export/import, blocked storage, no overflow or JavaScript errors.');
+    console.log('PASS: Chromium desktop/mobile flow, failure/retry, stars, 25-word dragon, resume, export/import, blocked storage, automatic 1200ms progression, feedback exit cancellation, no overflow or JavaScript errors.');
 } catch(error) {
     if(page)await page.screenshot({path:path.join(qa,'failure.jpg'),fullPage:true,type:'jpeg',quality:75}).catch(()=>{});
     throw error;
