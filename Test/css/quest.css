@@ -53,8 +53,7 @@
 .quest-review-card { cursor:default; min-height:240px; text-align:center; margin:10px 0 22px; padding:26px 20px; border-color:#cbb56d; }
 .quest-book-number { display:block; font-size:11px; color:#738979; letter-spacing:1px; }
 .quest-review-card .meaning-text-render { font-size:24px; }
-.quest-question-card { cursor:default; min-height:145px; padding:24px 18px; margin:10px 0; text-align:center; border-color:#cbb56d; }
-.quest-question-card .arabic-text-render { margin:12px 0; }
+.quest-question-card { cursor:default; min-height:140px; margin-bottom:15px; text-align:center; }
 .quest-feedback { min-height:26px; font-size:14px; line-height:1.6; color:#b7ebcb; margin:14px 0 0; }
 .quest-feedback-wrong { color:#ffe0a2; }
 .quest-session-save { font-size:11px; color:#a7c6ba; margin:16px 2px; line-height:1.6; }
