@@ -6,6 +6,9 @@ on:
     paths:
       - 'Test/**'
       - '.github/workflows/verify-strawberry.yml'
+concurrency:
+  group: strawberry-verification
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
