@@ -1,4 +1,4 @@
-import { openQuest, initializeQuest } from './quest.js';
+import { openQuest, initializeQuest } from './quest.js?v=20261025-quest2';
 import { state } from './state.js';
 import { vocabularyList, loadVocabulary } from './vocabulary.js';
 import { shuffleArray, getRandomSubset } from './utils.js';
