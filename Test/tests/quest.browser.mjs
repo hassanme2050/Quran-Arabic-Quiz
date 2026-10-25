@@ -27,10 +27,11 @@ try {
     const context=await browser.newContext({viewport:{width:1280,height:900},acceptDownloads:true});
     page=await context.newPage();
     page.on('pageerror',error=>errors.push(error.message));
+    await page.clock.install({time:new Date('2026-10-25T10:00:00Z')});
     await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();
     await page.locator('[data-action="openQuest"]').click();
     await page.locator('#quest-map-view:not(.hidden)').waitFor();
-    await page.clock.install();
+    await page.clock.pauseAt(new Date('2026-10-25T12:00:00Z'));
     assert.equal(await page.locator('.quest-node').count(),10);
     assert(await page.locator('[data-node="stage-2"]').isDisabled());
     await page.evaluate(()=>document.fonts.ready);
