@@ -1,3 +1,4 @@
+import { state } from './state.js';
 import { vocabularyList } from './vocabulary.js';
 import { shuffleArray } from './utils.js';
 import { generateQuizChoices } from './quiz.js';
@@ -150,7 +151,6 @@ function renderQuestion() {
     byId('quest-question-number').textContent='Book word #'+number;
     byId('quest-question-word').textContent=item.word;
     byId('quest-feedback').textContent='';
-    byId('quest-question-next').classList.add('hidden');
     const options=byId('quest-answer-options');
     options.replaceChildren();
     // Reuse Pineapple's exact distractor generation and meaning matching.
@@ -177,9 +177,12 @@ function submitAnswer(button,choice,item) {
     persist();
     byId('quest-feedback').textContent=correct?'✓ Correct!':'Correct meaning: '+item.meaning;
     byId('quest-feedback').classList.toggle('quest-feedback-wrong',!correct);
-    const next=byId('quest-question-next');
-    next.textContent=currentRun().phase==='result'?'See your stars →':'Next question →';
-    next.classList.remove('hidden');
+    const answeredId=currentId;
+    cancelPendingAnswer();
+    state.answerTimer=setTimeout(()=>{
+        state.answerTimer=null;
+        if(currentId===answeredId && !byId('quest-quiz-view').classList.contains('hidden'))renderRun();
+    },1200);
 }
 function renderResult() {
     const node=currentNode(),run=currentRun(),result=resultForRun(run),index=plan.findIndex(item=>item.id===node.id);
@@ -230,7 +233,6 @@ async function importProgress(event) {
 }
 export function initializeQuest() {
     byId('quest-review-next').addEventListener('click',()=>{advanceQuestReview(progress,currentId,shuffleArray);persist();renderRun();});
-    byId('quest-question-next').addEventListener('click',()=>{if(answerLocked)renderRun();});
     byId('quest-result-retry').addEventListener('click',()=>{retryQuestNode(plan,progress,currentId,shuffleArray);persist();renderRun();});
     byId('quest-result-continue').addEventListener('click',()=>{if(nextId)startNode(nextId);});
     document.querySelectorAll('[data-quest-action]').forEach(button=>button.addEventListener('click',()=>{
