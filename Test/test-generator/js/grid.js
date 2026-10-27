@@ -12,7 +12,7 @@ export function renderInventoryTilesGrid() {
 
     for (let i = startIdx; i < endIdx; i++) {
         const item = state.fullVocabularyInventory[i];
-        const absoluteIndex = i + 1;
+        const absoluteIndex = item.number || i + 1;
         const isSelected = state.selected.has(absoluteIndex);
         const tile = document.createElement('div');
         tile.className = 'compact-word-tile' + (isSelected ? ' selected-state' : '');
@@ -20,7 +20,7 @@ export function renderInventoryTilesGrid() {
         tile.setAttribute('role', 'button');
         tile.setAttribute('aria-pressed', String(isSelected));
         tile.tabIndex = 0;
-        if (absoluteIndex > 999) {
+        if (absoluteIndex > (state.activeBook === 'book_b' ? 9999 : 999)) {
             tile.setAttribute('aria-disabled', 'true');
             tile.tabIndex = -1;
         }
@@ -36,6 +36,8 @@ export function renderInventoryTilesGrid() {
         meaningNode.className = 'tile-meaning-text';
         meaningNode.title = item.meaning;
         meaningNode.textContent = item.meaning;
+        meaningNode.dir = state.activeBook === 'book_b' ? 'rtl' : 'auto';
+        meaningNode.lang = state.activeBook === 'book_b' ? 'ur' : 'en';
         tile.append(indexNode, checkboxNode, arabicNode, meaningNode);
         fragment.appendChild(tile);
     }

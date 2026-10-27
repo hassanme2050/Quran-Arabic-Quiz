@@ -286,6 +286,39 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert(read('Test-Generator.html').includes('url=test-generator/index.html'));
     });
 
+    await t.test('Book B sessions exclude unverified words, dictionary keeps them, and codes enforce book identity', async () => {
+        dom('index.html');
+        const vocabulary = await import('../js/vocabulary.js');
+        const quiz = await import('../js/quiz.js');
+        const dictionary = await import('../js/dictionary.js');
+        const cards = await import('../js/flashcards.js');
+        const {state} = await import('../js/state.js');
+        const headings = read('Lughat-AlQuran-word-meaning.txt').split(/\r?\n/).slice(0,2).join('\n');
+        const rows = Array.from({length:30},(_,i)=>String(i+1).padStart(4,'0')+' word'+(i+1)+' \u27F5 meaning'+(i+1)+' (note)');
+        const text = headings+'\n'+rows.slice(0,20).join('\n')+'\n-----\n'+rows.slice(20).join('\n');
+        vocabulary.parseVocabulary(text,'book_b');
+        assert.equal(vocabulary.vocabularyList.length,20);
+        assert.equal(vocabulary.dictionaryVocabularyList.length,30);
+        assert.equal(el('dict-sort-english').textContent,'Urdu');
+        for(const item of vocabulary.vocabularyList) assert(quiz.generateQuizChoices(item).every(choice=>choice.verified!==false));
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+1));
+        quiz.startQuizWithCode(); assert(!el('quiz-code-error').classList.contains('hidden'));
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+1),'book_b');
+        quiz.startQuizWithCode(); assert.equal(state.sessionWords.length,10); assert(state.sessionWords.every(item=>item.verified));
+        cards.showCard(); assert.equal(el('card-meaning-field').dir,'rtl'); assert(el('card-meaning-field').textContent.includes('(note)'));
+        dictionary.openDictionaryMode(); dictionary.setDictionarySort('number');
+        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,30);
+        assert.equal(el('dictionary-list').querySelectorAll('.unverified').length,10);
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+15),'book_b');
+        quiz.startQuizWithCode(); assert(!el('quiz-code-error').classList.contains('hidden'));
+        vocabulary.parseVocabulary(headings+'\n'+rows.join('\n'),'book_b');
+        assert.equal(vocabulary.vocabularyList.length,0); assert.equal(vocabulary.dictionaryVocabularyList.length,30);
+        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.unverified').length,30);
+        vocabulary.parseVocabulary(vocabularyText);
+        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,88);
+        assert.equal(el('dict-sort-english').textContent,'English');
+    });
+
     await t.test('HTTP preview serves all tool pages, shared assets and clean subfolder URLs', async () => {
         // Node's HTTP client needs real timer handles, including unref().
         globalThis.setTimeout = nativeTimeout;

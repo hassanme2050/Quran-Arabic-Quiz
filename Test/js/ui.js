@@ -1,6 +1,6 @@
 export { launchToastAlert } from '../shared/ui.js';
 import { state } from './state.js';
-const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view', 'quest-map-view', 'quest-review-view', 'quest-quiz-view', 'quest-result-view'];
+const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view'];
 export function switchView(viewId) {
   for (const id of views) document.getElementById(id).classList.toggle('hidden', id !== viewId);
 }

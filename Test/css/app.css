@@ -501,3 +501,18 @@ button.exit-btn:hover {
 .dictionary-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; color:#c6e3e3; font-size:12px; margin:8px 4px 0; }
 #app-title.dictionary-title { font-size:28px; margin-bottom:20px; letter-spacing:0; }
 @media(max-width:420px) { .dictionary-list { padding-left:8px; padding-right:43px; } .dictionary-entry { gap:6px; padding:10px 2px; grid-template-columns:minmax(0,max-content) 9px minmax(0,max-content); } .dictionary-word { font-size:22px; } .dictionary-meaning { font-size:15px; } .dictionary-jump { width:39px; } .dictionary-jump-track { left:17px; } .dictionary-jump button { width:37px; font-size:10px; } #app-title.dictionary-title { font-size:26px; } }
+
+/* Peaches: Urdu book content and verification status. */
+[data-book="book_b"] .dictionary-meaning,
+[data-book="book_b"] .meaning-text-render,
+[data-book="book_b"] .quiz-options button,
+[data-book="book_b"] .summary-table td:nth-child(n+4) {
+    direction: rtl; text-align: right; font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Segoe UI', serif;
+    line-height: 2; overflow-wrap: anywhere;
+}
+[data-book="book_b"] .meaning-text-render { white-space: pre-line; }
+.dictionary-entry.unverified { opacity: .62; background: #f1f3f5; }
+.dictionary-note { font-size: .88em; color: #475569; }
+.dictionary-meta { font: 12px/1.6 'Segoe UI', sans-serif; color: #52616b; margin-top: 6px; }
+.dictionary-entry.unverified .dictionary-meta { font-weight: 600; }
+[data-book="book_b"] .dictionary-word { overflow-wrap: anywhere; min-width: 0; }

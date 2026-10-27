@@ -6,9 +6,8 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=20261024-alexandria1">
-    <link rel="stylesheet" href="css/app.css?v=20261024-alexandria1">
-    <link rel="stylesheet" href="css/quest.css?v=20261025-quest2">
+    <link rel="stylesheet" href="shared/typography.css?v=20261026-peaches1">
+    <link rel="stylesheet" href="css/app.css?v=20261026-peaches1">
 </head>
 <body>
     <div class="app-wrapper">
@@ -37,14 +36,13 @@
             <div class="menu-action-layout">
                 <button data-action="triggerSelectedSession" data-value="flashcard">Review Mode</button>
                 <button data-action="triggerSelectedSession" data-value="quiz">Quiz Mode</button>
-                <button class="quest-menu-button" data-action="openQuest">Quest Mode <span>New · Learn, test & unlock</span></button>
                 <button data-action="openDictionaryMode">Dictionary Mode</button>
             </div>
 
             <!-- Book Selection Dropdown element positioned under Quiz Mode -->
             <select class="custom-select-menu" id="vocabulary-book-selector">
                 <option value="book_a" selected>Book A - Arabic to English</option>
-                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
                 <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
             </select>
 
@@ -135,91 +133,9 @@
                 <button class="exit-btn" data-action="exitToHome">🏠 Go to Home</button>
             </div>
         </div>
-
-        <section id="quest-map-view" class="quest-shell hidden" aria-label="Quest map">
-            <header class="quest-hero">
-                <div class="quest-eyebrow">STRAWBERRY · BOOK A</div>
-                <h2>Your word adventure</h2>
-                <p>Small steps. Stronger Arabic. One stage at a time.</p>
-                <div class="quest-overview" id="quest-overview"></div>
-                <progress id="quest-progress" value="0" max="1" aria-label="Quest stages cleared"></progress>
-                <button id="quest-continue" class="quest-primary" type="button">Begin your quest</button>
-            </header>
-            <p class="quest-save-note" id="quest-save-note" role="status">Progress is saved in this browser. Export a backup to keep it safe.</p>
-            <div class="quest-map-key"><span>● Ready</span><span>★ Cleared</span><span>🔒 Locked</span><span>🐉 Dragon</span></div>
-            <div class="quest-map-landscape">
-                <svg id="quest-route" class="quest-route" aria-hidden="true" preserveAspectRatio="none"><path id="quest-route-path"></path></svg>
-                <ol id="quest-map-nodes" aria-label="Stages in book order"></ol>
-            </div>
-            <div class="quest-rules">
-                <strong>How your quest works</strong>
-                <p>Review each word with its meaning, then answer a shuffled quiz. Earn at least one star to unlock the next stop.</p>
-                <div class="quest-star-guide"><span>★ 60%</span><span>★★ 80%</span><span>★★★ 100%</span></div>
-                <p>Every five stages, a dragon tests 25 previously learned words, prioritizing your mistakes. The final stage uses the words left in the book.</p>
-            </div>
-            <details class="quest-trouble-panel">
-                <summary>Words to strengthen</summary>
-                <p>Your recent misses and repeated mistakes guide the dragon challenges.</p>
-                <ul id="quest-weak-words"></ul>
-            </details>
-            <div class="quest-backup-actions">
-                <button id="quest-export" class="exit-btn" type="button">Export progress</button>
-                <button id="quest-import" class="exit-btn" type="button">Import progress</button>
-                <input id="quest-import-file" type="file" accept=".json,application/json" hidden>
-            </div>
-            <p class="quest-device-note">Saved on this device and browser for this app address. Clearing browser data removes progress; export a backup to move it elsewhere.</p>
-            <button class="exit-btn quest-wide" type="button" data-quest-action="home">← Main menu</button>
-        </section>
-
-        <section id="quest-review-view" class="quest-shell hidden" aria-label="Quest word review">
-            <div class="quest-eyebrow" id="quest-review-heading"></div>
-            <h2>Meet your next words</h2>
-            <p class="quest-caption">Read the word and meaning. The quiz starts after your final card.</p>
-            <div class="quest-session-progress" id="quest-review-counter"></div>
-            <div class="display-card-frame quest-review-card">
-                <span class="quest-book-number" id="quest-review-number"></span>
-                <div id="quest-review-word" class="arabic-text-render" lang="ar" dir="rtl"></div>
-                <div id="quest-review-meaning" class="meaning-text-render"></div>
-            </div>
-            <button id="quest-review-next" class="quest-wide" type="button">Next word</button>
-            <button class="exit-btn quest-wide" type="button" data-quest-action="map">← Save &amp; return to map</button>
-            <p class="quest-session-save" role="status"></p>
-        </section>
-
-        <section id="quest-quiz-view" class="quest-shell hidden" aria-label="Quest quiz">
-            <div class="quest-eyebrow" id="quest-quiz-heading"></div>
-            <h2 id="quest-quiz-title">Put your words to the test</h2>
-            <p class="quest-caption" id="quest-quiz-description"></p>
-            <div class="quest-session-progress" id="quest-question-counter"></div>
-            <div class="display-card-frame quest-question-card">
-                <span class="quest-book-number" id="quest-question-number"></span>
-                <div class="arabic-text-render" id="quest-question-word" lang="ar" dir="rtl"></div>
-            </div>
-            <div id="quest-answer-options" class="quiz-options"></div>
-            <p id="quest-feedback" class="quest-feedback" role="status" aria-live="polite"></p>
-            <button class="exit-btn quest-wide" type="button" data-quest-action="map">← Save &amp; return to map</button>
-            <p class="quest-session-save" role="status"></p>
-        </section>
-
-        <section id="quest-result-view" class="quest-shell hidden" aria-label="Quest results">
-            <div class="quest-result-card">
-                <div class="quest-eyebrow" id="quest-result-stage"></div>
-                <div id="quest-result-stars" class="quest-result-stars" aria-label="Stars earned"></div>
-                <h2 id="quest-result-title"></h2>
-                <div id="quest-result-score" class="quest-result-score"></div>
-                <p id="quest-result-message"></p>
-                <div class="quest-star-guide"><span>★ 60%</span><span>★★ 80%</span><span>★★★ 100%</span></div>
-            </div>
-            <button id="quest-result-continue" class="quest-wide" type="button">Next stage</button>
-            <button id="quest-result-retry" class="exit-btn quest-wide" type="button">Review &amp; try again</button>
-            <button class="exit-btn quest-wide" type="button" data-quest-action="map">View quest map</button>
-            <details class="quest-answer-review"><summary>Review your answers</summary><ol id="quest-result-answers"></ol></details>
-            <p class="quest-session-save" role="status"></p>
-        </section>
-
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=20261025-quest2"></script>
+    <script type="module" src="js/app.js?v=20261026-peaches1"></script>
 </body>
 </html>
