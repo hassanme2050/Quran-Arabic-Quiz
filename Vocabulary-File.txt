@@ -86,3 +86,8 @@
 إِذَا = When (for future)
 ثُمَّ = Then
 فَ = Then, Thus, Therefore
+بَلْ = However, But, rather
+عِنْدَ، لَدَى، لَدُنْ = Near, with
+إِنْ... إِلَّا = nothing but
+مَا... إِلَّا = Nothing but
+أَلَّا (أَنْ + لَا) = That... not, so as not to
