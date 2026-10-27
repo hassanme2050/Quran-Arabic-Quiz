@@ -16,7 +16,8 @@ test('real source preserves all entries, duplicate numbers, metadata, Urdu and e
  assert.equal(parsed.records.filter(item=>item.number===952).length,2);
  assert.equal(parsed.warnings.filter(w=>w.startsWith('Duplicate')).length,14);
  assert.equal(parsed.warnings.filter(w=>w.startsWith('Unrecognized')).length,0);
- assert(parsed.records.every(item=>item.verified===false));
+ assert.equal(parsed.records.filter(item=>item.verified).length,20);
+ assert(parsed.records.filter(item=>item.verified).every(item=>item.number<=20));
 });
 test('first boundary controls verification, including subsequent headings and repeated boundaries',()=>{
  const parsed=parseLughatBook('\uFEFF'+headings+'\r\n'+row(1,'meaning (root)')+'\r\n  ----- All words above this line are verified.\r\n'+row(2)+'\r\n'+headings+'\r\n-----\r\n'+row(3));
