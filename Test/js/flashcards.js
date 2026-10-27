@@ -7,7 +7,7 @@ export function showCard() {
     document.getElementById('card-arabic-field').textContent = state.sessionWords[state.currentIndex].word;
     const item = state.sessionWords[state.currentIndex];
     const meaningField = document.getElementById('card-meaning-field');
-    meaningField.textContent = item.meaning + (item.explanation ? '\n' + item.explanation : '');
+    meaningField.textContent = item.meaning + (item.explanation ? ' ' + item.explanation : '');
     meaningField.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
     meaningField.lang = activeBook === 'book_b' ? 'ur' : 'en';
     

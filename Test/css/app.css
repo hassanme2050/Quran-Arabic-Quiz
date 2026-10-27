@@ -510,9 +510,6 @@ button.exit-btn:hover {
     direction: rtl; text-align: right; font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Segoe UI', serif;
     line-height: 2; overflow-wrap: anywhere;
 }
-[data-book="book_b"] .meaning-text-render { white-space: pre-line; }
+[data-book="book_b"] .meaning-text-render { white-space: normal; }
 .dictionary-entry.unverified { opacity: .62; background: #f1f3f5; }
-.dictionary-note { font-size: .88em; color: #475569; }
-.dictionary-meta { font: 12px/1.6 'Segoe UI', sans-serif; color: #52616b; margin-top: 6px; }
-.dictionary-entry.unverified .dictionary-meta { font-weight: 600; }
 [data-book="book_b"] .dictionary-word { overflow-wrap: anywhere; min-width: 0; }

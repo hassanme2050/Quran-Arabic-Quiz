@@ -24,7 +24,8 @@ try {
   assert.equal(await page.locator('.dictionary-entry').count(),1858);
   assert.equal(await page.locator('.dictionary-entry.unverified').count(),1838);
   await page.locator('#dict-sort-number').click();
-  assert((await page.locator('.dictionary-meta').first().textContent()).includes('#0001'));
+  assert.equal(await page.locator('.dictionary-meta').count(),0);
+  assert.equal(await page.locator('.dictionary-note').count(),0);
   assert.equal(await page.locator('.dictionary-meaning').first().getAttribute('dir'),'rtl');
   await page.locator('#dict-sort-english').click();
   await page.screenshot({path:'artifacts/dictionary-'+viewport.width+'.png',fullPage:true});

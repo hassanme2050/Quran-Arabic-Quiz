@@ -105,16 +105,8 @@ export function renderDictionary() {
         row.dataset.jumpKey = getDictionaryJumpKey(item, index);
         const meaning = document.createElement('div');
         meaning.className = 'dictionary-meaning';
-        meaning.textContent = item.meaning;
+        meaning.textContent = item.meaning + (item.explanation ? ' ' + item.explanation : '');
         if (activeBook === 'book_b') { meaning.dir = 'rtl'; meaning.lang = 'ur'; }
-        if (item.explanation) {
-            const note = document.createElement('div'); note.className = 'dictionary-note'; note.textContent = item.explanation; meaning.appendChild(note);
-        }
-        if (item.number) {
-            const meta = document.createElement('div'); meta.className = 'dictionary-meta'; meta.dir = 'auto';
-            meta.textContent = '#' + String(item.number).padStart(4,'0') + ' ? ' + [item.juzz && ('Juzz ' + item.juzz.number), item.surah && item.surah.name, item.verified === false && 'Unverified'].filter(Boolean).join(' ? ');
-            meaning.appendChild(meta);
-        }
         const word = document.createElement('div');
         word.className = 'dictionary-word';
         word.dir = 'rtl';

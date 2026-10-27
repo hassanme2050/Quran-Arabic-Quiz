@@ -2,9 +2,9 @@ import { state } from './state.js';
 import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js';
 import { shuffleArray, getRandomSubset } from './utils.js';
 import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=20261026-peaches2';
 import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js';
-import { openDictionaryMode, setDictionarySort } from './dictionary.js?v=20261026-peaches1';
+import { openDictionaryMode, setDictionarySort } from './dictionary.js?v=20261026-peaches2';
 import { copyScreenshotToClipboard } from './platform.js';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
