@@ -513,3 +513,13 @@ button.exit-btn:hover {
 [data-book="book_b"] .meaning-text-render { white-space: normal; }
 .dictionary-entry.unverified { opacity: .62; background: #f1f3f5; }
 [data-book="book_b"] .dictionary-word { overflow-wrap: anywhere; min-width: 0; }
+
+/* Larger Urdu meanings across Book B student screens. */
+[data-book="book_b"] .quiz-options button { font-size: 22px; }
+[data-book="book_b"] .meaning-text-render { font-size: 32px; }
+[data-book="book_b"] .dictionary-meaning { font-size: 22px; }
+[data-book="book_b"] .summary-table .large-bold-cell:nth-child(n+4) { font-size: 24px; }
+[data-book="book_b"] .summary-table .small-choice-cell { font-size: 20px; }
+@media (max-width: 420px) {
+    [data-book="book_b"] .dictionary-meaning { font-size: 20px; }
+}
