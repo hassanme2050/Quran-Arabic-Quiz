@@ -103,7 +103,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     });
 
     await t.test('shared parser preserves book order, duplicates, Unicode, separators and root paths', async () => {
-        assert.equal(records.length, 88);
+        assert(records.length >= 61, "Book A needs at least 61 words for cross-page selection coverage");
         assert.deepEqual(parseVocabularyRecords('one = a=b\r\ninvalid\r\n = empty\nاثنان = two\none = repeated'), [
             {word:'one',meaning:'a=b'}, {word:'اثنان',meaning:'two'}, {word:'one',meaning:'repeated'}
         ]);
@@ -135,7 +135,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.equal(el('tiles-matrix-box').children[0],firstTile);
         assert(el('generate-code-btn').disabled);
         changeMatrixActivePage('1');
-        assert.equal(el('tiles-matrix-box').children.length,38);
+        assert.equal(el('tiles-matrix-box').children.length,Math.min(50, records.length - 50));
         assert.equal(el('tiles-matrix-box').children[0].dataset.number,'51');
         for (let number=51; number<=60; number++) toggleWordSelection(number,el('tiles-matrix-box').children[number-51]);
         assert.equal(state.selected.size,20);
@@ -174,7 +174,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         runDelay(300);
         assert(el('login-shield-gate').classList.contains('is-hidden'));
         assert.equal(state.selected.size,0);
-        assert.equal(state.fullVocabularyInventory.length,88);
+        assert.equal(state.fullVocabularyInventory.length,records.length);
         assert(el('generate-code-btn').disabled);
     });
 
@@ -219,7 +219,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         vocabulary.parseVocabulary(vocabularyText);
         const original = structuredClone(vocabulary.vocabularyList);
         dictionary.openDictionaryMode();
-        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,88);
+        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,records.length);
         const first = el('dictionary-list').children[0];
         dictionary.renderDictionary();
         assert.equal(el('dictionary-list').children[0],first);
@@ -315,7 +315,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.equal(vocabulary.vocabularyList.length,0); assert.equal(vocabulary.dictionaryVocabularyList.length,30);
         dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.unverified').length,30);
         vocabulary.parseVocabulary(vocabularyText);
-        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,88);
+        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,records.length);
         assert.equal(el('dict-sort-english').textContent,'English');
     });
 

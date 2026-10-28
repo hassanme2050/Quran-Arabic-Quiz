@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {parseVocabularyRecords} from '../shared/vocabulary.js';
 const root=new URL('../',import.meta.url);
+const bookACount=parseVocabularyRecords(fs.readFileSync(new URL('Vocabulary-File.txt',root),'utf8')).length;
 const source=fs.readFileSync(new URL('Lughat-AlQuran-word-meaning.txt',root),'utf8');
 const lines=source.split(/\r?\n/).filter(line=>!/^\s*-{5,}/.test(line));const boundaryIndex=lines.findIndex(line=>/^0021\s/.test(line));
 const fixture=[...lines.slice(0,boundaryIndex),'-----',...lines.slice(boundaryIndex)].join('\n');
@@ -55,7 +57,7 @@ try {
   await page.getByRole('button',{name:'Go to Home'}).click();
   await page.route('**/Lughat-AlQuran-word-meaning.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:fixture}));
   await page.selectOption('#vocabulary-book-selector','book_a');
-  await page.waitForFunction(()=>document.querySelector('#status-message').textContent.includes('88'));
+  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.startsWith(n+' '),bookACount);
   await page.selectOption('#vocabulary-book-selector','book_b');
   await page.waitForFunction(()=>document.querySelector('#status-message').textContent.startsWith('20 verified'));
   await page.getByRole('button',{name:'Review Mode',exact:true}).click();
@@ -76,7 +78,7 @@ try {
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.getByRole('button',{name:'Go to Home'}).click();
   await page.selectOption('#vocabulary-book-selector','book_a');
-  await page.waitForFunction(()=>document.querySelector('#status-message').textContent.includes('88'));
+  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.startsWith(n+' '),bookACount);
   assert(await page.getByRole('button',{name:'Quiz Mode',exact:true}).isEnabled());
   await page.getByRole('button',{name:'Dictionary Mode',exact:true}).click();
   await page.locator('#dict-sort-english').click();
@@ -88,7 +90,7 @@ try {
   assert.equal(await page.locator('.dictionary-entry').count(),0);
   assert(await page.locator('.dictionary-empty').isVisible());
   await page.locator('#dictionary-keyboard').getByRole('button',{name:'Clear',exact:true}).click();
-  assert.equal(await page.locator('.dictionary-entry').count(),88);
+  assert.equal(await page.locator('.dictionary-entry').count(),bookACount);
   await page.locator('#dict-sort-number').click();
   assert(await page.locator('#dictionary-keyboard').isHidden());
   assert.deepEqual(errors,[]);
