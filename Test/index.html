@@ -6,8 +6,8 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=20261026-peaches5">
-    <link rel="stylesheet" href="css/app.css?v=20261026-peaches5">
+    <link rel="stylesheet" href="shared/typography.css?v=20261028-peaches-search1">
+    <link rel="stylesheet" href="css/app.css?v=20261028-peaches-search1">
 </head>
 <body>
     <div class="app-wrapper">
@@ -62,14 +62,16 @@
                 <button type="button" id="dict-sort-number" data-action="setDictionarySort" data-value="number">123</button>
                 <button type="button" id="dict-sort-english" data-action="setDictionarySort" data-value="english">English</button>
                 <button type="button" id="dict-sort-arabic" class="active" data-action="setDictionarySort" data-value="arabic">Arabic</button>
+                <input id="dictionary-search" class="dictionary-search" type="text" autocomplete="off" spellcheck="false" aria-label="Live dictionary search" placeholder="Search…">
             </div>
+            <div id="dictionary-keyboard" class="dictionary-keyboard hidden" role="group" aria-label="Search keyboard"></div>
             <div class="dictionary-layout">
                 <div class="dictionary-list" id="dictionary-list" aria-label="Vocabulary dictionary"></div>
                 <div class="dictionary-jump" id="dictionary-jump" aria-label="Quick jump index">
                     <div class="dictionary-jump-track"></div>
                 </div>
             </div>
-            <div class="dictionary-footer"><span id="dictionary-count">0 words</span><span id="dictionary-sort-caption">Sorted by Arabic Alphabet</span></div>
+            <div class="dictionary-footer"><span id="dictionary-count" role="status" aria-live="polite">0 words</span><span id="dictionary-sort-caption">Sorted by Arabic Alphabet</span></div>
             <button class="exit-btn" style="width:100%; margin-top:16px;" data-action="exitToHome">🏠 Go to Home</button>
         </div>
 
@@ -136,6 +138,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=20261026-peaches5"></script>
+    <script type="module" src="js/app.js?v=20261028-peaches-search1"></script>
 </body>
 </html>

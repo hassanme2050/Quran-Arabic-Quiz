@@ -1,5 +1,6 @@
 import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js';
 import { switchView, launchToastAlert } from './ui.js';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search1';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -9,6 +10,25 @@ let jumpTargets = new Map();
 let cachedVocabulary;
 let renderedVocabulary;
 let renderedMode;
+let renderedQuery;
+let searchBook;
+let searchQuery = '';
+
+function configureKeyboard() {
+    const input = document.getElementById('dictionary-search');
+    const language = dictionarySortMode === 'number' ? 'number' : dictionarySortMode === 'arabic' ? 'ar' : activeBook === 'book_b' ? 'ur' : 'en';
+    configureSearchKeyboard(input, document.getElementById('dictionary-keyboard'), language, () => { searchQuery = input.value; renderDictionary(); });
+}
+
+export function initializeDictionarySearch() {
+    const input = document.getElementById('dictionary-search');
+    input.addEventListener('input', () => { searchQuery = input.value; renderDictionary(); });
+    input.addEventListener('focus', () => { if (dictionarySortMode !== 'number') document.getElementById('dictionary-keyboard').classList.remove('hidden'); });
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') event.preventDefault();
+        if (event.key === 'Escape') { document.getElementById('dictionary-keyboard').classList.add('hidden'); input.blur(); }
+    });
+}
 const sortedCache = new Map();
 let markerFrame = null;
 function scheduleDictionaryMarker() {
@@ -33,7 +53,13 @@ export function openDictionaryMode() {
 }
 
 export function setDictionarySort(mode) {
+    if (mode !== dictionarySortMode || searchBook !== activeBook) {
+        searchQuery = '';
+        document.getElementById('dictionary-search').value = '';
+    }
+    searchBook = activeBook;
     dictionarySortMode = mode;
+    configureKeyboard();
     ['number','english','arabic'].forEach(key => {
         const button = document.getElementById('dict-sort-' + key);
         if (button) button.classList.toggle('active', key === mode);
@@ -67,7 +93,7 @@ export function getDictionaryJumpKey(item, index) {
 export function renderDictionary() {
     const list = document.getElementById('dictionary-list');
     if (!list) return;
-    if (renderedVocabulary === vocabularyList && renderedMode === dictionarySortMode) {
+    if (renderedVocabulary === vocabularyList && renderedMode === dictionarySortMode && renderedQuery === searchQuery) {
         scheduleDictionaryMarker();
         return;
     }
@@ -86,7 +112,7 @@ export function renderDictionary() {
     }
         sortedCache.set(dictionarySortMode, dictionarySortedItems);
     }
-    dictionarySortedItems = sortedCache.get(dictionarySortMode);
+    dictionarySortedItems = searchDictionary(sortedCache.get(dictionarySortMode), searchQuery, dictionarySortMode);
     list.innerHTML = '';
     const fragment = document.createDocumentFragment();
     dictionarySortedItems.forEach((item, index) => {
@@ -122,7 +148,7 @@ export function renderDictionary() {
     if (!dictionarySortedItems.length) {
         const empty = document.createElement('div');
         empty.className = 'dictionary-empty';
-        empty.textContent = 'No vocabulary words found.';
+        empty.textContent = searchQuery.trim() ? 'No matching words. Try a shorter search.' : 'No vocabulary words found.';
         fragment.appendChild(empty);
     }
     list.appendChild(fragment);
@@ -134,6 +160,7 @@ export function renderDictionary() {
     }
     renderedVocabulary = vocabularyList;
     renderedMode = dictionarySortMode;
+    renderedQuery = searchQuery;
     buildDictionaryJumpIndex();
     list.scrollTop = 0;
     if (!list.dataset.wheelBound) {
@@ -148,7 +175,9 @@ export function buildDictionaryJumpIndex() {
     const jump = document.getElementById('dictionary-jump');
     jump.dataset.script = dictionarySortMode === 'arabic' || (dictionarySortMode === 'english' && activeBook === 'book_b') ? 'arabic' : 'latin';
     jump.innerHTML = '<div class="dictionary-jump-track"></div>';
-    const keys = [...jumpTargets.keys()];
+    jump.classList.toggle('hidden', !!searchQuery.trim());
+    document.getElementById('dictionary-list').classList.toggle('search-results', !!searchQuery.trim());
+    const keys = searchQuery.trim() ? [] : [...jumpTargets.keys()];
     dictionaryJumpItems = keys;
     let shownKeys = keys;
     if (keys.length > 30 && dictionarySortMode === 'english' && activeBook !== 'book_b') shownKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(k => keys.includes(k)).concat(keys.includes('#') ? ['#'] : []);

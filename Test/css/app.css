@@ -478,7 +478,7 @@ button.exit-btn:hover {
 /* Dictionary Mode: isolated styles so existing quiz/review screens remain unchanged */
 #dictionary-view { text-align:left; }
 .dictionary-sort { display:flex; position:relative; gap:0; padding:4px; margin:18px 0 12px; border-radius:12px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); user-select:none; }
-.dictionary-sort-pill { position:absolute; top:4px; bottom:4px; left:4px; width:calc(33.333% - 2.67px); border-radius:9px; background:var(--button-gold); box-shadow:0 2px 8px rgba(0,0,0,.2); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:1; pointer-events:none; }
+.dictionary-sort-pill { position:absolute; top:4px; bottom:4px; left:4px; width:calc(25% - 2px); border-radius:9px; background:var(--button-gold); box-shadow:0 2px 8px rgba(0,0,0,.2); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:1; pointer-events:none; }
 .dictionary-sort button { position:relative; z-index:2; flex:1; min-width:0; padding:11px 4px; font-size:15px; color:#d5eeee; background:transparent; box-shadow:none; transform:none; }
 .dictionary-sort button:hover:not(:disabled) { background:transparent; box-shadow:none; transform:none; }
 .dictionary-sort button.active { color:#1a1002; }
@@ -523,3 +523,16 @@ button.exit-btn:hover {
 @media (max-width: 420px) {
     [data-book="book_b"] .dictionary-meaning { font-size: 21px; }
 }
+
+/* Live search is the fourth top control. */
+.dictionary-search { position:relative; z-index:2; flex:1; width:25%; min-width:0; box-sizing:border-box; margin:0; padding:8px 6px; border:1px solid #8caeae; border-radius:8px; background:#fff; color:#173b3b; font-size:16px; }
+.dictionary-search:focus { outline:2px solid var(--button-gold); outline-offset:1px; }
+.dictionary-search[dir="rtl"] { font-family:var(--arabic-font); }
+.dictionary-keyboard { padding:8px 4px; margin-bottom:10px; border-radius:12px; background:#173d3d; }
+.dictionary-keyboard-row { display:flex; justify-content:center; gap:3px; margin:4px 0; }
+.dictionary-keyboard-row button { flex:1; min-width:0; padding:9px 1px; margin:0; background:#eef5f5; color:#123c3c; font-family:var(--arabic-font); font-size:19px; line-height:1.5; border-radius:5px; box-shadow:none; }
+.dictionary-keyboard-row button:focus-visible { outline:2px solid var(--button-gold); }
+.dictionary-keyboard-row button:hover:not(:disabled) { transform:none; box-shadow:none; background:#ffe3a0; }
+.dictionary-keyboard-row.keyboard-tools button { font-family:inherit; font-size:13px; }
+.dictionary-list.search-results { padding-right:12px; }
+@media(max-width:420px) { .dictionary-sort button { font-size:13px; } .dictionary-keyboard-row button { font-size:17px; padding:8px 0; } }
