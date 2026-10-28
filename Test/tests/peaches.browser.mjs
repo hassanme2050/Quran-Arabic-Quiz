@@ -30,15 +30,15 @@ try {
   assert.equal(await page.locator('.dictionary-meta').count(),0);
   assert.equal(await page.locator('.dictionary-note').count(),0);
   assert.equal(await page.locator('.dictionary-meaning').first().getAttribute('dir'),'rtl');
-  await page.locator('#dictionary-search').fill('????');
+  await page.locator('#dictionary-search').fill('۰۰۰۱');
   assert.equal(await page.locator('.dictionary-entry').count(),1);
   await page.locator('#dictionary-search').press('Enter');
   assert.equal(await page.locator('.dictionary-entry').count(),1);
   await page.locator('#dict-sort-arabic').click();
   await page.locator('#dictionary-search').click();
   assert.equal(await page.locator('#dictionary-search').getAttribute('lang'),'ar');
-  await page.locator('#dictionary-keyboard').getByRole('button',{name:'?',exact:true}).click();
-  assert.equal(await page.locator('#dictionary-search').inputValue(),'?');
+  await page.locator('#dictionary-keyboard').getByRole('button',{name:'ل',exact:true}).click();
+  assert.equal(await page.locator('#dictionary-search').inputValue(),'ل');
   assert(await page.locator('.dictionary-entry').count()>0);
   assert(await page.locator('.dictionary-entry').count()<1858);
   await page.screenshot({path:'artifacts/search-arabic-'+viewport.width+'.png',fullPage:true});
@@ -47,8 +47,8 @@ try {
   await page.locator('#dict-sort-english').click();
   await page.locator('#dictionary-search').click();
   assert.equal(await page.locator('#dictionary-search').getAttribute('lang'),'ur');
-  await page.locator('#dictionary-keyboard').getByRole('button',{name:'?',exact:true}).click();
-  assert.equal(await page.locator('#dictionary-search').inputValue(),'?');
+  await page.locator('#dictionary-keyboard').getByRole('button',{name:'ک',exact:true}).click();
+  assert.equal(await page.locator('#dictionary-search').inputValue(),'ک');
   await page.screenshot({path:'artifacts/search-urdu-'+viewport.width+'.png',fullPage:true});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.locator('#dictionary-keyboard').getByRole('button',{name:'Clear',exact:true}).click();
@@ -57,7 +57,7 @@ try {
   await page.getByRole('button',{name:'Go to Home'}).click();
   await page.route('**/Lughat-AlQuran-word-meaning.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:fixture}));
   await page.selectOption('#vocabulary-book-selector','book_a');
-  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.startsWith(n+' '),bookACount);
+  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.includes(' '+n+' words'),bookACount);
   await page.selectOption('#vocabulary-book-selector','book_b');
   await page.waitForFunction(()=>document.querySelector('#status-message').textContent.startsWith('20 verified'));
   await page.getByRole('button',{name:'Review Mode',exact:true}).click();
@@ -78,7 +78,7 @@ try {
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.getByRole('button',{name:'Go to Home'}).click();
   await page.selectOption('#vocabulary-book-selector','book_a');
-  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.startsWith(n+' '),bookACount);
+  await page.waitForFunction(n=>document.querySelector('#status-message').textContent.includes(' '+n+' words'),bookACount);
   assert(await page.getByRole('button',{name:'Quiz Mode',exact:true}).isEnabled());
   await page.getByRole('button',{name:'Dictionary Mode',exact:true}).click();
   await page.locator('#dict-sort-english').click();
