@@ -1,7 +1,7 @@
-import { state } from './state.js?v=1029.26-editor3';
+import { state } from './state.js?v=1029.26-editor4';
 import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { saveVocabularyRecord } from './github.js?v=1029.26-editor3';
-import { refreshArabicFontControls } from './font.js?v=1029.26-editor3';
+import { saveVocabularyRecord } from './github.js?v=1029.26-editor4';
+import { refreshArabicFontControls } from './font.js?v=1029.26-editor4';
 export async function saveWordUpdateToGitHub() {
     if (state.saving) return;
     const number = state.loadedNumber;

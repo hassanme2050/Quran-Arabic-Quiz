@@ -192,7 +192,7 @@ h1 {
     --arabic-box-min-height: 155px;
     font-family: var(--arabic-font);
     font-size: calc(var(--arabic-base-font-size) + var(--arabic-font-adjustment, -2pt));
-    line-height: 1.35;
+    line-height: 1.8;
     height: max(var(--arabic-box-min-height), calc(var(--arabic-base-font-size) * 1.8 + 20px));
     min-height: 0;
     font-weight: 600;
