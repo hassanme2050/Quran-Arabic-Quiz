@@ -12,6 +12,7 @@ const password='test-only-\u0627\u0644\u0641';
 const cp='\uFEFF'+Buffer.from('another-test-password').toString('base64')+'\r\n\r\n'+Buffer.from(password).toString('base64')+'\r\n';
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 let browser,page;
+let pageErrors=[];
 try {
     const url=await new Promise((resolve,reject)=>{
         const timer=setTimeout(()=>reject(Error('Preview startup timed out')),10000);
@@ -24,6 +25,7 @@ try {
     for(const viewport of [{width:1280,height:900},{width:390,height:844}]) {
         const context=await browser.newContext({viewport});page=await context.newPage();
         const errors=[],githubRequests=[];let mode='success',passwordRequests=0;
+        pageErrors=errors;
         page.on('pageerror',error=>errors.push(error.message));
         await page.route('https://api.github.com/**',route=>{githubRequests.push(route.request().method());return route.abort();});
         await page.route('**/CP.txt',route=>{
@@ -35,6 +37,7 @@ try {
         await page.route('**/Vocabulary-File.txt',route=>route.fulfill({status:mode==='vocabulary-failed'?503:200,contentType:'text/plain; charset=utf-8',body:vocabulary}));
         await page.goto(url+'/Editor.html');
         await page.locator('#editor-login-form').waitFor();
+        await page.locator('#verify-open-btn:enabled').waitFor();
         assert(new URL(page.url()).pathname.endsWith('/editor/index.html'));
         assert(await page.locator('#login-book-selector option[value="book_b"]').isDisabled());
         assert(await page.locator('#edit-arabic-field').isDisabled());
@@ -75,6 +78,7 @@ try {
     }
     console.log('PASS: Editor desktop/mobile configured UTF-8 password, invalid/missing inputs, Enter/button submission, CP/vocabulary failure recovery, unchanged Book B lock and no GitHub writes.');
 } catch(error) {
+    console.error('Editor browser diagnostics:',JSON.stringify({pageErrors,url:page?.url(),loginError:await page?.locator('#login-error').textContent().catch(()=>null)}));
     if(page)await page.screenshot({path:'artifacts/editor-failure.png',fullPage:true}).catch(()=>{});
     throw error;
 } finally {if(browser)await browser.close();server.kill();}
