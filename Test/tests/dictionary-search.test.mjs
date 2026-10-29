@@ -2,6 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { searchDictionary, normalizeSearch } from '../js/dictionary-search.js';
 
+test('searches every field regardless of selected sort and keeps stable relevance order', () => {
+    const items = [
+        {word:'كِتَاب',meaning:'book',explanation:'کتاب',number:12,originalIndex:0},
+        {word:'ل',meaning:'for',number:2,originalIndex:1},
+        {word:'إِلَّا',meaning:'except',number:102,originalIndex:2}
+    ];
+    for (const mode of ['arabic','english','number']) {
+        assert.equal(searchDictionary(items,'book',mode)[0],items[0]);
+        assert.equal(searchDictionary(items,'کتاب',mode)[0],items[0]);
+        assert.equal(searchDictionary(items,'كِتَاب',mode)[0],items[0]);
+        assert.equal(searchDictionary(items,'۱۲',mode)[0],items[0]);
+        assert.equal(searchDictionary(items,'illa',mode)[0],items[2]);
+        assert.deepEqual(searchDictionary([...items].reverse(),'2',mode).map(x=>x.number),[2,12,102]);
+    }
+});
+
 test('Arabic exact, vowel/shadda variants, prefix, middle and end ranking', () => {
     const items = ['سَلَام', 'لَهُ', 'عَلَم', 'ل', 'إِلَّا', 'اِلَا', 'إِلّا'].map((word, originalIndex) => ({word,originalIndex}));
     assert.deepEqual(searchDictionary(items,'ل','arabic').map(x=>x.word), ['ل','لَهُ','سَلَام','عَلَم','إِلَّا','اِلَا','إِلّا']);

@@ -1,6 +1,6 @@
 import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js';
 import { switchView, launchToastAlert } from './ui.js';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search2';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search3';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -72,7 +72,7 @@ export function openDictionaryMode() {
 }
 
 export function setDictionarySort(mode) {
-    if (mode !== dictionarySortMode || searchBook !== activeBook) {
+    if (searchBook !== activeBook) {
         searchQuery = '';
         document.getElementById('dictionary-search').value = '';
     }
@@ -131,7 +131,7 @@ export function renderDictionary() {
     }
         sortedCache.set(dictionarySortMode, dictionarySortedItems);
     }
-    dictionarySortedItems = searchDictionary(sortedCache.get(dictionarySortMode), searchQuery, dictionarySortMode);
+    dictionarySortedItems = searchDictionary(sortedCache.get(dictionarySortMode), searchQuery);
     list.innerHTML = '';
     const fragment = document.createDocumentFragment();
     dictionarySortedItems.forEach((item, index) => {

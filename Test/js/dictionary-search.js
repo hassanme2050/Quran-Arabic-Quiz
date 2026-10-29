@@ -18,23 +18,28 @@ function near(a, b) {
     return previous[b.length] <= 1;
 }
 
-export function searchDictionary(items, query, mode) {
+export function searchDictionary(items, query) {
     const raw = String(query ?? '').trim().toLowerCase();
-    let key = normalizeSearch(raw);
+    const key = normalizeSearch(raw);
     if (!key) return items;
-    if (mode === 'arabic') key = ({laam:'ل', lam:'ل', illa:'الا'})[key] || key;
-    return items.map((item, order) => {
-        const value = mode === 'number' ? String(item.number ?? item.originalIndex + 1) : mode === 'arabic' ? item.word : item.meaning;
+    const arabicKey = ({laam:'ل', lam:'ل', illa:'الا'})[key] || key;
+    function fieldRank(value, queryKey, numeric = false) {
+        if (value == null) return Infinity;
         const text = normalizeSearch(value);
-        let rank = Infinity;
-        if (String(value).trim().toLowerCase() === raw) rank = 0;
-        else if (text === key || (mode === 'number' && /^\d+$/.test(key) && Number(text) === Number(key))) rank = 1;
-        else if (text.startsWith(key)) rank = 2;
-        else if (text.split(/[^\p{L}\p{N}]+/u).includes(key)) rank = 3;
-        else if (text.includes(key)) rank = text.endsWith(key) ? 5 : 4;
-        else if (mode !== 'number' && text.split(/\s+/).some(word => near(key, word))) rank = 6;
-        else if (mode === 'english' && normalizeSearch(item.explanation).includes(key)) rank = 7;
-        return {item, order, rank};
+        if (String(value).trim().toLowerCase() === raw) return 0;
+        if (text === queryKey || (numeric && /^\d+$/.test(queryKey) && Number(text) === Number(queryKey))) return 1;
+        if (text.startsWith(queryKey)) return 2;
+        if (text.split(/[^\p{L}\p{N}]+/u).includes(queryKey)) return 3;
+        if (text.includes(queryKey)) return text.endsWith(queryKey) ? 5 : 4;
+        if (!numeric && text.split(/\s+/).some(word => near(queryKey, word))) return 6;
+        return Infinity;
+    }
+    return items.map((item, order) => {
+        const number = item.number ?? (item.originalIndex == null ? null : item.originalIndex + 1);
+        const rank = Math.min(fieldRank(item.word, arabicKey), fieldRank(item.meaning, key),
+            /^\d+$/.test(key) ? fieldRank(number, key, true) : Infinity,
+            normalizeSearch(item.explanation).includes(key) ? 7 : Infinity);
+        return {item, order:item.originalIndex ?? order, rank};
     }).filter(hit => Number.isFinite(hit.rank)).sort((a,b) => a.rank-b.rank || a.order-b.order).map(hit => hit.item);
 }
 
@@ -43,6 +48,6 @@ export function configureSearchKeyboard(input, language) {
     input.lang = language === 'number' ? 'en' : language;
     input.dir = language === 'ar' || language === 'ur' ? 'rtl' : 'ltr';
     input.inputMode = 'text';
-    input.placeholder = language === 'number' ? 'Number...' : 'Search...';
-    input.setAttribute('aria-label', language === 'number' ? 'Search by word number' : 'Live dictionary search');
+    input.placeholder = 'Search...';
+    input.setAttribute('aria-label', 'Search Arabic, meanings or word numbers');
 }
