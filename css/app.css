@@ -445,7 +445,7 @@ button.exit-btn:hover {
     font-weight: bold;
     color: #10b981;
     font-style: normal !important;
-    display: inline-block;
+    display: table-cell;
 }
 
 .classic-indicator-fail {
@@ -453,8 +453,11 @@ button.exit-btn:hover {
     font-weight: bold;
     color: #ef4444;
     font-style: normal !important;
-    display: inline-block;
+    display: table-cell;
 }
+
+.summary-table th:nth-child(-n+2),
+.summary-table td:nth-child(-n+2) { white-space:nowrap; direction:ltr; }
 
 .hidden { display: none !important; }
 

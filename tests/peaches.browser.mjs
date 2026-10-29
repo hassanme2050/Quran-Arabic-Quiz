@@ -117,6 +117,28 @@ try {
   }
   await page.waitForFunction(()=>!document.querySelector('#quiz-finished-view').classList.contains('hidden'));
   assert.equal(await page.locator('#score-text-value').textContent(),'10/10');
+  await page.locator('#toggle-table-btn').click();
+  // Exercise a wrong-answer marker too, without changing the completed quiz score.
+  await page.locator('.summary-table tbody tr:last-child td:nth-child(2)').evaluate(el=>{el.className='classic-indicator-fail';el.textContent=String.fromCharCode(10007);});
+  const tableGeometry=await page.locator('.summary-table').evaluate(table=>{
+   const headers=[...table.tHead.rows[0].cells].map(c=>c.getBoundingClientRect());
+   return [...table.tBodies[0].rows].map(row=>[...row.cells].map((cell,i)=>{
+    const box=cell.getBoundingClientRect();
+    return {display:getComputedStyle(cell).display,x:box.x,width:box.width,y:box.y,height:box.height,headerX:headers[i].x,headerWidth:headers[i].width};
+   }));
+  });
+  assert.equal(tableGeometry.length,10);
+  for(const row of tableGeometry){
+   assert.equal(row.length,5);
+   for(const cell of row){
+    assert.equal(cell.display,'table-cell');
+    assert(Math.abs(cell.x-cell.headerX)<1);
+    assert(Math.abs(cell.width-cell.headerWidth)<1);
+    assert(Math.abs(cell.y-row[0].y)<1);
+    assert(Math.abs(cell.height-row[0].height)<1);
+   }
+  }
+  await page.screenshot({path:'artifacts/performance-summary-'+viewport.width+'.png',fullPage:true});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.getByRole('button',{name:'Go to Home'}).click();
   await page.selectOption('#vocabulary-book-selector','book_a');
