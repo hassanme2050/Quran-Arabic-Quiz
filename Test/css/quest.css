@@ -1,6 +1,4 @@
 /* Strawberry Quest: independent screens; existing modes keep their Pineapple styles. */
-.quest-menu-button { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#daeac8; border:1px solid #c2d6ab; }
-.quest-menu-button span { font-size:11px; font-weight:600; color:#335d3c; }
 .quest-shell { text-align:left; }
 .quest-shell h2 { margin:8px 0 12px; font-size:30px; letter-spacing:-.6px; line-height:1.2; }
 .quest-shell button { touch-action:manipulation; }
@@ -23,12 +21,6 @@
 .quest-route path { fill:none; stroke:#c5cd9f; stroke-width:5; stroke-linecap:round; stroke-dasharray:4 9; vector-effect:non-scaling-stroke; }
 #quest-map-nodes { position:absolute; inset:0; list-style:none; margin:0; padding:0; }
 .quest-stop { position:absolute; transform:translateX(-50%); width:138px; display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
-.quest-node { width:64px; height:64px; padding:0; border-radius:50%; background:#245744; color:#fff8da; border:4px solid #fffdf2; box-shadow:0 4px 0 #b9c5a9,0 6px 12px #38553925; font-size:23px; font-weight:800; }
-.quest-node:hover:not(:disabled) { transform:translateY(-2px); background:#39764f; box-shadow:0 4px 0 #b9c5a9,0 6px 12px #38553925; }
-.quest-node[data-status="current"] { outline:3px solid #d2a449; outline-offset:3px; background:#a86b2d; }
-.quest-node[data-status="cleared"] { background:#4a7755; border-color:#e9d089; }
-.quest-node:disabled { opacity:1; color:#728b7d; background:#d1ddce; border-color:#e8eddf; box-shadow:0 3px 0 #b9c5a9; font-size:19px; }
-.quest-dragon { font-size:30px; background:#51476a; }
 .quest-stop-title { color:#244c3e; font-size:12px; margin-top:3px; }
 .quest-stop-range { color:#657c67; font-size:10px; }
 .quest-stop-stars { color:#a47c2e; font-size:14px; letter-spacing:2px; line-height:1; }
@@ -83,3 +75,28 @@
 @media (prefers-reduced-motion:reduce) {
     .quest-shell *, .quest-menu-button { transition:none!important; scroll-behavior:auto!important; }
 }
+
+/* Horizontal map; shared controls use the same gold and teal styles as other modes. */
+.quest-map-scroll { width:100%; max-width:100%; overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain; border:1px solid rgba(255,255,255,.15); border-radius:12px; background:rgba(255,255,255,.06); scrollbar-color:var(--button-gold) transparent; }
+.quest-map-scroll:focus-visible { outline:2px solid var(--button-gold); outline-offset:3px; }
+.quest-map-landscape { border:0; border-radius:0; background:transparent; box-shadow:none; }
+.quest-route path { stroke:rgba(255,255,255,.24); }
+.quest-stop { width:132px; }
+.quest-node { width:64px; height:64px; padding:0; font-size:22px; flex-shrink:0; }
+.quest-node[data-status="current"] { outline:2px solid var(--button-gold); outline-offset:5px; }
+.quest-node[data-status="cleared"] { background:var(--exit-btn-color); color:var(--white); border:1px solid var(--button-gold); }
+.quest-stop-title { color:var(--white); }
+.quest-stop-range { color:var(--counter-teal); }
+.quest-stop-stars { color:var(--button-gold); }
+.quest-trouble-panel { border:0; border-radius:0; padding:0; background:transparent; margin:24px 0; }
+.quest-trouble-panel summary { list-style:none; padding:16px 24px; border-radius:10px; background:var(--exit-btn-color); border:1px solid rgba(255,255,255,.1); text-align:center; font-size:16px; font-weight:500; cursor:pointer; }
+.quest-trouble-panel summary::-webkit-details-marker { display:none; }
+.quest-trouble-panel summary:hover { background:var(--exit-btn-hover); }
+.quest-table-scroll { overflow-x:auto; }
+.quest-trouble-panel .summary-table th { white-space:normal; }
+.quest-trouble-panel .summary-table th,.quest-trouble-panel .summary-table td { padding:12px 8px; }
+.quest-trouble-panel .summary-table td:nth-child(2) { direction:rtl; }
+.quest-overview { margin:20px 0 10px; text-align:center; }
+#quest-progress { height:8px; margin:0 0 16px; }
+.quest-backup-actions { margin-top:0; gap:16px; }
+.quest-backup-actions button { padding:16px 12px; font-size:16px; }

@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { vocabularyList } from './vocabulary.js';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js';
 import { shuffleArray } from './utils.js';
 import { generateQuizChoices } from './quiz.js';
 import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js';
@@ -50,7 +50,12 @@ function continuationNode() {
     if(prior && progress.runs[prior.id]?.phase!=='result' && progress.runs[prior.id] && isNodeUnlocked(plan,progress,prior.id))return prior;
     return nextQuestNode(plan,progress);
 }
-export function openQuest() {
+export async function openQuest() {
+    if(activeBook !== 'book_a') {
+        document.getElementById('vocabulary-book-selector').value='book_a';
+        await loadVocabulary('book_a');
+        launchToastAlert('Quest uses Book A.');
+    }
     if(!vocabularyList.length){launchToastAlert('Vocabulary is not loaded yet.');return;}
     ensureProgress();
     renderQuestMap();
@@ -71,17 +76,17 @@ export function renderQuestMap() {
     const list=byId('quest-map-nodes');
     list.replaceChildren();
     const pathPoints=[];
-    const lanes=[24,50,76,50];
-    const height=plan.length*120+32;
-    byId('quest-route').setAttribute('viewBox','0 0 300 '+height);
+    const width=Math.max(320,plan.length*144+32),height=224;
+    byId('quest-route').setAttribute('viewBox','0 0 '+width+' '+height);
+    list.parentElement.style.width=width+'px';
     list.parentElement.style.height=height+'px';
     plan.forEach((node,index)=>{
         const unlocked=isNodeUnlocked(plan,progress,node.id);
         const record=progress.records[node.id],earned=record?.bestStars||0;
-        const x=lanes[index%lanes.length],y=index*120+14;
-        pathPoints.push({x:x*3,y:y+32});
+        const x=88+index*144,y=index%2?58:30;
+        pathPoints.push({x,y:y+32});
         const stop=make('li','quest-stop');
-        stop.style.left=x+'%';stop.style.top=y+'px';
+        stop.style.left=x+'px';stop.style.top=y+'px';
         const button=make('button','quest-node'+(node.kind==='dragon'?' quest-dragon':''),unlocked?(node.kind==='dragon'?'🐉':String(node.number)):'🔒');
         button.type='button';button.disabled=!unlocked;
         button.dataset.node=node.id;
@@ -97,27 +102,32 @@ export function renderQuestMap() {
     const path=pathPoints.map((point,index)=>{
         if(!index)return 'M '+point.x+' '+point.y;
         const prior=pathPoints[index-1];
-        return 'C '+prior.x+' '+(prior.y+64)+' '+point.x+' '+(point.y-64)+' '+point.x+' '+point.y;
+        return 'C '+(prior.x+72)+' '+prior.y+' '+(point.x-72)+' '+point.y+' '+point.x+' '+point.y;
     }).join(' ');
     byId('quest-route-path').setAttribute('d',path);
     renderWeakWords();
     show('quest-map-view');
-}
-function renderWeakWords() {
-    const list=byId('quest-weak-words');
-    list.replaceChildren();
-    const lastLearned=Math.max(0,...Object.keys(progress.words).map(Number));
-    const weak=rankQuestWords(progress,lastLearned).filter(number=>progress.words[number]?.wrong>0).slice(0,10);
-    if(!weak.length){list.appendChild(make('li','quest-empty','No trouble words yet. Your challenges adapt as you play.'));return;}
-    for(const number of weak) {
-        const item=vocabularyList[number-1],stats=progress.words[number];
-        const row=make('li','quest-weak-row');
-        row.append(make('span','quest-word-index','#'+number),make('span','quest-arabic',item.word),
-            make('span','quest-weak-meaning',item.meaning),
-            make('small','quest-word-history',stats.wrong+' misses · '+stats.correct+' correct'));
-        list.appendChild(row);
+    {
+        const node=list.querySelector('[data-node="'+(target?.id||plan.at(-1)?.id)+'"]');
+        if(node){const viewport=byId('quest-map-scroll');viewport.scrollLeft=node.parentElement.offsetLeft-viewport.clientWidth/2;}
     }
 }
+function renderWeakWords() {
+    const list=byId('quest-weak-words');list.replaceChildren();
+    const lastLearned=Math.max(0,...Object.keys(progress.words).map(Number));
+    const weak=rankQuestWords(progress,lastLearned).filter(number=>progress.words[number]?.wrong>0).slice(0,10);
+    if(!weak.length){list.appendChild(make('p','quest-empty','No trouble words yet. Your challenges adapt as you play.'));return;}
+    const table=make('table','summary-table'),head=make('thead'),hr=make('tr');
+    for(const label of ['Word #','Arabic','Meaning','Misses','Correct'])hr.appendChild(make('th','',label));
+    head.appendChild(hr);table.appendChild(head);const body=make('tbody');
+    for(const number of weak){
+        const item=vocabularyList[number-1],stats=progress.words[number],row=make('tr');
+        row.append(make('td','',number),make('td','large-bold-cell large-arabic-cell',item.word),make('td','',item.meaning),make('td','',stats.wrong),make('td','',stats.correct));
+        body.appendChild(row);
+    }
+    table.appendChild(body);list.appendChild(table);
+}
+
 function startNode(id) {
     currentId=id;
     try {beginQuestNode(plan,progress,id,shuffleArray);persist();renderRun();}

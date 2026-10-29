@@ -445,7 +445,7 @@ button.exit-btn:hover {
     font-weight: bold;
     color: #10b981;
     font-style: normal !important;
-    display: inline-block;
+    display: table-cell;
 }
 
 .classic-indicator-fail {
@@ -453,8 +453,11 @@ button.exit-btn:hover {
     font-weight: bold;
     color: #ef4444;
     font-style: normal !important;
-    display: inline-block;
+    display: table-cell;
 }
+
+.summary-table th:nth-child(-n+2),
+.summary-table td:nth-child(-n+2) { white-space:nowrap; direction:ltr; }
 
 .hidden { display: none !important; }
 
@@ -478,10 +481,10 @@ button.exit-btn:hover {
 /* Dictionary Mode: isolated styles so existing quiz/review screens remain unchanged */
 #dictionary-view { text-align:left; }
 .dictionary-sort { display:flex; position:relative; gap:0; padding:4px; margin:18px 0 12px; border-radius:12px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); user-select:none; }
-.dictionary-sort-pill { position:absolute; top:4px; bottom:4px; left:4px; width:calc(33.333% - 2.67px); border-radius:9px; background:var(--button-gold); box-shadow:0 2px 8px rgba(0,0,0,.2); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:1; pointer-events:none; }
-.dictionary-sort button { position:relative; z-index:2; flex:1; min-width:0; padding:11px 4px; font-size:15px; color:#d5eeee; background:transparent; box-shadow:none; transform:none; }
-.dictionary-sort button:hover:not(:disabled) { background:transparent; box-shadow:none; transform:none; }
-.dictionary-sort button.active { color:#1a1002; }
+.dictionary-sort-pill { position:absolute; top:4px; bottom:4px; left:4px; width:calc(25% - 2px); border-radius:9px; background:var(--button-gold); box-shadow:0 2px 8px rgba(0,0,0,.2); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:1; pointer-events:none; }
+.dictionary-sort > button { position:relative; z-index:2; flex:1; min-width:0; padding:11px 4px; font-size:15px; color:var(--counter-teal); background:transparent; box-shadow:none; transform:none; }
+.dictionary-sort > button:hover:not(:disabled) { background:transparent; box-shadow:none; transform:none; }
+.dictionary-sort > button.active { color:#1a1002; }
 .dictionary-layout { position:relative; }
 .dictionary-list { background:#fff; color:#1e2d2d; border-radius:18px; height:min(66vh,720px); min-height:330px; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; overscroll-behavior:contain; padding:10px 47px 10px 12px; box-sizing:border-box; scroll-behavior:auto; }
 .dictionary-list::-webkit-scrollbar { display:none; }
@@ -501,3 +504,50 @@ button.exit-btn:hover {
 .dictionary-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; color:#c6e3e3; font-size:12px; margin:8px 4px 0; }
 #app-title.dictionary-title { font-size:28px; margin-bottom:20px; letter-spacing:0; }
 @media(max-width:420px) { .dictionary-list { padding-left:8px; padding-right:43px; } .dictionary-entry { gap:6px; padding:10px 2px; grid-template-columns:minmax(0,max-content) 9px minmax(0,max-content); } .dictionary-word { font-size:22px; } .dictionary-meaning { font-size:15px; } .dictionary-jump { width:39px; } .dictionary-jump-track { left:17px; } .dictionary-jump button { width:37px; font-size:10px; } #app-title.dictionary-title { font-size:26px; } }
+
+/* Peaches: Urdu book content and verification status. */
+[data-book="book_b"] .dictionary-meaning,
+[data-book="book_b"] .meaning-text-render,
+[data-book="book_b"] .quiz-options button,
+[data-book="book_b"] .summary-table td:nth-child(n+4) {
+    direction: rtl; text-align: right; font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', 'Segoe UI', serif;
+    line-height: 2; overflow-wrap: anywhere;
+}
+[data-book="book_b"] .meaning-text-render { white-space: normal; }
+.dictionary-entry.unverified { opacity: .62; background: #f1f3f5; }
+[data-book="book_b"] .dictionary-word { overflow-wrap: anywhere; min-width: 0; }
+
+/* Larger Urdu meanings across Book B student screens. */
+[data-book="book_b"] .quiz-options button { font-size: 22px; text-align: center; }
+[data-book="book_b"] .meaning-text-render { font-size: 32px; text-align: center; }
+[data-book="book_b"] .dictionary-meaning { font-size: 23px; }
+[data-book="book_b"] .summary-table .large-bold-cell:nth-child(n+4) { font-size: 26px; }
+[data-book="book_b"] .summary-table .small-choice-cell { font-size: 22px; }
+@media (max-width: 420px) {
+    [data-book="book_b"] .dictionary-meaning { font-size: 21px; }
+}
+
+/* The keyboard button expands into a native-input search field. */
+.dictionary-sort { --dictionary-control-size:50px; gap:6px; align-items:center; }
+.dictionary-sort-pill { display:none; }
+.dictionary-sort > button { height:var(--dictionary-control-size); border-radius:10px; transition:flex .25s ease,background-color .2s,color .25s,box-shadow .2s; }
+.dictionary-sort > button.active { background:var(--button-gold); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+.dictionary-search-control { position:relative; flex:0 0 var(--dictionary-control-size); min-width:0; height:var(--dictionary-control-size); box-sizing:border-box; border-radius:10px; transition:flex .28s ease,background .2s ease; }
+.dictionary-search-control .dictionary-search-toggle { position:absolute; left:0; top:0; width:var(--dictionary-control-size); height:var(--dictionary-control-size); padding:0; font-size:25px; border-radius:10px; background:transparent; color:var(--counter-teal); box-shadow:none; line-height:1; box-sizing:border-box; }
+.dictionary-search { visibility:hidden; display:block; width:100%; height:var(--dictionary-control-size); min-width:0; margin:0; padding:6px 12px 6px 38px; box-sizing:border-box; font-size:16px; opacity:0; transition:opacity .2s ease; }
+.dictionary-search[dir="rtl"] { font-family:var(--arabic-font); }
+.search-open > button { flex:0 0 var(--dictionary-control-size); font-size:11px; padding:0 1px; }
+.search-open .dictionary-search-control { flex:1 1 0%; }
+.search-open .dictionary-search { visibility:visible; opacity:1; }
+.search-open .dictionary-search-toggle { background:var(--button-gold); color:#1a1002; box-shadow:0 2px 8px rgba(0,0,0,.2); width:36px; font-size:22px; border-radius:8px 0 0 8px; }
+.dictionary-search:focus { border-color:var(--button-gold); outline:none; }
+.dictionary-sort > button:hover:not(:disabled) { background:var(--button-gold-hover); color:#1a1002; transform:none; box-shadow:none; }
+.dictionary-sort > button:active:not(:disabled) { background:var(--button-gold-active); transform:none; }
+.dictionary-search-control .dictionary-search-toggle:hover:not(:disabled) { background:var(--button-gold-hover); color:#1a1002; transform:none; box-shadow:none; }
+.dictionary-search-control .dictionary-search-toggle:active:not(:disabled) { background:var(--button-gold-active); transform:none; }
+.dictionary-list.search-results { padding-right:12px; }
+@media(max-width:420px) { .dictionary-sort { gap:4px; } .search-open > button { flex-basis:var(--dictionary-control-size); font-size:10px; } .dictionary-search-control { flex-basis:var(--dictionary-control-size); } .dictionary-search-control .dictionary-search-toggle { width:var(--dictionary-control-size); } .search-open .dictionary-search-toggle { width:32px; } .dictionary-search { padding-left:33px; } }
+@media(prefers-reduced-motion:reduce) { .dictionary-sort > button,.dictionary-search-control,.dictionary-search { transition:none; } }
+
+/* Toolbar highlighting changes color only; never lifts or scales controls. */
+#dictionary-toolbar button,#dictionary-toolbar button:hover,#dictionary-toolbar button:active { transform:none !important; box-sizing:border-box; }
