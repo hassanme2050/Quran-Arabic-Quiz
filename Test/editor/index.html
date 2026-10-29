@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="../shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/editor.css?v=1029.26-strawberry1">
+    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor1">
 </head>
 <body>
     <!-- Book selection and authentication -->
@@ -16,16 +16,17 @@
             <h2>Admin Verification</h2>
             <p>Select the vocabulary book, then enter your system password and GitHub token to access the editor.</p>
 
-            <div class="password-input-wrapper">
+            <form class="password-input-wrapper" id="editor-login-form">
                 <select class="custom-select-menu" id="login-book-selector" aria-label="Select book">
                     <option value="book_a" selected>Book A - Arabic to English</option>
                     <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
                     <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
                 </select>
-                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" autocomplete="current-password">
-                <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)" autocomplete="off">
-                <button id="verify-open-btn" data-action="evaluateAdministrativeCredentials">Verify &amp; Open Editor</button>
-            </div>
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" aria-label="System password" aria-describedby="login-error" autocomplete="current-password">
+                <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)" aria-label="GitHub token" aria-describedby="login-error" autocomplete="off">
+                <div id="login-error" class="login-error" role="alert" aria-live="polite"></div>
+                <button id="verify-open-btn" type="submit">Verify &amp; Open Editor</button>
+            </form>
         </div>
     </div>
 
@@ -61,6 +62,6 @@
 
     <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
 
-    <script type="module" src="js/app.js?v=1029.26-strawberry1"></script>
+    <script type="module" src="js/app.js?v=1029.26-editor1"></script>
 </body>
 </html>

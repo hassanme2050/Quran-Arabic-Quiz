@@ -72,3 +72,4 @@ Production release: the user-approved Peaches build is published at https://hass
 - Quest supports Book A and verified Book B words, with a book selector, independent stages and saved positions, Urdu meanings and original Book B word numbers.
 - Export progress backs up both books in one JSON file. Import restores both together; older single-book backups restore only their book and preserve the other book. Existing browser Book A saves migrate automatically.
 - Editor Book B support remains deferred for the next instructions.
+- Editor login uses the configured passwords in CP.txt, with visible validation errors, Enter-key submission and retry after file-loading errors. A GitHub token is still required for saving edits.

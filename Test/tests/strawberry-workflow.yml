@@ -31,6 +31,8 @@ jobs:
         run: node Test/tests/quest.browser.mjs
       - name: Peaches desktop and mobile browser checks
         run: node Test/tests/peaches.browser.mjs
+      - name: Editor login desktop and mobile browser checks
+        run: node Test/tests/editor.browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

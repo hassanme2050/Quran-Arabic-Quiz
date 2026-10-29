@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
 import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry1';
-import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-strawberry1';
+import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor1';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -63,6 +63,7 @@ function dom(file) {
         const element = new Element(match[1]);
         const attributes = Object.fromEntries([...match[2].matchAll(/([\w-]+)="([^"]*)"/g)].map(value => [value[1], value[2]]));
         Object.assign(element, { className: attributes.class || '', value: attributes.value || '' });
+        element.disabled = /\sdisabled(?:\s|=|$)/.test(match[2]);
         for (const [key,value] of Object.entries(attributes)) if (key.startsWith('data-')) element.dataset[key.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value;
         if (attributes.id) elements.set(attributes.id,element);
         if (element.dataset.action) actionElements.push(element);
@@ -231,13 +232,103 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.deepEqual(vocabulary.vocabularyList,original);
     });
 
+    await t.test('Editor rejects missing credentials and passwords absent from CP.txt', async () => {
+        dom('editor/index.html');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor1');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor1');
+        state.token='';
+        const requests=[];
+        globalThis.fetch = async (url,options) => {
+            requests.push({url:String(url),options});
+            return {ok:true,text:async()=>Buffer.from('test-only-configured-password').toString('base64')};
+        };
+        el('login-book-selector').value='book_a';
+        await evaluateAdministrativeCredentials();
+        assert.match(el('login-error').textContent,/system password/);
+        el('admin-passcode-box').value='wrong-test-password';
+        await evaluateAdministrativeCredentials();
+        assert.match(el('login-error').textContent,/GitHub token/);
+        assert.equal(requests.length,0);
+        el('admin-token-box').value='test-only-token';
+        await evaluateAdministrativeCredentials();
+        assert.match(el('login-error').textContent,/Invalid password/);
+        assert.equal(el('admin-passcode-box').value,'');
+        assert(el('admin-passcode-box').focused);
+        assert.equal(state.token,'');
+        assert.equal(requests.length,1);
+        assert(requests[0].url.endsWith('/CP.txt'));
+        assert.equal(requests[0].options.cache,'no-store');
+        assert(!requests[0].options.headers,'password verification must not transmit the GitHub token');
+        assert.notEqual(el('login-shield-gate').style.opacity,'0');
+        assert(!el('verify-open-btn').disabled);
+    });
+
+    await t.test('Editor uses current UTF-8 passwords from CP.txt and blocks duplicate submissions', async () => {
+        dom('editor/index.html');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor1');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor1');
+        const configured='test-only-\u0627\u0644\u0641';
+        el('login-book-selector').value='book_a';
+        el('admin-passcode-box').value=' '+configured+' ';
+        el('admin-token-box').value=' test-only-token ';
+        const requests=[];
+        globalThis.fetch = async (url,options) => {
+            requests.push({url:String(url),options});
+            return {ok:true,text:async()=>String(url).endsWith('CP.txt')
+                ? '\uFEFF'+Buffer.from('another-test-password').toString('base64')+'\r\n\r\n '+Buffer.from(configured).toString('base64')+' \r\n'
+                : vocabularyText};
+        };
+        const first=evaluateAdministrativeCredentials();
+        assert(el('verify-open-btn').disabled);
+        await Promise.all([first,evaluateAdministrativeCredentials()]);
+        assert.equal(requests.filter(r=>r.url.endsWith('CP.txt')).length,1);
+        assert.equal(requests.filter(r=>r.url.endsWith('Vocabulary-File.txt')).length,1);
+        assert.equal(state.token,'test-only-token');
+        assert.equal(state.loadedNumber,1);
+        assert.equal(el('admin-passcode-box').value,'');
+        assert.equal(el('login-error').textContent,'');
+        runDelay(300);
+        assert(el('login-shield-gate').classList.contains('hidden'));
+        assert(!el('verify-open-btn').disabled);
+        assert(!el('edit-arabic-field').disabled);
+    });
+
+    await t.test('Editor stays gated after password-file or vocabulary failures and can retry', async () => {
+        dom('editor/index.html');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor1');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor1');
+        state.token='';
+        el('login-book-selector').value='book_a';
+        el('admin-passcode-box').value='test-only-password';
+        el('admin-token-box').value='test-only-token';
+        let mode='unavailable';
+        globalThis.fetch = async url => ({
+            ok:String(url).endsWith('CP.txt')?mode!=='unavailable':mode!=='vocabulary-failed',status:503,
+            text:async()=>String(url).endsWith('CP.txt')?(mode==='empty'?'\r\n ':Buffer.from('test-only-password').toString('base64')):vocabularyText
+        });
+        for(const [failure,message] of [['unavailable',/Unable to verify/],['empty',/No passwords/],['vocabulary-failed',/Vocabulary file could not be loaded/]]) {
+            mode=failure;
+            await evaluateAdministrativeCredentials();
+            assert.match(el('login-error').textContent,message);
+            assert.equal(state.token,'');
+            assert(!el('login-shield-gate').classList.contains('hidden'));
+            assert(!el('verify-open-btn').disabled);
+            assert(el('edit-arabic-field').disabled);
+        }
+        mode='success';
+        await evaluateAdministrativeCredentials();runDelay(300);
+        assert(el('login-shield-gate').classList.contains('hidden'));
+        assert.equal(el('login-error').textContent,'');
+        assert.equal(state.token,'test-only-token');
+    });
+
     await t.test('Editor loads and navigates book numbers, rejects mismatched save target, and blocks conflicts', async () => {
         dom('editor/index.html');
-        await import('../editor/js/app.js?v=1029.26-strawberry1');
-        const {state} = await import('../editor/js/state.js?v=1029.26-strawberry1');
-        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-strawberry1');
-        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-strawberry1');
-        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-strawberry1');
+        await import('../editor/js/app.js?v=1029.26-editor1');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor1');
+        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-editor1');
+        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-editor1');
+        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-editor1');
         let requests = 0;
         globalThis.fetch = async () => { requests++; return {ok:true,text:async()=>vocabularyText}; };
         assert(await initializeVocabularyDataStream());

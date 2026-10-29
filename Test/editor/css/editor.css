@@ -94,6 +94,8 @@ h1 {
     flex-direction: column;
     gap: 13px;
 }
+.login-error { color: #b91c1c; font-size: 14px; line-height: 1.5; text-align: left; }
+.login-error:empty { display: none; }
 
 .admin-text-field {
     width: 100%;
