@@ -1,8 +1,8 @@
-import { state } from './state.js';
-import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js';
-import { launchToastAlert } from '../../shared/ui.js';
-import { renderInventoryTilesGrid } from './grid.js';
-import { resetOutputCodeState } from './selection.js';
+import { state } from './state.js?v=1029.26-strawberry1';
+import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { renderInventoryTilesGrid } from './grid.js?v=1029.26-strawberry1';
+import { resetOutputCodeState } from './selection.js?v=1029.26-strawberry1';
 let bannerTimer;
 export async function evaluateTeacherCredentials() {
     const passwordBox = document.getElementById('admin-passcode-box');
@@ -59,13 +59,13 @@ export async function loadSelectedVocabularyFile() {
     banner.textContent = 'Connecting to Vocabulary Records...';
     try {
         const records = await loadBook(state.activeBook);
-        state.fullVocabularyInventory = records;
+        state.fullVocabularyInventory = records.filter(item => item.verified !== false && (state.activeBook !== 'book_b' || records.filter(other => other.number === item.number).length === 1));
         state.selected.clear();
         state.activeMatrixPage = 1;
         resetOutputCodeState();
         renderInventoryTilesGrid();
-        banner.textContent = records.length ? '✅ Success: Parsed ' + records.length + ' library records.' : '⚠️ No matching vocabulary format found.';
-        if (records.length > 999) launchToastAlert('Quiz codes support book numbers 1–999. Later words are shown for reference.');
+        banner.textContent = state.activeBook === 'book_b' ? state.fullVocabularyInventory.length + ' verified words available for Book B quizzes.' : records.length ? '✅ Success: Parsed ' + records.length + ' library records.' : '⚠️ No matching vocabulary format found.';
+        if (state.activeBook === 'book_a' && records.length > 999) launchToastAlert('Quiz codes support book numbers 1–999. Later words are shown for reference.');
         if (records.length) {
             bannerTimer = setTimeout(() => {
                 banner.style.opacity = '0';

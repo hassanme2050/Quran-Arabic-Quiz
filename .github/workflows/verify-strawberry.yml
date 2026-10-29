@@ -3,9 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'Test/**'
-      - '.github/workflows/verify-strawberry.yml'
+    paths: ['Test/**', '.github/workflows/verify-strawberry.yml']
 concurrency:
   group: strawberry-verification
   cancel-in-progress: true
@@ -20,34 +18,38 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Quest rules and Pineapple regression checks
-        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs
-      - name: Install browser test runtime
+      - name: Quest and Peaches regression checks
+        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs Test/tests/lughat.test.mjs Test/tests/dictionary-search.test.mjs
+      - name: Install browser runtime
         run: |
-          npm install --prefix "$RUNNER_TEMP/quest-browser" --no-save --package-lock=false playwright@1.56.1
-          "$RUNNER_TEMP/quest-browser/node_modules/.bin/playwright" install --with-deps chromium
-      - name: Desktop and mobile browser checks
+          npm install --prefix Test --no-save --package-lock=false playwright@1.56.1
+          Test/node_modules/.bin/playwright install --with-deps chromium
+      - name: Quest desktop and mobile browser checks
         env:
-          PLAYWRIGHT_MODULE: ${{ runner.temp }}/quest-browser/node_modules/playwright
+          PLAYWRIGHT_MODULE: ${{ github.workspace }}/Test/node_modules/playwright
           QUEST_QA_DIR: ${{ runner.temp }}/strawberry-qa
         run: node Test/tests/quest.browser.mjs
+      - name: Peaches desktop and mobile browser checks
+        run: node Test/tests/peaches.browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Strawberry-browser-screenshots
-          path: ${{ runner.temp }}/strawberry-qa/
+          path: |
+            ${{ runner.temp }}/strawberry-qa/
+            artifacts/
           if-no-files-found: ignore
-      - name: Preview screenshots through connector
+      - name: Preview map screenshots through connector
         if: always()
         env:
           QUEST_QA_DIR: ${{ runner.temp }}/strawberry-qa
         run: |
           node <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
-          const dir=process.env.QUEST_QA_DIR;
-          if(!fs.existsSync(dir))process.exit(0);
-          for(const name of fs.readdirSync(dir).filter(name=>name.endsWith('.jpg'))) {
-            const base64=fs.readFileSync(path.join(dir,name)).toString('base64');
+          for(const name of ['desktop-map.jpg','mobile-map.jpg','failure.jpg']) {
+            const file=path.join(process.env.QUEST_QA_DIR,name);
+            if(!fs.existsSync(file))continue;
+            const base64=fs.readFileSync(file).toString('base64');
             for(let start=0;start<base64.length;start+=48000) console.log('QUEST_IMAGE|'+name+'|'+String(start/48000).padStart(4,'0')+'|'+base64.slice(start,start+48000));
           }
           NODE

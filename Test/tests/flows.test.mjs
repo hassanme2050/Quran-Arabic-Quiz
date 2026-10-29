@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
-import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js';
-import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js';
-import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js';
+import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
+import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry1';
+import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-strawberry1';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -36,6 +36,7 @@ class Element {
     setAttribute(name, value) { this.attributes[name] = String(value); }
     addEventListener(event, handler) { (this.events[event] ??= []).push(handler); }
     focus() { this.focused = true; }
+    blur() { this.focused = false; }
     select() { this.selected = true; }
     contains(element) { return element === this || this.children.some(child => child.contains(element)); }
     querySelectorAll(selector) {
@@ -103,7 +104,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     });
 
     await t.test('shared parser preserves book order, duplicates, Unicode, separators and root paths', async () => {
-        assert.equal(records.length, 88);
+        assert(records.length >= 61, "Book A needs at least 61 words for cross-page selection coverage");
         assert.deepEqual(parseVocabularyRecords('one = a=b\r\ninvalid\r\n = empty\nاثنان = two\none = repeated'), [
             {word:'one',meaning:'a=b'}, {word:'اثنان',meaning:'two'}, {word:'one',meaning:'repeated'}
         ]);
@@ -122,10 +123,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator selection spans pages, updates one tile, stops at 20 and invalidates stale codes', async () => {
         dom('test-generator/index.html');
-        await import('../test-generator/js/app.js');
-        const {state} = await import('../test-generator/js/state.js');
-        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js');
-        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js');
+        await import('../test-generator/js/app.js?v=1029.26-strawberry1');
+        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry1');
+        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js?v=1029.26-strawberry1');
+        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js?v=1029.26-strawberry1');
         state.fullVocabularyInventory = records;
         renderInventoryTilesGrid();
         assert.equal(state.totalCardsPerPageLimit,50);
@@ -135,7 +136,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.equal(el('tiles-matrix-box').children[0],firstTile);
         assert(el('generate-code-btn').disabled);
         changeMatrixActivePage('1');
-        assert.equal(el('tiles-matrix-box').children.length,38);
+        assert.equal(el('tiles-matrix-box').children.length,Math.min(50, records.length - 50));
         assert.equal(el('tiles-matrix-box').children[0].dataset.number,'51');
         for (let number=51; number<=60; number++) toggleWordSelection(number,el('tiles-matrix-box').children[number-51]);
         assert.equal(state.selected.size,20);
@@ -155,8 +156,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator login keeps failed loads visible and resets selection after a successful load', async () => {
         dom('test-generator/index.html');
-        const {state} = await import('../test-generator/js/state.js');
-        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js');
+        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry1');
+        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js?v=1029.26-strawberry1');
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
         globalThis.fetch = async url => String(url).endsWith('CP.txt')
@@ -174,16 +175,16 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         runDelay(300);
         assert(el('login-shield-gate').classList.contains('is-hidden'));
         assert.equal(state.selected.size,0);
-        assert.equal(state.fullVocabularyInventory.length,88);
+        assert.equal(state.fullVocabularyInventory.length,records.length);
         assert(el('generate-code-btn').disabled);
     });
 
     await t.test('student runs complete 20- and legacy 10-question quizzes and cancels pending answers on exit', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js');
-        const quiz = await import('../js/quiz.js');
-        const {state} = await import('../js/state.js');
-        const {exitToHome} = await import('../js/ui.js');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry1');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry1');
+        const {exitToHome} = await import('../js/ui.js?v=1029.26-strawberry1');
         vocabulary.parseVocabulary(vocabularyText);
         for (const count of [20,10]) {
             el('quiz-code-field').value = encodeQuizCode(Array.from({length:count},(_,index)=>index+1));
@@ -214,12 +215,12 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('dictionary sorting never changes book order and reuses unchanged rows', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js');
-        const dictionary = await import('../js/dictionary.js');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry1');
         vocabulary.parseVocabulary(vocabularyText);
         const original = structuredClone(vocabulary.vocabularyList);
         dictionary.openDictionaryMode();
-        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,88);
+        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,records.length);
         const first = el('dictionary-list').children[0];
         dictionary.renderDictionary();
         assert.equal(el('dictionary-list').children[0],first);
@@ -232,11 +233,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Editor loads and navigates book numbers, rejects mismatched save target, and blocks conflicts', async () => {
         dom('editor/index.html');
-        await import('../editor/js/app.js');
-        const {state} = await import('../editor/js/state.js');
-        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js');
-        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js');
-        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js');
+        await import('../editor/js/app.js?v=1029.26-strawberry1');
+        const {state} = await import('../editor/js/state.js?v=1029.26-strawberry1');
+        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-strawberry1');
+        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-strawberry1');
+        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-strawberry1');
         let requests = 0;
         globalThis.fetch = async () => { requests++; return {ok:true,text:async()=>vocabularyText}; };
         assert(await initializeVocabularyDataStream());
@@ -284,6 +285,39 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         }
         assert(read('Editor.html').includes('url=editor/index.html'));
         assert(read('Test-Generator.html').includes('url=test-generator/index.html'));
+    });
+
+    await t.test('Book B sessions exclude unverified words, dictionary keeps them, and codes enforce book identity', async () => {
+        dom('index.html');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry1');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry1');
+        const cards = await import('../js/flashcards.js?v=1029.26-strawberry1');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry1');
+        const headings = read('Lughat-AlQuran-word-meaning.txt').split(/\r?\n/).slice(0,2).join('\n');
+        const rows = Array.from({length:30},(_,i)=>String(i+1).padStart(4,'0')+' word'+(i+1)+' \u27F5 meaning'+(i+1)+' (note)');
+        const text = headings+'\n'+rows.slice(0,20).join('\n')+'\n-----\n'+rows.slice(20).join('\n');
+        vocabulary.parseVocabulary(text,'book_b');
+        assert.equal(vocabulary.vocabularyList.length,20);
+        assert.equal(vocabulary.dictionaryVocabularyList.length,30);
+        assert.equal(el('dict-sort-english').textContent,'Urdu');
+        for(const item of vocabulary.vocabularyList) assert(quiz.generateQuizChoices(item).every(choice=>choice.verified!==false));
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+1));
+        quiz.startQuizWithCode(); assert(!el('quiz-code-error').classList.contains('hidden'));
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+1),'book_b');
+        quiz.startQuizWithCode(); assert.equal(state.sessionWords.length,10); assert(state.sessionWords.every(item=>item.verified));
+        cards.showCard(); assert.equal(el('card-meaning-field').dir,'rtl'); assert(el('card-meaning-field').textContent.includes('(note)'));
+        dictionary.openDictionaryMode(); dictionary.setDictionarySort('number');
+        assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,30);
+        assert.equal(el('dictionary-list').querySelectorAll('.unverified').length,10);
+        el('quiz-code-field').value=encodeQuizCode(Array.from({length:10},(_,i)=>i+15),'book_b');
+        quiz.startQuizWithCode(); assert(!el('quiz-code-error').classList.contains('hidden'));
+        vocabulary.parseVocabulary(headings+'\n'+rows.join('\n'),'book_b');
+        assert.equal(vocabulary.vocabularyList.length,0); assert.equal(vocabulary.dictionaryVocabularyList.length,30);
+        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.unverified').length,30);
+        vocabulary.parseVocabulary(vocabularyText);
+        dictionary.openDictionaryMode(); assert.equal(el('dictionary-list').querySelectorAll('.dictionary-entry').length,records.length);
+        assert.equal(el('dict-sort-english').textContent,'English');
     });
 
     await t.test('HTTP preview serves all tool pages, shared assets and clean subfolder URLs', async () => {

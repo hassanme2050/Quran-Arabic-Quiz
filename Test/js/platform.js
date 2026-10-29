@@ -1,4 +1,4 @@
-import { launchToastAlert } from './ui.js';
+import { launchToastAlert } from './ui.js?v=1029.26-strawberry1';
 // The browser adapter can be replaced by Android/iOS clipboard and sharing adapters.
 let rendererPromise;
 function loadScorecardRenderer() {

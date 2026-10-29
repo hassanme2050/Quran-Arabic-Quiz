@@ -1,5 +1,5 @@
-import { state } from './state.js';
-import { launchToastAlert } from '../../shared/ui.js';
+import { state } from './state.js?v=1029.26-strawberry1';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
 export function disableEditorControls() {
     document.getElementById('word-target-index').disabled = true;
     document.getElementById('lookup-go-btn').disabled = true;

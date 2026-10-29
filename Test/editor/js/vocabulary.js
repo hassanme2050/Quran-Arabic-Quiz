@@ -1,7 +1,7 @@
-import { state } from './state.js';
-import { loadBook } from '../../shared/vocabulary.js';
-import { launchToastAlert } from '../../shared/ui.js';
-import { disableEditorControls, loadTargetInventoryRecord } from './records.js';
+import { state } from './state.js?v=1029.26-strawberry1';
+import { loadBook } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1029.26-strawberry1';
 export async function initializeVocabularyDataStream() {
     try {
         state.records = await loadBook(state.activeBook);

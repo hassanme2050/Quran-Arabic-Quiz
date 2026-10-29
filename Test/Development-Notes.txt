@@ -1,0 +1,5 @@
+QuranAQ-v1029.26 Strawberry - October 29, 2026
+Base: QuranAQ-v1026.26 Peaches.
+Includes Strawberry Quest and the requested horizontal layout, shared buttons, score-detail weak words and bottom progress bar.
+Original QuranAQ-v1025.26 Strawberry preserved separately.
+Preview destination: GitHub Test/.

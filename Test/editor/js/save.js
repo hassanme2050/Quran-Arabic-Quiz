@@ -1,6 +1,6 @@
-import { state } from './state.js';
-import { launchToastAlert } from '../../shared/ui.js';
-import { saveVocabularyRecord } from './github.js';
+import { state } from './state.js?v=1029.26-strawberry1';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { saveVocabularyRecord } from './github.js?v=1029.26-strawberry1';
 export async function saveWordUpdateToGitHub() {
     if (state.saving) return;
     const number = state.loadedNumber;

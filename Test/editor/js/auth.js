@@ -1,7 +1,7 @@
-import { state } from './state.js';
-import { BOOK_FILES } from '../../shared/vocabulary.js';
-import { launchToastAlert } from '../../shared/ui.js';
-import { initializeVocabularyDataStream } from './vocabulary.js';
+import { state } from './state.js?v=1029.26-strawberry1';
+import { BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { initializeVocabularyDataStream } from './vocabulary.js?v=1029.26-strawberry1';
 // Preserve the Editor's existing password rules; GitHub authorizes writes with the supplied token.
 export async function evaluateAdministrativeCredentials() {
     const passwordBox = document.getElementById('admin-passcode-box');
