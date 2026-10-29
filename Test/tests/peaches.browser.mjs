@@ -32,7 +32,14 @@ try {
   assert.equal(await page.locator('.dictionary-note').count(),0);
   assert.equal(await page.locator('.dictionary-meaning').first().getAttribute('dir'),'rtl');
   assert(await page.locator('#dictionary-search').isHidden());
+  const controlGeometry=()=>page.locator('#dictionary-toolbar').evaluate(el=>({height:el.getBoundingClientRect().height,heights:[...el.querySelectorAll(':scope > button,#dictionary-search-toggle')].map(b=>b.getBoundingClientRect().height)}));
+  const collapsed=await controlGeometry();
+  assert(collapsed.heights.every(h=>Math.abs(h-collapsed.heights[0])<.1));
+  assert.equal(await page.locator('#dictionary-search-toggle').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
   await page.locator('#dictionary-search-toggle').click();
+  const expanded=await controlGeometry();
+  assert(expanded.heights.every(h=>Math.abs(h-collapsed.heights[0])<.1));
+  assert.equal(expanded.height,collapsed.height);
   assert(await page.locator('#dictionary-search').evaluate(el=>el===document.activeElement));
   assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-expanded'),'true');
   assert.equal(await page.locator('#dictionary-keyboard').count(),0);
