@@ -1,15 +1,15 @@
 import { state } from './state.js';
-import { vocabularyList, loadVocabulary } from './vocabulary.js';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js';
 import { shuffleArray, getRandomSubset } from './utils.js';
 import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=20261026-peaches2';
 import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js';
-import { openDictionaryMode, setDictionarySort } from './dictionary.js?v=20261024-alexandria1';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=20261028-peaches-option1';
 import { copyScreenshotToClipboard } from './platform.js';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
 export function normalizeCustomRange() {
-    const count = vocabularyList.length;
+    const count = activeBook === 'book_b' ? (vocabularyList.at(-1)?.number || 0) : vocabularyList.length;
     if (!count) return;
     const first = document.getElementById('range-input-start');
     const last = document.getElementById('range-input-end');
@@ -64,6 +64,7 @@ export function updateSegmentSelection(targetStrategy) {
 }
 
 export function startSession(strategy, mode) {
+    if (!vocabularyList.length) return;
     cancelPendingAnswer();
     state.currentMode = mode;
     state.quizHistory = [];
@@ -80,7 +81,7 @@ export function startSession(strategy, mode) {
     } else if (strategy === 'custom') {
         let startIdx = parseInt(document.getElementById('range-input-start').value) - 1;
         let endIdx = parseInt(document.getElementById('range-input-end').value) - 1;
-        state.currentPool = vocabularyList.slice(startIdx, endIdx + 1);
+        state.currentPool = activeBook === 'book_b' ? vocabularyList.filter(item => item.number >= startIdx + 1 && item.number <= endIdx + 1) : vocabularyList.slice(startIdx, endIdx + 1);
         state.sessionWords = getRandomSubset(state.currentPool, 10);
     }
 
@@ -110,6 +111,7 @@ export function startSession(strategy, mode) {
 }
 
 function initializeApp() {
+    initializeDictionarySearch();
     const actions = {
         updateSegmentSelection, validateLiveCustomBounds, triggerSelectedSession,
         startQuizWithCode, openDictionaryMode, setDictionarySort, exitToHome,
@@ -128,6 +130,8 @@ function initializeApp() {
         if (event.key === 'Enter') startQuizWithCode();
     });
     input.addEventListener('input', clearQuizCodeError);
-    loadVocabulary();
+    const selector = document.getElementById('vocabulary-book-selector');
+    selector.addEventListener('change', () => { clearQuizCodeError(); loadVocabulary(selector.value); });
+    loadVocabulary(selector.value || 'book_a');
 }
 initializeApp();

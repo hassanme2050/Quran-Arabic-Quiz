@@ -1,10 +1,15 @@
+import { activeBook } from './vocabulary.js';
 import { state } from './state.js';
 import { switchView } from './ui.js';
 
 export function showCard() {
     document.getElementById('card-counter').textContent = "Word " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('card-arabic-field').textContent = state.sessionWords[state.currentIndex].word;
-    document.getElementById('card-meaning-field').textContent = state.sessionWords[state.currentIndex].meaning;
+    const item = state.sessionWords[state.currentIndex];
+    const meaningField = document.getElementById('card-meaning-field');
+    meaningField.textContent = item.meaning + (item.explanation ? ' ' + item.explanation : '');
+    meaningField.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
+    meaningField.lang = activeBook === 'book_b' ? 'ur' : 'en';
     
     if (state.globalPersistentEyeToggleStatus) {
         state.isMeaningVisible = true;

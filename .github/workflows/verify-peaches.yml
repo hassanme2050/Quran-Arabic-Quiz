@@ -1,10 +1,21 @@
-name: Verify Peaches preview
+name: Verify Peaches production
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'Test/**'
+      - 'index.html'
+      - 'Editor.html'
+      - 'Test-Generator.html'
+      - 'Vocabulary-File.txt'
+      - 'Lughat-AlQuran-word-meaning.txt'
+      - 'css/**'
+      - 'js/**'
+      - 'shared/**'
+      - 'editor/**'
+      - 'test-generator/**'
+      - 'tests/**'
+      - 'serve.cjs'
       - '.github/workflows/verify-peaches.yml'
 permissions:
   contents: read
@@ -17,7 +28,7 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: Test
+        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,4 +46,4 @@ jobs:
         if: always()
         with:
           name: Peaches-browser-screenshots
-          path: Test/artifacts
+          path: artifacts

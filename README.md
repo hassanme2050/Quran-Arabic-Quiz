@@ -1,4 +1,6 @@
-# Quran Arabic Quiz — Pineapple
+# Quran Arabic Quiz — Peaches
+
+Peaches (QuranAQ-v1026.26) starts as a clone of production Pineapple. Copied Android files and APKs remain Pineapple artifacts; no Peaches Android build has been created.
 
 Serve this folder over HTTP; opening index.html with a file:// URL cannot reliably load vocabulary or JavaScript modules.
 
@@ -48,3 +50,15 @@ All session changes and verification notes belong in the parent Quran Arabic Qui
 ## Verification
 
 Run `node --test tests/flows.test.mjs` for shared code compatibility, 20-question selection across pages, 10/20 student quiz completion, dictionary order, mocked Editor saves/conflicts, and local HTTP routes. These checks use a small DOM harness; they do not replace visual testing in a browser. GitHub writes are mocked in tests.
+
+## Peaches Book B
+
+Book B reads Lughat-AlQuran-word-meaning.txt unchanged. Its parser retains source numbers, Juzz/Surah metadata, Urdu meanings and trailing parenthesized explanations. Quiz/review/distractors and the Generator use only words above the first five-dash verification line. Dictionary includes all records, with unverified rows subdued. Without a verification line, Book B is dictionary-only. Explanations appear inline with meanings in Review and Dictionary, separately from quiz answers. Per-word source metadata and verification labels are not displayed. Book A and its legacy codes are unchanged. Book B teacher codes use B2: followed by 10 or 20 four-digit source numbers separated by dots; choose Book B before entering them. Book B remains disabled in the Editor until its format can be edited without rewriting the source. No Peaches Android build is included.
+
+Dictionary live search: tap the fourth keyboard-icon button to expand and focus the search field; sort controls animate into compact squares. Input opens the native device keyboard. The page sets ar/ur/en language, direction and text input hints; browser/OS controls the actual keyboard language. No custom keyboard is rendered. Search updates without Enter; close or Escape clears and collapses the field. Matching and numeric/Arabic/Urdu normalization are unchanged. Run node --test tests/flows.test.mjs tests/lughat.test.mjs tests/dictionary-search.test.mjs.
+
+Search is independent of the selected sort: every query searches Arabic words, English/Urdu meanings, explanations and original word numbers together. Sort changes preserve the query; relevance ties follow source order. Keyboard language hints still follow the selected sort.
+
+Dictionary options are mutually exclusive: opening search selects only the keyboard control. Selecting Number, English/Urdu or Arabic clears/collapses search, blurs the input to dismiss the native keyboard and selects only that sort. The close icon is removed. Escape returns to the last sort. This supersedes the earlier query-retention behavior.
+
+Production release: the user-approved Peaches build is published at https://hassanme2050.github.io/Quran-Arabic-Quiz/ . Generator: test-generator/index.html; Editor: editor/index.html. The former Test/ preview has been removed. Future feature previews will be deployed to a new Test/ folder, separately from the approved production version. The Peaches production workflow verifies root files and saves browser screenshots under artifacts/.
