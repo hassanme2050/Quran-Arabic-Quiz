@@ -6,8 +6,8 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=20261028-peaches-search1">
-    <link rel="stylesheet" href="css/app.css?v=20261028-peaches-search1">
+    <link rel="stylesheet" href="shared/typography.css?v=20261028-peaches-search2">
+    <link rel="stylesheet" href="css/app.css?v=20261028-peaches-search2">
 </head>
 <body>
     <div class="app-wrapper">
@@ -57,14 +57,17 @@
 
         <!-- Dictionary Mode is a separate module; it does not alter quiz/review session state. -->
         <div id="dictionary-view" class="hidden">
-            <div class="dictionary-sort" role="group" aria-label="Sort dictionary">
+            <div id="dictionary-toolbar" class="dictionary-sort" role="group" aria-label="Sort dictionary">
                 <div class="dictionary-sort-pill" id="dictionary-sort-pill"></div>
                 <button type="button" id="dict-sort-number" data-action="setDictionarySort" data-value="number">123</button>
                 <button type="button" id="dict-sort-english" data-action="setDictionarySort" data-value="english">English</button>
                 <button type="button" id="dict-sort-arabic" class="active" data-action="setDictionarySort" data-value="arabic">Arabic</button>
-                <input id="dictionary-search" class="dictionary-search" type="text" autocomplete="off" spellcheck="false" aria-label="Live dictionary search" placeholder="Search…">
+                <div class="dictionary-search-control">
+                    <input id="dictionary-search" class="dictionary-search" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" tabindex="-1" aria-label="Live dictionary search" placeholder="Search…">
+                    <button type="button" id="dictionary-search-toggle" class="dictionary-search-toggle" aria-label="Open dictionary search" aria-controls="dictionary-search" aria-expanded="false"><span aria-hidden="true">⌨</span></button>
+                    <button type="button" id="dictionary-search-close" class="dictionary-search-close" aria-label="Close and clear search" tabindex="-1">×</button>
+                </div>
             </div>
-            <div id="dictionary-keyboard" class="dictionary-keyboard hidden" role="group" aria-label="Search keyboard"></div>
             <div class="dictionary-layout">
                 <div class="dictionary-list" id="dictionary-list" aria-label="Vocabulary dictionary"></div>
                 <div class="dictionary-jump" id="dictionary-jump" aria-label="Quick jump index">
@@ -138,6 +141,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=20261028-peaches-search1"></script>
+    <script type="module" src="js/app.js?v=20261028-peaches-search2"></script>
 </body>
 </html>

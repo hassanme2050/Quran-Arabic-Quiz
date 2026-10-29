@@ -38,44 +38,11 @@ export function searchDictionary(items, query, mode) {
     }).filter(hit => Number.isFinite(hit.rank)).sort((a,b) => a.rank-b.rank || a.order-b.order).map(hit => hit.item);
 }
 
-const layouts = {
-    ar: ['ض ص ث ق ف غ ع ه خ ح ج د', 'ش س ي ب ل ا ت ن م ك ط', 'ئ ء ؤ ر لا ى ة و ز ظ', 'أ إ آ ٱ َ ِ ُ ّ ْ ً ٍ ٌ'],
-    ur: ['ق و ع ر ت ے ء ی ہ پ', 'ا س د ف گ ھ ج ک ل', 'ز ش چ ط ب ن م ں ح خ', 'ٹ ڈ ڑ ژ ث ص ض ذ ظ غ ؤ ئ'],
-    en: ['q w e r t y u i o p', 'a s d f g h j k l', 'z x c v b n m']
-};
-
-export function configureSearchKeyboard(input, keyboard, language, onInput) {
-    input.lang = language;
+// Browser/OS input hints: native keyboard language is chosen by the device.
+export function configureSearchKeyboard(input, language) {
+    input.lang = language === 'number' ? 'en' : language;
     input.dir = language === 'ar' || language === 'ur' ? 'rtl' : 'ltr';
     input.inputMode = 'text';
-    input.placeholder = language === 'ar' ? 'ابحث…' : language === 'ur' ? 'تلاش کریں…' : language === 'number' ? 'Word number…' : 'Search…';
+    input.placeholder = language === 'number' ? 'Number...' : 'Search...';
     input.setAttribute('aria-label', language === 'number' ? 'Search by word number' : 'Live dictionary search');
-    keyboard.replaceChildren();
-    keyboard.classList.add('hidden');
-    if (language === 'number') return;
-    keyboard.setAttribute('aria-label', {ar:'Arabic',ur:'Urdu',en:'English'}[language] + ' keyboard');
-    function keyButton(label, action, row) {
-        const button = document.createElement('button');
-        button.type = 'button'; button.textContent = label;
-        button.addEventListener('pointerdown', event => event.preventDefault());
-        button.addEventListener('click', action);
-        row.appendChild(button);
-    }
-    function insert(text, erase = false) {
-        const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? start;
-        const from = erase && start === end ? Math.max(0, start - 1) : start;
-        input.setRangeText(text, from, end, 'end');
-        input.focus(); onInput();
-    }
-    for (const letters of layouts[language]) {
-        const row = document.createElement('div'); row.className = 'dictionary-keyboard-row';
-        for (const letter of letters.split(' ')) keyButton(letter, () => insert(letter), row);
-        keyboard.appendChild(row);
-    }
-    const tools = document.createElement('div'); tools.className = 'dictionary-keyboard-row keyboard-tools';
-    keyButton('Space', () => insert(' '), tools);
-    keyButton('⌫', () => insert('', true), tools);
-    keyButton('Clear', () => { input.value = ''; input.focus(); onInput(); }, tools);
-    keyButton('Hide', () => { keyboard.classList.add('hidden'); input.blur(); }, tools);
-    keyboard.appendChild(tools);
 }

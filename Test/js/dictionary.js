@@ -1,6 +1,6 @@
 import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js';
 import { switchView, launchToastAlert } from './ui.js';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search1';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search2';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -17,16 +17,35 @@ let searchQuery = '';
 function configureKeyboard() {
     const input = document.getElementById('dictionary-search');
     const language = dictionarySortMode === 'number' ? 'number' : dictionarySortMode === 'arabic' ? 'ar' : activeBook === 'book_b' ? 'ur' : 'en';
-    configureSearchKeyboard(input, document.getElementById('dictionary-keyboard'), language, () => { searchQuery = input.value; renderDictionary(); });
+    configureSearchKeyboard(input, language);
 }
 
 export function initializeDictionarySearch() {
     const input = document.getElementById('dictionary-search');
     input.addEventListener('input', () => { searchQuery = input.value; renderDictionary(); });
-    input.addEventListener('focus', () => { if (dictionarySortMode !== 'number') document.getElementById('dictionary-keyboard').classList.remove('hidden'); });
+    const toggle = document.getElementById('dictionary-search-toggle');
+    const close = document.getElementById('dictionary-search-close');
+    const toolbar = document.getElementById('dictionary-toolbar');
+    function collapse() {
+        toolbar.classList.remove('search-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        input.tabIndex = close.tabIndex = -1;
+        input.value = searchQuery = '';
+        input.blur();
+        renderDictionary();
+        toggle.focus();
+    }
+    toggle.addEventListener('click', () => {
+        toolbar.classList.add('search-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        input.tabIndex = close.tabIndex = 0;
+        // Synchronous focus within the tap allows the device keyboard to open.
+        input.focus();
+    });
+    close.addEventListener('click', collapse);
     input.addEventListener('keydown', event => {
         if (event.key === 'Enter') event.preventDefault();
-        if (event.key === 'Escape') { document.getElementById('dictionary-keyboard').classList.add('hidden'); input.blur(); }
+        if (event.key === 'Escape') collapse();
     });
 }
 const sortedCache = new Map();
