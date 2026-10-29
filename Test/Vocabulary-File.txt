@@ -22,7 +22,7 @@
 دُونَ = Besides, Less than
 إِلَّا = Except, only
 نَعَمْ = YES
-هُ = HIS
+هُ = His
 هُمْ = They
 كُمْ = Your
 يِي (نِي) = My (Me)
