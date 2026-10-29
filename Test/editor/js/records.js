@@ -1,5 +1,6 @@
-import { state } from './state.js?v=1029.26-editor2';
+import { state } from './state.js?v=1029.26-editor3';
 import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { refreshArabicFontControls } from './font.js?v=1029.26-editor3';
 export function disableEditorControls() {
     document.getElementById('word-target-index').disabled = true;
     document.getElementById('lookup-go-btn').disabled = true;
@@ -8,6 +9,7 @@ export function disableEditorControls() {
     document.getElementById('edit-arabic-field').disabled = true;
     document.getElementById('edit-meaning-field').disabled = true;
     document.getElementById('commit-save-btn').disabled = true;
+    refreshArabicFontControls();
 }
 
 export function hasUnsavedEdits() {
@@ -55,8 +57,10 @@ export function loadTargetInventoryRecord() {
     state.loadedNumber = indexPointer;
 
     // Keep Previous/Next enabled; navigation clamps to the first/last record.
+    document.getElementById('lookup-go-btn').disabled = false;
     document.getElementById('lookup-prev-btn').disabled = false;
     document.getElementById('lookup-next-btn').disabled = false;
+    refreshArabicFontControls();
 }
 
 export function navigateWord(direction) {

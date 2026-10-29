@@ -1,8 +1,10 @@
 import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor2';
-import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor2';
-import { saveWordUpdateToGitHub } from './save.js?v=1029.26-editor2';
-bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub });
+import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor3';
+import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor3';
+import { saveWordUpdateToGitHub } from './save.js?v=1029.26-editor3';
+import { changeArabicFontSize, refreshArabicFontControls } from './font.js?v=1029.26-editor3';
+bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, changeArabicFontSize });
+refreshArabicFontControls();
 document.getElementById('editor-login-form').addEventListener('submit', event => {
     event.preventDefault();
     evaluateAdministrativeCredentials();

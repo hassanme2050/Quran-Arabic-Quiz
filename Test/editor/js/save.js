@@ -1,6 +1,7 @@
-import { state } from './state.js?v=1029.26-editor2';
+import { state } from './state.js?v=1029.26-editor3';
 import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { saveVocabularyRecord } from './github.js?v=1029.26-editor2';
+import { saveVocabularyRecord } from './github.js?v=1029.26-editor3';
+import { refreshArabicFontControls } from './font.js?v=1029.26-editor3';
 export async function saveWordUpdateToGitHub() {
     if (state.saving) return;
     const number = state.loadedNumber;
@@ -20,6 +21,7 @@ export async function saveWordUpdateToGitHub() {
     state.saving = true;
     const controls = ['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-meaning-field','commit-save-btn'];
     controls.forEach(id => { document.getElementById(id).disabled = true; });
+    refreshArabicFontControls();
     launchToastAlert('⏳ Saving changes to GitHub...');
     try {
         await saveVocabularyRecord({ filename: state.activeFile, token: state.token, number, expected: state.records[number - 1], updated });
@@ -31,5 +33,6 @@ export async function saveWordUpdateToGitHub() {
     } finally {
         state.saving = false;
         controls.forEach(id => { document.getElementById(id).disabled = false; });
+        refreshArabicFontControls();
     }
 }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
 import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry1';
-import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor2';
+import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor3';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -235,8 +235,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor rejects missing credentials and passwords absent from CP.txt', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor2');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor2');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor3');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor3');
         state.token='';
         const requests=[];
         globalThis.fetch = async (url,options) => {
@@ -267,8 +267,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor uses current UTF-8 passwords from CP.txt and blocks duplicate submissions', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor2');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor2');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor3');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor3');
         const configured='test-only-\u0627\u0644\u0641';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value=' '+configured+' ';
@@ -298,8 +298,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor stays gated after password-file or vocabulary failures and can retry', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor2');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor2');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor3');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor3');
         state.token='';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
@@ -327,15 +327,20 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Editor loads and navigates book numbers, rejects mismatched save target, and blocks conflicts', async () => {
         dom('editor/index.html');
-        await import('../editor/js/app.js?v=1029.26-editor2');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor2');
-        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-editor2');
-        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-editor2');
-        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-editor2');
+        await import('../editor/js/app.js?v=1029.26-editor3');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor3');
+        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-editor3');
+        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-editor3');
+        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-editor3');
         let requests = 0;
         globalThis.fetch = async () => { requests++; return {ok:true,text:async()=>vocabularyText}; };
         assert(await initializeVocabularyDataStream());
         assert.equal(state.loadedNumber,1);
+        assert(!el('lookup-go-btn').disabled,'GO must be available as soon as the library is loaded');
+        el('word-target-index').value=2;el('lookup-go-btn').events.click[0]();
+        assert.equal(state.loadedNumber,2,'GO must load the typed book number');
+        assert.equal(el('edit-arabic-field').value,records[1].word);
+        el('word-target-index').value=1;el('lookup-go-btn').events.click[0]();
         navigateWord(1); assert.equal(state.loadedNumber,2);
         el('word-target-index').value=3;
         state.token='test-only';
@@ -353,7 +358,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
             return {ok:true,json:async()=>({sha:'test-sha',content:Buffer.from(vocabularyText).toString('base64')})};
         };
         el('edit-meaning-field').value='test updated meaning';
-        await saveWordUpdateToGitHub();
+        const saving=saveWordUpdateToGitHub();
+        assert(el('lookup-go-btn').disabled,'GO must pause while a save is pending');
+        assert(el('arabic-font-smaller').disabled);assert(el('arabic-font-larger').disabled);
+        await saving;
         assert.equal(calls.length,2);
         const payload = JSON.parse(calls[1].options.body);
         assert.equal(payload.branch,'main'); assert.equal(payload.sha,'test-sha');
@@ -361,6 +369,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.deepEqual(saved[2],{word:original.word,meaning:'test updated meaning'});
         assert.deepEqual(saved.filter((_,index)=>index!==2),records.filter((_,index)=>index!==2));
         assert(!state.saving); assert(!el('commit-save-btn').disabled);
+        assert(!el('lookup-go-btn').disabled,'GO must be restored after saving');
+        assert(!el('arabic-font-smaller').disabled);assert(!el('arabic-font-larger').disabled);
         calls.length=0;
         await assert.rejects(saveVocabularyRecord({filename:'Vocabulary-File.txt',token:'test-only',number:3,expected:{word:'changed',meaning:'x'},updated:original}), /changed/);
         assert.equal(calls.length,1,'Conflict must not issue PUT');

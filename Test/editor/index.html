@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="../shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor2">
+    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor3">
 </head>
 <body>
     <!-- Book selection and authentication -->
@@ -40,14 +40,20 @@
                 <div class="field-label-header">Target Word Number</div>
                 <input type="number" class="admin-text-field index-numeric-input" id="word-target-index" value="1" min="1" disabled>
             </div>
-            <button id="lookup-go-btn" data-action="loadTargetInventoryRecord" disabled>GO</button>
+            <button id="lookup-go-btn" type="button" data-action="loadTargetInventoryRecord" disabled>GO</button>
             <button class="nav-button" id="lookup-prev-btn" type="button" data-action="navigateWord" data-value="-1" aria-label="Previous word" title="Previous word" disabled>&#8249;</button>
             <button class="nav-button" id="lookup-next-btn" type="button" data-action="navigateWord" data-value="1" aria-label="Next word" title="Next word" disabled>&#8250;</button>
         </div>
 
         <div class="workspace-editing-panel">
             <div>
-                <div class="field-label-header">Arabic Word</div>
+                <div class="arabic-field-header">
+                    <label class="field-label-header" for="edit-arabic-field">Arabic Word</label>
+                    <div class="arabic-font-controls" role="group" aria-label="Arabic word font size">
+                        <button id="arabic-font-smaller" class="font-step-button" type="button" data-action="changeArabicFontSize" data-value="-1" aria-label="Decrease Arabic font size" aria-controls="edit-arabic-field" title="Smaller Arabic text" disabled>−</button>
+                        <button id="arabic-font-larger" class="font-step-button" type="button" data-action="changeArabicFontSize" data-value="1" aria-label="Increase Arabic font size" aria-controls="edit-arabic-field" title="Larger Arabic text" disabled>+</button>
+                    </div>
+                </div>
                 <input type="text" class="admin-text-field large-arabic-input" id="edit-arabic-field" placeholder="—" disabled>
             </div>
 
@@ -62,6 +68,6 @@
 
     <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
 
-    <script type="module" src="js/app.js?v=1029.26-editor2"></script>
+    <script type="module" src="js/app.js?v=1029.26-editor3"></script>
 </body>
 </html>

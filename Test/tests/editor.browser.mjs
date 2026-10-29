@@ -7,7 +7,7 @@ import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1029.26-strawber
 
 const root=new URL('../',import.meta.url);
 const vocabulary=fs.readFileSync(new URL('Vocabulary-File.txt',root),'utf8');
-const firstWord=parseVocabularyRecords(vocabulary)[0];
+const records=parseVocabularyRecords(vocabulary),firstWord=records[0];
 const password='test-only-\u0627\u0644\u0641';
 const cp='\uFEFF'+Buffer.from('another-test-password').toString('base64')+'\r\n\r\n'+Buffer.from(password).toString('base64')+'\r\n';
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
@@ -41,6 +41,8 @@ try {
         assert(new URL(page.url()).pathname.endsWith('/editor/index.html'));
         assert(await page.locator('#login-book-selector option[value="book_b"]').isDisabled());
         assert(await page.locator('#edit-arabic-field').isDisabled());
+        assert(await page.locator('#lookup-go-btn').isDisabled());
+        assert(await page.locator('#arabic-font-smaller').isDisabled());
         await page.locator('#admin-passcode-box').fill(password);
         await page.locator('#admin-passcode-box').press('Enter');
         await page.locator('#login-error').filter({hasText:'Please enter your GitHub token.'}).waitFor();
@@ -69,6 +71,45 @@ try {
         assert.equal(await page.locator('#edit-arabic-field').inputValue(),firstWord.word);
         assert.equal(await page.locator('#edit-meaning-field').inputValue(),firstWord.meaning);
         assert(await page.locator('#commit-save-btn').isEnabled());
+        assert(await page.locator('#lookup-go-btn').isEnabled(),'GO must be enabled after login');
+        const geometry=()=>page.locator('#edit-arabic-field').evaluate(el=>{
+            const rect=el.getBoundingClientRect();return {width:rect.width,height:rect.height,font:parseFloat(getComputedStyle(el).fontSize)};
+        });
+        const initial=await geometry();
+        const oldSize=viewport.width<=520?Math.max(36,Math.min(60,viewport.width*.11)):Math.max(40,Math.min(80,viewport.width*.07));
+        const step=2*96/72;
+        assert(Math.abs(initial.font-(oldSize-step))<.1,'default must be two points smaller');
+        assert(Math.abs(initial.height-Math.max(viewport.width<=520?120:155,oldSize*1.8+20))<.1,'initial input size must match the previous layout');
+        const sameBox=box=>{assert(Math.abs(box.width-initial.width)<.1);assert(Math.abs(box.height-initial.height)<.1);};
+        await page.locator('#arabic-font-larger').click();
+        const larger=await geometry();sameBox(larger);assert(Math.abs(larger.font-initial.font-step)<.1);
+        const afterFont=await page.locator('.arabic-field-header').evaluate(el=>{
+            const caption=el.querySelector('label').getBoundingClientRect(),controls=el.querySelector('.arabic-font-controls').getBoundingClientRect();
+            return {captionRight:caption.right,controlsLeft:controls.left,captionCenter:caption.y+caption.height/2,controlsCenter:controls.y+controls.height/2};
+        });
+        assert(afterFont.controlsLeft>afterFont.captionRight);
+        assert(Math.abs(afterFont.captionCenter-afterFont.controlsCenter)<.1);
+        await page.locator('#word-target-index').fill('7');await page.locator('#lookup-go-btn').click();
+        assert.equal(await page.locator('#edit-arabic-field').inputValue(),records[6].word);
+        assert.equal(await page.locator('#edit-meaning-field').inputValue(),records[6].meaning);
+        assert.equal((await geometry()).font,larger.font,'font preference must survive loading another word');
+        sameBox(await geometry());
+        await page.locator('#arabic-font-smaller').click();sameBox(await geometry());
+        assert(Math.abs((await geometry()).font-initial.font)<.1);
+        await page.locator('#arabic-font-smaller').click();sameBox(await geometry());
+        assert(Math.abs((await geometry()).font-initial.font+step)<.1);
+        await page.locator('#arabic-font-larger').click();
+        await page.locator('#word-target-index').fill('3');await page.locator('#word-target-index').press('Enter');
+        assert.equal(await page.locator('#edit-arabic-field').inputValue(),records[2].word);
+        await page.locator('#edit-meaning-field').fill('unsaved-test-meaning');
+        page.once('dialog',dialog=>dialog.dismiss());
+        await page.locator('#word-target-index').fill('2');await page.locator('#lookup-go-btn').click();
+        assert.equal(await page.locator('#word-target-index').inputValue(),'3');
+        assert.equal(await page.locator('#edit-meaning-field').inputValue(),'unsaved-test-meaning');
+        page.once('dialog',dialog=>dialog.accept());
+        await page.locator('#word-target-index').fill('2');await page.locator('#lookup-go-btn').click();
+        assert.equal(await page.locator('#edit-arabic-field').inputValue(),records[1].word);
+        assert(await page.locator('#lookup-go-btn').isEnabled());
         assert.equal(await page.locator('#admin-passcode-box').inputValue(),'');
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
         assert.deepEqual(githubRequests,[],'login must not write to GitHub');
@@ -76,7 +117,7 @@ try {
         await page.screenshot({path:'artifacts/editor-open-'+viewport.width+'.png',fullPage:true});
         await context.close();page=null;
     }
-    console.log('PASS: Editor desktop/mobile configured UTF-8 password, invalid/missing inputs, Enter/button submission, CP/vocabulary failure recovery, unchanged Book B lock and no GitHub writes.');
+    console.log('PASS: Editor desktop/mobile login, GO/Enter word lookup, unsaved edit protection, two-point font default and controls with fixed input dimensions, failure recovery and no GitHub writes.');
 } catch(error) {
     console.error('Editor browser diagnostics:',JSON.stringify({pageErrors,url:page?.url(),loginError:await page?.locator('#login-error').textContent().catch(()=>null)}));
     if(page)await page.screenshot({path:'artifacts/editor-failure.png',fullPage:true}).catch(()=>{});
