@@ -1,8 +1,7 @@
-import { parseLughatBook } from './lughat.js';
 // The application root is resolved relative to this module, never to the page URL.
 export const BOOK_FILES = Object.freeze({
     book_a: 'Vocabulary-File.txt',
-    book_b: 'Lughat-AlQuran-word-meaning.txt',
+    book_b: 'Vocabulary-Urdu-File.txt',
     book_c: 'Vocabulary-Tajweed-File.txt'
 });
 export function rootFileUrl(filename) {
@@ -26,6 +25,5 @@ export function parseVocabularyRecords(text) {
 export async function loadBook(bookId) {
     const filename = BOOK_FILES[bookId];
     if (!filename) throw new Error('Unknown vocabulary book.');
-    const text = await fetchRootText(filename);
-    return bookId === 'book_b' ? parseLughatBook(text).records : parseVocabularyRecords(text);
+    return parseVocabularyRecords(await fetchRootText(filename));
 }

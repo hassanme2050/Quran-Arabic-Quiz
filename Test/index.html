@@ -6,9 +6,9 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=20261029-quest3">
-    <link rel="stylesheet" href="css/app.css?v=20261029-quest3">
-    <link rel="stylesheet" href="css/quest.css?v=20261029-quest3">
+    <link rel="stylesheet" href="shared/typography.css?v=20261024-alexandria1">
+    <link rel="stylesheet" href="css/app.css?v=20261024-alexandria1">
+    <link rel="stylesheet" href="css/quest.css?v=20261025-quest2">
 </head>
 <body>
     <div class="app-wrapper">
@@ -37,14 +37,14 @@
             <div class="menu-action-layout">
                 <button data-action="triggerSelectedSession" data-value="flashcard">Review Mode</button>
                 <button data-action="triggerSelectedSession" data-value="quiz">Quiz Mode</button>
-                <button data-action="openQuest">Quest Mode</button>
+                <button class="quest-menu-button" data-action="openQuest">Quest Mode <span>New · Learn, test & unlock</span></button>
                 <button data-action="openDictionaryMode">Dictionary Mode</button>
             </div>
 
             <!-- Book Selection Dropdown element positioned under Quiz Mode -->
             <select class="custom-select-menu" id="vocabulary-book-selector">
                 <option value="book_a" selected>Book A - Arabic to English</option>
-                <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
+                <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
                 <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
             </select>
 
@@ -59,15 +59,11 @@
 
         <!-- Dictionary Mode is a separate module; it does not alter quiz/review session state. -->
         <div id="dictionary-view" class="hidden">
-            <div id="dictionary-toolbar" class="dictionary-sort" role="group" aria-label="Sort dictionary">
+            <div class="dictionary-sort" role="group" aria-label="Sort dictionary">
                 <div class="dictionary-sort-pill" id="dictionary-sort-pill"></div>
                 <button type="button" id="dict-sort-number" data-action="setDictionarySort" data-value="number">123</button>
                 <button type="button" id="dict-sort-english" data-action="setDictionarySort" data-value="english">English</button>
                 <button type="button" id="dict-sort-arabic" class="active" data-action="setDictionarySort" data-value="arabic">Arabic</button>
-                <div class="dictionary-search-control">
-                    <input id="dictionary-search" class="custom-text-input dictionary-search" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" tabindex="-1" aria-label="Live dictionary search" placeholder="Search…">
-                    <button type="button" id="dictionary-search-toggle" class="dictionary-search-toggle" aria-label="Open dictionary search" aria-controls="dictionary-search" aria-expanded="false" aria-pressed="false"><span aria-hidden="true">⌨</span></button>
-                </div>
             </div>
             <div class="dictionary-layout">
                 <div class="dictionary-list" id="dictionary-list" aria-label="Vocabulary dictionary"></div>
@@ -75,7 +71,7 @@
                     <div class="dictionary-jump-track"></div>
                 </div>
             </div>
-            <div class="dictionary-footer"><span id="dictionary-count" role="status" aria-live="polite">0 words</span><span id="dictionary-sort-caption">Sorted by Arabic Alphabet</span></div>
+            <div class="dictionary-footer"><span id="dictionary-count">0 words</span><span id="dictionary-sort-caption">Sorted by Arabic Alphabet</span></div>
             <button class="exit-btn" style="width:100%; margin-top:16px;" data-action="exitToHome">🏠 Go to Home</button>
         </div>
 
@@ -139,28 +135,38 @@
                 <button class="exit-btn" data-action="exitToHome">🏠 Go to Home</button>
             </div>
         </div>
-        <section id="quest-map-view" class="quest-shell hidden" aria-label="Quest map">
 
-            <div class="quest-map-scroll" id="quest-map-scroll" tabindex="0" role="region" aria-label="Quest stages, scroll left or right">
+        <section id="quest-map-view" class="quest-shell hidden" aria-label="Quest map">
+            <header class="quest-hero">
+                <div class="quest-eyebrow">STRAWBERRY · BOOK A</div>
+                <h2>Your word adventure</h2>
+                <p>Small steps. Stronger Arabic. One stage at a time.</p>
+                <div class="quest-overview" id="quest-overview"></div>
+                <progress id="quest-progress" value="0" max="1" aria-label="Quest stages cleared"></progress>
+                <button id="quest-continue" class="quest-primary" type="button">Begin your quest</button>
+            </header>
+            <p class="quest-save-note" id="quest-save-note" role="status">Progress is saved in this browser. Export a backup to keep it safe.</p>
+            <div class="quest-map-key"><span>● Ready</span><span>★ Cleared</span><span>🔒 Locked</span><span>🐉 Dragon</span></div>
             <div class="quest-map-landscape">
                 <svg id="quest-route" class="quest-route" aria-hidden="true" preserveAspectRatio="none"><path id="quest-route-path"></path></svg>
                 <ol id="quest-map-nodes" aria-label="Stages in book order"></ol>
             </div>
+            <div class="quest-rules">
+                <strong>How your quest works</strong>
+                <p>Review each word with its meaning, then answer a shuffled quiz. Earn at least one star to unlock the next stop.</p>
+                <div class="quest-star-guide"><span>★ 60%</span><span>★★ 80%</span><span>★★★ 100%</span></div>
+                <p>Every five stages, a dragon tests 25 previously learned words, prioritizing your mistakes. The final stage uses the words left in the book.</p>
             </div>
-            <button id="quest-continue" class="quest-wide" type="button">Begin your quest</button>
             <details class="quest-trouble-panel">
                 <summary>Words to strengthen</summary>
                 <p>Your recent misses and repeated mistakes guide the dragon challenges.</p>
-                <div id="quest-weak-words" class="quest-table-scroll"></div>
+                <ul id="quest-weak-words"></ul>
             </details>
-            <div class="quest-overview" id="quest-overview"></div>
-            <progress id="quest-progress" value="0" max="1" aria-label="Quest stages cleared"></progress>
             <div class="quest-backup-actions">
                 <button id="quest-export" class="exit-btn" type="button">Export progress</button>
                 <button id="quest-import" class="exit-btn" type="button">Import progress</button>
                 <input id="quest-import-file" type="file" accept=".json,application/json" hidden>
             </div>
-            <p class="quest-save-note" id="quest-save-note" role="status"></p>
             <p class="quest-device-note">Saved on this device and browser for this app address. Clearing browser data removes progress; export a backup to move it elsewhere.</p>
             <button class="exit-btn quest-wide" type="button" data-quest-action="home">← Main menu</button>
         </section>
@@ -214,6 +220,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=20261029-quest3"></script>
+    <script type="module" src="js/app.js?v=20261025-quest2"></script>
 </body>
 </html>

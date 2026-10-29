@@ -15,7 +15,7 @@ export function updateStickyCounterBanner() {
     document.getElementById('generate-code-btn').disabled = picked !== count;
 }
 export function toggleWordSelection(number, tile) {
-    if (!Number.isInteger(number) || number < 1 || !(state.activeBook === 'book_b' ? state.fullVocabularyInventory.some(item => item.number === number && item.verified !== false) : number <= Math.min(999, state.fullVocabularyInventory.length))) return;
+    if (!Number.isInteger(number) || number < 1 || number > Math.min(999, state.fullVocabularyInventory.length)) return;
     if (state.selected.has(number)) state.selected.delete(number);
     else {
         if (state.selected.size >= count) {
@@ -34,7 +34,7 @@ export function toggleWordSelection(number, tile) {
 export function processSelectedHexadecimalQuizCode() {
     if (state.selected.size !== count) return;
     try {
-        document.getElementById('quiz-code-output').value = encodeQuizCode([...state.selected], state.activeBook || 'book_a');
+        document.getElementById('quiz-code-output').value = encodeQuizCode([...state.selected]);
         document.getElementById('copy-code-btn').disabled = false;
         launchToastAlert('🎉 ' + count + '-question quiz code compiled successfully!');
     } catch (error) { launchToastAlert('⚠️ ' + error.message); }

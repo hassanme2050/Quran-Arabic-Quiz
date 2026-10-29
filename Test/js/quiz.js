@@ -1,7 +1,7 @@
 import { decodeTeacherQuizCode } from '../shared/quiz-codes.js';
 export { decodeTeacherQuizCode };
 import { state } from './state.js';
-import { vocabularyList, activeBook } from './vocabulary.js';
+import { vocabularyList } from './vocabulary.js';
 import { shuffleArray } from './utils.js';
 import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
 
@@ -16,8 +16,6 @@ export function startQuizWithCode() {
         return;
     }
 
-    const codeBook = enteredCode.startsWith('B2:') ? 'book_b' : 'book_a';
-    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_b' ? 'Book B' : 'Book A') + ' for this quiz code.'); return; }
     const selectedQuestionNumbers = enteredCode ? decodeTeacherQuizCode(enteredCode) : null;
     if (!selectedQuestionNumbers) {
         showQuizCodeError('Invalid quiz code. Please try again or check with your teacher.');
@@ -26,13 +24,11 @@ export function startQuizWithCode() {
     }
     const selectedWords = [];
     for (const questionNumber of selectedQuestionNumbers) {
-        const matches = activeBook === 'book_b' ? vocabularyList.filter(item => item.number === questionNumber) : [];
-        const selected = activeBook === 'book_b' ? (matches.length === 1 ? matches[0] : null) : vocabularyList[questionNumber - 1];
-        if (!Number.isInteger(questionNumber) || questionNumber < 1 || !selected) {
+        if (!Number.isInteger(questionNumber) || questionNumber < 1 || questionNumber > vocabularyList.length) {
             showQuizCodeError('This quiz code is not available with the current vocabulary file. Please check with your teacher.');
             return;
         }
-        selectedWords.push(selected);
+        selectedWords.push(vocabularyList[questionNumber - 1]);
     }
 
     if (selectedWords.length === 0) {
@@ -90,7 +86,6 @@ export function generateQuizChoices(correctItem) {
 }
 
 export function getMeaningTokens(meaningString) {
-    if (activeBook === 'book_b') return meaningString.split(/[\u060C,\u061B;/]/).map(token => token.trim()).filter(Boolean);
     return meaningString.toLowerCase()
         .replace(/[!.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
         .split('/')
@@ -111,8 +106,6 @@ export function showQuizQuestion() {
     choices.forEach(choice => {
         const btn = document.createElement('button');
         btn.textContent = choice.meaning;
-        btn.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
-        btn.lang = activeBook === 'book_b' ? 'ur' : 'en';
         btn.onclick = function() { evaluateQuizAnswer(btn, choice, currentItem); };
         optionsBox.appendChild(btn);
     });
