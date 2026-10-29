@@ -41,20 +41,20 @@ async function checkHarakat(setting,width) {
         for(const [index,sample] of samples.entries()) {
             await field.fill(sample);await field.evaluate(el=>el.blur());
             const actual=await field.screenshot(index===0?{path:'artifacts/editor-harakat-'+setting+'-'+width+'.png'}:{});
-            await field.evaluate(el=>{
-                const reference=el.cloneNode();reference.id='arabic-ink-reference';reference.value=el.value;
-                Object.assign(reference.style,{position:'fixed',left:'16px',top:'16px',zIndex:'40000',width:el.getBoundingClientRect().width+'px',height:'400px',lineHeight:'3'});
-                document.body.appendChild(reference);
-            });
-            const expected=await page.locator('#arabic-ink-reference').screenshot();
-            await page.locator('#arabic-ink-reference').evaluate(el=>el.remove());
-            const [ink,reference]=await Promise.all([inkProfile(actual),inkProfile(expected)]);
+            const reference=await field.evaluate((el,text)=>{
+                const style=getComputedStyle(el),context=document.createElement('canvas').getContext('2d');
+                context.font=style.fontWeight+' '+style.fontSize+' '+style.fontFamily;
+                if(!context.font.includes(style.fontSize))throw Error('Canvas font did not match the Arabic field');
+                context.direction=style.direction;context.textAlign='center';
+                const bounds=context.measureText(text);
+                return {height:bounds.actualBoundingBoxAscent+bounds.actualBoundingBoxDescent,width:bounds.actualBoundingBoxLeft+bounds.actualBoundingBoxRight};
+            },sample);
+            const ink=await inkProfile(actual);
             assert(reference.height>0&&ink.height>0,'Arabic ink must be visible');
             assert(ink.height>=reference.height-2,'Top/bottom harakat clipped at '+setting+' '+width+': '+JSON.stringify({ink,reference}));
             assert(ink.width>=reference.width-2,'Arabic word clipped horizontally');
         }
     } finally {
-        await page.locator('#arabic-ink-reference').evaluateAll(nodes=>nodes.forEach(el=>el.remove()));
         await field.fill(original);await field.evaluate(el=>el.blur());
     }
 }
