@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildQuestPlan,emptyQuestProgress,isNodeUnlocked,nextQuestNode,beginQuestNode,advanceQuestReview,
-    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1029.26-strawberry1';
-import {createQuestStorage,parseQuestImport} from '../js/quest-storage.js?v=1029.26-strawberry1';
+    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1029.26-strawberry2';
+import {createQuestStorage,parseQuestImport,createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1029.26-strawberry2';
 const shuffle=array=>array.reverse();
 function finish(plan,progress,id,correctCount=10) {
     const run=beginQuestNode(plan,progress,id,shuffle);
@@ -111,4 +111,63 @@ test('malformed resume data and locked attempts cannot bypass stage sequencing',
     input.runs['stage-1']={phase:'quiz',order:Array(10).fill(1),reviewIndex:0,answers:[]};
     const clean=reconcileQuestProgress(input,88);
     assert.deepEqual(clean.runs,{});
+});
+
+test('Book B earns its own stars and resumes independently of Book A',()=>{
+    const data=new Map(),storage={getItem:key=>data.get(key),setItem:(key,value)=>data.set(key,value)};
+    const library=createQuestLibraryStorage(storage,'library','legacy');
+    const a=library.loadBook('book_a',88),b=library.loadBook('book_b',20);
+    finish(buildQuestPlan(88),a,'stage-1',8);library.save(a);
+    const plan=buildQuestPlan(20),run=beginQuestNode(plan,b,'stage-1',shuffle);
+    advanceQuestReview(b,'stage-1',shuffle);library.save(b);
+    const restored=createQuestLibraryStorage(storage,'library','legacy');
+    assert.equal(restored.loadBook('book_a',88).records['stage-1'].bestStars,2);
+    assert.equal(restored.loadBook('book_b',20).runs['stage-1'].reviewIndex,1);
+    assert(!isNodeUnlocked(plan,b,'stage-2'));
+    finish(plan,b,'stage-1',6);library.save(b);
+    assert(isNodeUnlocked(plan,b,'stage-2'));
+    assert.equal(run.phase,'result');
+    assert.equal(library.loadBook('book_a',88).records['stage-1'].bestStars,2);
+    assert.equal(reconcileQuestProgress(b,20).book,'book_a');
+    assert.deepEqual(reconcileQuestProgress(b,20).records,{});
+});
+test('a single backup moves both books including inactive runs into a fresh library',()=>{
+    const data=new Map(),storage={getItem:key=>data.get(key),setItem:(key,value)=>data.set(key,value)};
+    const library=createQuestLibraryStorage(storage,'library','legacy');
+    const a=library.loadBook('book_a',88),b=library.loadBook('book_b',20);
+    finish(buildQuestPlan(88),a,'stage-1',10);library.save(a);
+    finish(buildQuestPlan(20),b,'stage-1',8);
+    beginQuestNode(buildQuestPlan(20),b,'stage-2',shuffle);advanceQuestReview(b,'stage-2',shuffle);library.save(b);
+    const serialized=JSON.stringify(library.backup()),parsed=parseQuestBackup(serialized,{book_a:88,book_b:20});
+    let writes=0;const target=new Map(),newStorage={getItem:key=>target.get(key),setItem:(key,value)=>{writes++;target.set(key,value);}};
+    const moved=createQuestLibraryStorage(newStorage,'library','legacy');moved.importBooks(parsed);
+    assert.equal(writes,1,'combined import must persist as a single operation');
+    const reopened=createQuestLibraryStorage(newStorage,'library','legacy');
+    assert.equal(reopened.loadBook('book_a',88).records['stage-1'].bestStars,3);
+    assert.equal(reopened.loadBook('book_b',20).runs['stage-2'].reviewIndex,1);
+    assert.equal(reopened.backup().books.book_b.records['stage-1'].bestStars,2);
+});
+test('existing Book A saves migrate and legacy backups preserve Book B progress',()=>{
+    const legacy=emptyQuestProgress();finish(buildQuestPlan(88),legacy,'stage-1',6);
+    const data=new Map([['legacy',JSON.stringify(legacy)]]),storage={getItem:key=>data.get(key),setItem:(key,value)=>data.set(key,value)};
+    const library=createQuestLibraryStorage(storage,'library','legacy');
+    assert.equal(library.loadBook('book_a',88).records['stage-1'].bestStars,1);
+    const b=library.loadBook('book_b',20);finish(buildQuestPlan(20),b,'stage-1',10);library.save(b);
+    library.importBooks(parseQuestBackup(JSON.stringify(legacy),{book_a:88,book_b:20}));
+    assert.equal(library.loadBook('book_b',20).records['stage-1'].bestStars,3);
+    assert.deepEqual(JSON.parse(data.get('legacy')),legacy,'migration must keep the old save intact');
+    assert.equal(createQuestLibraryStorage(storage,'library','legacy').loadBook('book_a',88).records['stage-1'].bestStars,1);
+});
+test('combined imports reject mismatched books and blocked storage retains both books in memory',()=>{
+    const library=createQuestLibraryStorage({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});
+    assert(library.issue);
+    const b=library.loadBook('book_b',20);finish(buildQuestPlan(20),b,'stage-1',10);
+    assert.equal(library.save(b),false);
+    library.loadBook('book_a',88);
+    assert.equal(library.backup().books.book_b.records['stage-1'].bestStars,3);
+    const counts={book_a:88,book_b:20};
+    for(const input of ['bad','{"schema":2,"type":"other","books":{}}',JSON.stringify({schema:2,type:'quranaq-quest',books:{book_b:emptyQuestProgress()}}),JSON.stringify({schema:2,type:'quranaq-quest',books:{book_c:emptyQuestProgress('book_c')}})])
+        assert.throws(()=>parseQuestBackup(input,counts));
+    assert.throws(()=>parseQuestBackup(JSON.stringify(library.backup()),{book_a:88}));
+    assert.equal(parseQuestBackup(JSON.stringify(library.backup()),counts).book_b.records['stage-1'].bestStars,3);
 });

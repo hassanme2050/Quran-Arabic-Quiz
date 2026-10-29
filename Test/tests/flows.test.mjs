@@ -181,10 +181,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('student runs complete 20- and legacy 10-question quizzes and cancels pending answers on exit', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
-        const quiz = await import('../js/quiz.js?v=1029.26-strawberry1');
-        const {state} = await import('../js/state.js?v=1029.26-strawberry1');
-        const {exitToHome} = await import('../js/ui.js?v=1029.26-strawberry1');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry2');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry2');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry2');
+        const {exitToHome} = await import('../js/ui.js?v=1029.26-strawberry2');
         vocabulary.parseVocabulary(vocabularyText);
         for (const count of [20,10]) {
             el('quiz-code-field').value = encodeQuizCode(Array.from({length:count},(_,index)=>index+1));
@@ -215,8 +215,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('dictionary sorting never changes book order and reuses unchanged rows', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
-        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry1');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry2');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry2');
         vocabulary.parseVocabulary(vocabularyText);
         const original = structuredClone(vocabulary.vocabularyList);
         dictionary.openDictionaryMode();
@@ -289,11 +289,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Book B sessions exclude unverified words, dictionary keeps them, and codes enforce book identity', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry1');
-        const quiz = await import('../js/quiz.js?v=1029.26-strawberry1');
-        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry1');
-        const cards = await import('../js/flashcards.js?v=1029.26-strawberry1');
-        const {state} = await import('../js/state.js?v=1029.26-strawberry1');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry2');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry2');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry2');
+        const cards = await import('../js/flashcards.js?v=1029.26-strawberry2');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry2');
         const headings = read('Lughat-AlQuran-word-meaning.txt').split(/\r?\n/).slice(0,2).join('\n');
         const rows = Array.from({length:30},(_,i)=>String(i+1).padStart(4,'0')+' word'+(i+1)+' \u27F5 meaning'+(i+1)+' (note)');
         const text = headings+'\n'+rows.slice(0,20).join('\n')+'\n-----\n'+rows.slice(20).join('\n');

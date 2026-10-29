@@ -1,5 +1,5 @@
 export { launchToastAlert } from '../shared/ui.js?v=1029.26-strawberry1';
-import { state } from './state.js?v=1029.26-strawberry1';
+import { state } from './state.js?v=1029.26-strawberry2';
 const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view', 'quest-map-view', 'quest-review-view', 'quest-quiz-view', 'quest-result-view'];
 export function switchView(viewId) {
   for (const id of views) document.getElementById(id).classList.toggle('hidden', id !== viewId);

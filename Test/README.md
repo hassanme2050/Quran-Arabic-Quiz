@@ -69,4 +69,6 @@ Production release: the user-approved Peaches build is published at https://hass
 - Removed the introductory header, map legends and how-to section.
 - Words to strengthen uses the Quiz performance-table format.
 - Overall progress sits immediately above Export/Import.
-- Quest progress remains Book A; opening Quest from Book B selects Book A.
+- Quest supports Book A and verified Book B words, with a book selector, independent stages and saved positions, Urdu meanings and original Book B word numbers.
+- Export progress backs up both books in one JSON file. Import restores both together; older single-book backups restore only their book and preserve the other book. Existing browser Book A saves migrate automatically.
+- Editor Book B support remains deferred for the next instructions.

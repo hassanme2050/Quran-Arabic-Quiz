@@ -100,3 +100,12 @@
 #quest-progress { height:8px; margin:0 0 16px; }
 .quest-backup-actions { margin-top:0; gap:16px; }
 .quest-backup-actions button { padding:16px 12px; font-size:16px; }
+#quest-book-selector { margin:0 0 18px; }
+[data-book="book_b"] .quest-answer-meaning,
+[data-book="book_b"] .quest-your-answer,
+[data-book="book_b"] #quest-weak-words td:nth-child(3) {
+    direction:rtl; font-family:'Noto Nastaliq Urdu','Noto Naskh Arabic','Segoe UI',serif; font-size:22px; line-height:2;
+}
+[data-book="book_b"] #quest-weak-words td:nth-child(n+4) {
+    direction:ltr; font-family:inherit; font-size:14px; line-height:normal; text-align:center;
+}

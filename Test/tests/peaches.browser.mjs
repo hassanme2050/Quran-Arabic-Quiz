@@ -109,7 +109,7 @@ try {
   await page.getByRole('button',{name:'Exit to Menu'}).click();
   await page.getByRole('button',{name:'Quiz Mode',exact:true}).click();
   for(let i=0;i<10;i++) {
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry1');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry2');return state.sessionWords[state.currentIndex];});
    assert(item.number<=20);assert(item.verified);
    await page.getByRole('button',{name:item.meaning,exact:true}).click();
    if(i===0)await page.screenshot({path:'artifacts/quiz-'+viewport.width+'.png',fullPage:true});

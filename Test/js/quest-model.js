@@ -17,16 +17,16 @@ export function buildQuestPlan(wordCount) {
     }
     return plan;
 }
-export function emptyQuestProgress() {
-    return { schema:1, book:'book_a', records:{}, words:{}, runs:{}, lastNode:null, savedAt:null };
+export function emptyQuestProgress(book='book_a') {
+    return { schema:1, book, records:{}, words:{}, runs:{}, lastNode:null, savedAt:null };
 }
 const integer = value => Number.isSafeInteger(value) && value >= 0 ? Math.min(value,1e9) : 0;
 const timestamp = value => Number.isSafeInteger(value) && value > 0 ? value : 0;
 const wordNumbers = node => Array.from({length:node.wordCount},(_,i)=>node.firstWord+i);
 const sameNumbers = (a,b) => a.length===b.length && [...a].sort((x,y)=>x-y).every((value,i)=>value===[...b].sort((x,y)=>x-y)[i]);
-export function reconcileQuestProgress(input, wordCount) {
-    const progress=emptyQuestProgress();
-    if (!input || input.schema!==1 || input.book!=='book_a') return progress;
+export function reconcileQuestProgress(input, wordCount, book='book_a') {
+    const progress=emptyQuestProgress(book);
+    if (!input || input.schema!==1 || input.book!==book) return progress;
     const plan=buildQuestPlan(wordCount);
     for (const node of plan) {
         const record=input.records?.[node.id];

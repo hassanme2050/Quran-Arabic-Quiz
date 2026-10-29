@@ -46,7 +46,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
-          for(const name of ['desktop-map.jpg','mobile-map.jpg','failure.jpg']) {
+          for(const name of ['desktop-map.jpg','mobile-map.jpg','desktop-book-b.jpg','mobile-book-b.jpg','failure.jpg']) {
             const file=path.join(process.env.QUEST_QA_DIR,name);
             if(!fs.existsSync(file))continue;
             const base64=fs.readFileSync(file).toString('base64');

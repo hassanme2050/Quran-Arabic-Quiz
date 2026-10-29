@@ -1,6 +1,6 @@
 import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry1';
 import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry1';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry1';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry2';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -25,7 +25,7 @@ export async function loadVocabulary(bookId = 'book_a') {
 }
 function setSessionAvailability(available) {
     document.querySelectorAll('[data-action]').forEach(element => {
-        if (['triggerSelectedSession','startQuizWithCode'].includes(element.dataset.action)) element.disabled = !available;
+        if (['triggerSelectedSession','startQuizWithCode','openQuest'].includes(element.dataset.action)) element.disabled = !available;
     });
 }
 export function parseVocabulary(text, bookId = 'book_a') {

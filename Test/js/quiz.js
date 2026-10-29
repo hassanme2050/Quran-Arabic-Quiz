@@ -1,9 +1,9 @@
 import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1029.26-strawberry1';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry1';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry1';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry1';
+import { state } from './state.js?v=1029.26-strawberry2';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry2';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry2';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry2';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {

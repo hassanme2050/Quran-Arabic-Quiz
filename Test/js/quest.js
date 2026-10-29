@@ -1,11 +1,12 @@
-import { state } from './state.js?v=1029.26-strawberry1';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry1';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry1';
-import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry1';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry1';
+import { state } from './state.js?v=1029.26-strawberry2';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry2';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry1';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry2';
+import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry2';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry2';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry1';
-import { createQuestStorage, parseQuestImport } from './quest-storage.js?v=1029.26-strawberry1';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry2';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry2';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -14,10 +15,13 @@ const currentNode=()=>plan.find(node=>node.id===currentId);
 const currentRun=()=>progress.runs[currentId];
 function ensureProgress() {
     if (loadedVocabulary===vocabularyList && progress) return;
-    let storage;
-    try {storage=globalThis.localStorage;} catch {}
-    store=createQuestStorage(storage);
-    progress=store.load(vocabularyList.length);
+    if(!store) {
+        let storage;
+        try {storage=globalThis.localStorage;} catch {}
+        store=createQuestLibraryStorage(storage);
+    }
+    progress=store.loadBook(activeBook,vocabularyList.length);
+    currentId=null;nextId=null;
     loadedVocabulary=vocabularyList;
     plan=buildQuestPlan(vocabularyList.length);
 }
@@ -26,7 +30,7 @@ function persist() {
     updateSaveNotes();
 }
 function updateSaveNotes() {
-    const note=store.issue||'Progress saved in this browser. Export a backup to keep it safe.';
+    const note=store.issue||'Both books are saved in this browser. Export progress to back up all books.';
     byId('quest-save-note').textContent=note;
     byId('quest-save-note').classList.toggle('quest-save-warning',Boolean(store.issue));
     document.querySelectorAll('.quest-session-save').forEach(element=>{element.textContent=store.issue||'Your place is saved automatically.';});
@@ -37,6 +41,7 @@ function show(view) {
     byId('app-title').classList.remove('dictionary-title');
     byId('app-title').textContent='Quran Arabic Quest';
     switchView(view);
+    byId(view).dataset.book=activeBook;
     updateSaveNotes();
 }
 function make(tag,className,text) {
@@ -51,17 +56,13 @@ function continuationNode() {
     return nextQuestNode(plan,progress);
 }
 export async function openQuest() {
-    if(activeBook !== 'book_a') {
-        document.getElementById('vocabulary-book-selector').value='book_a';
-        await loadVocabulary('book_a');
-        launchToastAlert('Quest uses Book A.');
-    }
-    if(!vocabularyList.length){launchToastAlert('Vocabulary is not loaded yet.');return;}
+    if(!vocabularyList.length){launchToastAlert('No verified Quest words are available for this book yet.');return;}
     ensureProgress();
     renderQuestMap();
 }
 export function renderQuestMap() {
     answerLocked=false;
+    byId('quest-book-selector').value=activeBook;
     const stages=plan.filter(node=>node.kind==='stage'),dragons=plan.filter(node=>node.kind==='dragon');
     const cleared=nodes=>nodes.filter(node=>(progress.records[node.id]?.bestStars||0)>=1).length;
     const totalStars=plan.reduce((sum,node)=>sum+(progress.records[node.id]?.bestStars||0),0);
@@ -91,7 +92,9 @@ export function renderQuestMap() {
         button.type='button';button.disabled=!unlocked;
         button.dataset.node=node.id;
         button.dataset.status=!unlocked?'locked':earned?'cleared':target?.id===node.id?'current':'available';
-        const range=node.kind==='dragon'?node.wordCount+' adaptive words':'Words '+node.firstWord+'–'+node.lastWord;
+        const first=vocabularyList[node.firstWord-1]?.number??node.firstWord;
+        const last=vocabularyList[node.lastWord-1]?.number??node.lastWord;
+        const range=node.kind==='dragon'?node.wordCount+' adaptive words':'Words '+first+'–'+last;
         button.setAttribute('aria-label',node.title+'. '+range+'. '+(!unlocked?'Locked':earned?earned+' of 3 stars':'Ready'));
         button.onclick=()=>startNode(node.id);
         stop.append(button,make('strong','quest-stop-title',node.title),make('span','quest-stop-range',range));
@@ -122,7 +125,7 @@ function renderWeakWords() {
     head.appendChild(hr);table.appendChild(head);const body=make('tbody');
     for(const number of weak){
         const item=vocabularyList[number-1],stats=progress.words[number],row=make('tr');
-        row.append(make('td','',number),make('td','large-bold-cell large-arabic-cell',item.word),make('td','',item.meaning),make('td','',stats.wrong),make('td','',stats.correct));
+        row.append(make('td','',item.number??number),make('td','large-bold-cell large-arabic-cell',item.word),make('td','',item.meaning),make('td','',stats.wrong),make('td','',stats.correct));
         body.appendChild(row);
     }
     table.appendChild(body);list.appendChild(table);
@@ -142,9 +145,9 @@ function renderRun() {
 }
 function renderReview() {
     const node=currentNode(),run=currentRun(),number=run.order[run.reviewIndex],item=vocabularyList[number-1];
-    byId('quest-review-heading').textContent=node.title+' · WORDS '+node.firstWord+'–'+node.lastWord;
+    byId('quest-review-heading').textContent=node.title+' · WORDS '+(vocabularyList[node.firstWord-1].number??node.firstWord)+'–'+(vocabularyList[node.lastWord-1].number??node.lastWord);
     byId('quest-review-counter').textContent='Review '+(run.reviewIndex+1)+' of '+run.order.length;
-    byId('quest-review-number').textContent='Book word #'+number;
+    byId('quest-review-number').textContent='Book word #'+(item.number??number);
     byId('quest-review-word').textContent=item.word;
     byId('quest-review-meaning').textContent=item.meaning;
     byId('quest-review-next').textContent=run.reviewIndex===run.order.length-1?'Start shuffled quiz →':'Next word →';
@@ -158,7 +161,7 @@ function renderQuestion() {
     byId('quest-quiz-description').textContent=dragon?'These '+run.order.length+' learned words prioritize your recent and repeated mistakes.':
         'The same words you just reviewed, in a new order.';
     byId('quest-question-counter').textContent='Question '+(run.answers.length+1)+' of '+run.order.length;
-    byId('quest-question-number').textContent='Book word #'+number;
+    byId('quest-question-number').textContent='Book word #'+(item.number??number);
     byId('quest-question-word').textContent=item.word;
     byId('quest-feedback').textContent='';
     const options=byId('quest-answer-options');
@@ -214,7 +217,7 @@ function renderResult() {
     for(const answer of run.answers) {
         const item=vocabularyList[answer.number-1];
         const row=make('li','quest-result-answer'+(answer.correct?'':' quest-missed'));
-        row.append(make('span','quest-answer-mark',answer.correct?'✓':'✕'),make('span','quest-word-index','#'+answer.number),
+        row.append(make('span','quest-answer-mark',answer.correct?'✓':'✕'),make('span','quest-word-index','#'+(item.number??answer.number)),
             make('span','quest-arabic',item.word),make('span','quest-answer-meaning',item.meaning));
         if(!answer.correct)row.appendChild(make('small','quest-your-answer','Your answer: '+answer.chosen));
         list.appendChild(row);
@@ -222,26 +225,39 @@ function renderResult() {
     show('quest-result-view');
 }
 function exportProgress() {
-    const blob=new Blob([JSON.stringify(progress,null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify(store.backup(),null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download='QuranAQ-Quest-Progress.json';
+    link.href=url;link.download='QuranAQ-Quest-All-Books-Progress.json';
     document.body.appendChild(link);link.click();link.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
-    launchToastAlert('Quest progress exported. Keep the file as a backup.');
+    launchToastAlert('All books exported in one Quest progress backup.');
 }
 async function importProgress(event) {
     const file=event.target.files[0];
     if(!file)return;
     try {
-        if(file.size>1000000)throw new Error('This progress file is too large.');
-        const imported=parseQuestImport(await file.text(),vocabularyList.length);
-        if(!window.confirm('Replace Quest progress in this browser with this backup?'))return;
-        progress=imported;currentId=null;persist();renderQuestMap();
-        launchToastAlert('Quest progress imported.');
+        if(file.size>5000000)throw new Error('This progress file is too large.');
+        const counts=Object.fromEntries(await Promise.all(QUEST_BOOKS.map(async book=>[book,
+            book===activeBook?vocabularyList.length:(await loadBookRecords(book)).filter(item=>item.verified!==false).length])));
+        const imported=parseQuestBackup(await file.text(),counts);
+        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A':'Book B').join(' and ');
+        if(!window.confirm('Replace Quest progress for '+names+' in this browser with this backup?'))return;
+        store.importBooks(imported);
+        progress=store.loadBook(activeBook,vocabularyList.length);currentId=null;renderQuestMap();
+        launchToastAlert('Quest progress imported for '+names+'.');
     } catch(error){launchToastAlert(error.message);}
     finally{event.target.value='';}
 }
 export function initializeQuest() {
+    byId('quest-book-selector').addEventListener('change',async event=>{
+        const selector=event.target,book=selector.value;
+        selector.disabled=true;
+        try {
+            byId('vocabulary-book-selector').value=book;
+            await loadVocabulary(book);
+            if(activeBook===book&&vocabularyList.length)await openQuest();
+        } finally {selector.disabled=false;}
+    });
     byId('quest-review-next').addEventListener('click',()=>{advanceQuestReview(progress,currentId,shuffleArray);persist();renderRun();});
     byId('quest-result-retry').addEventListener('click',()=>{retryQuestNode(plan,progress,currentId,shuffleArray);persist();renderRun();});
     byId('quest-result-continue').addEventListener('click',()=>{if(nextId)startNode(nextId);});

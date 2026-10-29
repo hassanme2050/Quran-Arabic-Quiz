@@ -1,6 +1,6 @@
-import { activeBook } from './vocabulary.js?v=1029.26-strawberry1';
-import { state } from './state.js?v=1029.26-strawberry1';
-import { switchView } from './ui.js?v=1029.26-strawberry1';
+import { activeBook } from './vocabulary.js?v=1029.26-strawberry2';
+import { state } from './state.js?v=1029.26-strawberry2';
+import { switchView } from './ui.js?v=1029.26-strawberry2';
 
 export function showCard() {
     document.getElementById('card-counter').textContent = "Word " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
