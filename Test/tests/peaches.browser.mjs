@@ -24,6 +24,7 @@ try {
   await page.waitForFunction(()=>document.querySelector('#status-message').textContent.includes('1858'));
   assert(await page.getByRole('button',{name:'Quiz Mode',exact:true}).isEnabled());
   assert(await page.getByRole('button',{name:'Review Mode',exact:true}).isEnabled());
+  const homeModeHeight=await page.getByRole('button',{name:'Dictionary Mode',exact:true}).evaluate(el=>el.getBoundingClientRect().height);
   await page.getByRole('button',{name:'Dictionary Mode',exact:true}).click();
   assert.equal(await page.locator('.dictionary-entry').count(),1858);
   assert.equal(await page.locator('.dictionary-entry.unverified').count(),1838);
@@ -34,12 +35,20 @@ try {
   assert(await page.locator('#dictionary-search').isHidden());
   const controlGeometry=()=>page.locator('#dictionary-toolbar').evaluate(el=>({height:el.getBoundingClientRect().height,heights:[...el.querySelectorAll(':scope > button,#dictionary-search-toggle')].map(b=>b.getBoundingClientRect().height)}));
   const collapsed=await controlGeometry();
-  assert(collapsed.heights.every(h=>Math.abs(h-collapsed.heights[0])<.1));
+  assert(collapsed.heights.every(h=>Math.abs(h-homeModeHeight)<.1),'dictionary controls must match home mode height');
+  for(const selector of ['#dict-sort-number','#dict-sort-english','#dict-sort-arabic','#dictionary-search-toggle']) {
+   await page.locator(selector).hover();
+   assert.equal(await page.locator(selector).evaluate(el=>getComputedStyle(el).transform),'none');
+  }
+  await page.mouse.move(0,0);
+  await page.waitForTimeout(250);
   assert.equal(await page.locator('#dictionary-search-toggle').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
   await page.locator('#dictionary-search-toggle').click();
   const expanded=await controlGeometry();
   assert(expanded.heights.every(h=>Math.abs(h-collapsed.heights[0])<.1));
   assert.equal(expanded.height,collapsed.height);
+  console.log(JSON.stringify({viewport:viewport.width,homeModeHeight,collapsed:collapsed.heights,expanded:expanded.heights,toolbarHeight:expanded.height}));
+  assert.equal(await page.locator('#dictionary-search-toggle').evaluate(el=>getComputedStyle(el).transform),'none');
   assert(await page.locator('#dictionary-search').evaluate(el=>el===document.activeElement));
   assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-expanded'),'true');
   assert.equal(await page.locator('#dictionary-keyboard').count(),0);
