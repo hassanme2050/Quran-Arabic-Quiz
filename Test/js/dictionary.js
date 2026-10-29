@@ -1,6 +1,6 @@
 import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js';
 import { switchView, launchToastAlert } from './ui.js';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-search3';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=20261028-peaches-option1';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -11,7 +11,6 @@ let cachedVocabulary;
 let renderedVocabulary;
 let renderedMode;
 let renderedQuery;
-let searchBook;
 let searchQuery = '';
 
 function configureKeyboard() {
@@ -24,28 +23,27 @@ export function initializeDictionarySearch() {
     const input = document.getElementById('dictionary-search');
     input.addEventListener('input', () => { searchQuery = input.value; renderDictionary(); });
     const toggle = document.getElementById('dictionary-search-toggle');
-    const close = document.getElementById('dictionary-search-close');
     const toolbar = document.getElementById('dictionary-toolbar');
-    function collapse() {
-        toolbar.classList.remove('search-open');
-        toggle.setAttribute('aria-expanded', 'false');
-        input.tabIndex = close.tabIndex = -1;
-        input.value = searchQuery = '';
-        input.blur();
-        renderDictionary();
-        toggle.focus();
-    }
     toggle.addEventListener('click', () => {
         toolbar.classList.add('search-open');
+        toggle.classList.add('active');
         toggle.setAttribute('aria-expanded', 'true');
-        input.tabIndex = close.tabIndex = 0;
+        toggle.setAttribute('aria-pressed', 'true');
+        ['number','english','arabic'].forEach(key => {
+            const button = document.getElementById('dict-sort-' + key);
+            button.classList.remove('active');
+            button.setAttribute('aria-pressed', 'false');
+        });
+        input.tabIndex = 0;
         // Synchronous focus within the tap allows the device keyboard to open.
         input.focus();
     });
-    close.addEventListener('click', collapse);
     input.addEventListener('keydown', event => {
         if (event.key === 'Enter') event.preventDefault();
-        if (event.key === 'Escape') collapse();
+        if (event.key === 'Escape') {
+            setDictionarySort(dictionarySortMode);
+            document.getElementById('dict-sort-' + dictionarySortMode).focus();
+        }
     });
 }
 const sortedCache = new Map();
@@ -72,16 +70,22 @@ export function openDictionaryMode() {
 }
 
 export function setDictionarySort(mode) {
-    if (searchBook !== activeBook) {
-        searchQuery = '';
-        document.getElementById('dictionary-search').value = '';
-    }
-    searchBook = activeBook;
+    searchQuery = '';
+    const input = document.getElementById('dictionary-search');
+    input.value = '';
+    input.tabIndex = -1;
+    input.blur();
+    document.getElementById('dictionary-toolbar').classList.remove('search-open');
+    const toggle = document.getElementById('dictionary-search-toggle');
+    toggle.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-pressed', 'false');
     dictionarySortMode = mode;
     configureKeyboard();
     ['number','english','arabic'].forEach(key => {
         const button = document.getElementById('dict-sort-' + key);
         if (button) button.classList.toggle('active', key === mode);
+        if (button) button.setAttribute('aria-pressed', String(key === mode));
     });
     const captions = { number: 'Original word order', english: activeBook === 'book_b' ? 'Sorted by Urdu Alphabet' : 'Sorted by English Alphabet', arabic: 'Sorted by Arabic Alphabet' };
     const pill = document.getElementById('dictionary-sort-pill');

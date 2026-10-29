@@ -18,6 +18,21 @@ try {
  for(const viewport of [{width:1280,height:900},{width:390,height:844}]) {
   const context=await browser.newContext({viewport});const page=await context.newPage();const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  const selectSort=async(mode,reopen=false)=>{
+   await page.locator('#dict-sort-'+mode).click();
+   assert(await page.locator('#dictionary-search').isHidden());
+   assert.equal(await page.locator('#dictionary-search').inputValue(),'');
+   assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-pressed'),'false');
+   assert.equal(await page.locator('#dictionary-toolbar button.active').count(),1);
+   assert.equal(await page.locator('#dict-sort-'+mode).getAttribute('aria-pressed'),'true');
+   assert(await page.locator('#dictionary-search').evaluate(el=>el!==document.activeElement));
+   if(reopen){
+    await page.locator('#dictionary-search-toggle').click();
+    assert.equal(await page.locator('#dictionary-toolbar button.active').count(),1);
+    assert.equal(await page.locator('#dictionary-toolbar > button.active').count(),0);
+    assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-pressed'),'true');
+   }
+  };
   await page.goto('http://127.0.0.1:8136');
   await page.waitForFunction(()=>!document.querySelector('#menu-view').classList.contains('hidden'));
   await page.selectOption('#vocabulary-book-selector','book_b');
@@ -28,7 +43,7 @@ try {
   await page.getByRole('button',{name:'Dictionary Mode',exact:true}).click();
   assert.equal(await page.locator('.dictionary-entry').count(),1858);
   assert.equal(await page.locator('.dictionary-entry.unverified').count(),1838);
-  await page.locator('#dict-sort-number').click();
+  await selectSort('number',false);
   assert.equal(await page.locator('.dictionary-meta').count(),0);
   assert.equal(await page.locator('.dictionary-note').count(),0);
   assert.equal(await page.locator('.dictionary-meaning').first().getAttribute('dir'),'rtl');
@@ -51,12 +66,15 @@ try {
   assert.equal(await page.locator('#dictionary-search-toggle').evaluate(el=>getComputedStyle(el).transform),'none');
   assert(await page.locator('#dictionary-search').evaluate(el=>el===document.activeElement));
   assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-expanded'),'true');
+  assert.equal(await page.locator('#dictionary-toolbar button.active').count(),1);
+  assert.equal(await page.locator('#dictionary-toolbar > button.active').count(),0);
+  assert.equal(await page.locator('#dictionary-search-close').count(),0);
   assert.equal(await page.locator('#dictionary-keyboard').count(),0);
   await page.locator('#dictionary-search').fill('۰۰۰۱');
   assert.equal(await page.locator('.dictionary-entry').count(),1);
   await page.locator('#dictionary-search').press('Enter');
   assert.equal(await page.locator('.dictionary-entry').count(),1);
-  await page.locator('#dict-sort-arabic').click();
+  await selectSort('arabic',true);
   await page.locator('#dictionary-search').click();
   assert.equal(await page.locator('#dictionary-search').getAttribute('lang'),'ar');
   await page.locator('#dictionary-search').fill('ل');
@@ -66,7 +84,7 @@ try {
   await page.screenshot({path:'artifacts/search-arabic-'+viewport.width+'.png',fullPage:true});
   await page.locator('#dictionary-search').fill('');
   assert.equal(await page.locator('.dictionary-entry').count(),1858);
-  await page.locator('#dict-sort-english').click();
+  await selectSort('english',true);
   await page.locator('#dictionary-search').click();
   assert.equal(await page.locator('#dictionary-search').getAttribute('lang'),'ur');
   await page.locator('#dictionary-search').fill('ک');
@@ -74,7 +92,7 @@ try {
   await page.screenshot({path:'artifacts/search-urdu-'+viewport.width+'.png',fullPage:true});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.locator('#dictionary-search').fill('');
-  await page.locator('#dictionary-search-close').click();
+  await selectSort('english',false);
   assert(await page.locator('#dictionary-search').isHidden());
   assert.equal(await page.locator('#dictionary-search-toggle').getAttribute('aria-expanded'),'false');
   await page.screenshot({path:'artifacts/dictionary-'+viewport.width+'.png',fullPage:true});
@@ -105,17 +123,16 @@ try {
   await page.waitForFunction(n=>document.querySelector('#status-message').textContent.includes(' '+n+' words'),bookACount);
   assert(await page.getByRole('button',{name:'Quiz Mode',exact:true}).isEnabled());
   await page.getByRole('button',{name:'Dictionary Mode',exact:true}).click();
-  await page.locator('#dict-sort-english').click();
+  await selectSort('english',true);
   await page.locator('#dictionary-search-toggle').click();
   assert.equal(await page.locator('#dictionary-search').getAttribute('lang'),'en');
-  await page.locator('#dict-sort-arabic').click();
+  await selectSort('arabic',true);
   await page.locator('#dictionary-search').fill('1');
   assert.equal(await page.locator('.dictionary-word').first().textContent(),bookARecords[0].word);
   await page.locator('#dictionary-search').fill(bookARecords[0].meaning);
   assert.equal(await page.locator('.dictionary-meaning').first().textContent(),bookARecords[0].meaning);
-  const query=await page.locator('#dictionary-search').inputValue();
-  await page.locator('#dict-sort-number').click();
-  assert.equal(await page.locator('#dictionary-search').inputValue(),query);
+  await selectSort('number',true);
+  assert.equal(await page.locator('#dictionary-search').inputValue(),'');
   assert.equal(await page.locator('.dictionary-meaning').first().textContent(),bookARecords[0].meaning);
   await page.locator('#dictionary-search').fill(bookARecords[0].word);
   assert.equal(await page.locator('.dictionary-word').first().textContent(),bookARecords[0].word);
@@ -126,7 +143,7 @@ try {
   assert(await page.locator('.dictionary-empty').isVisible());
   await page.locator('#dictionary-search').fill('');
   assert.equal(await page.locator('.dictionary-entry').count(),bookACount);
-  await page.locator('#dict-sort-number').click();
+  await selectSort('number',true);
   assert.equal(await page.locator('#dictionary-keyboard').count(),0);
   await page.waitForTimeout(320);
   const geometry=await page.locator('#dictionary-toolbar').evaluate(el=>({width:el.clientWidth,scroll:el.scrollWidth,buttons:[...el.querySelectorAll(':scope > button')].map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height}))}));

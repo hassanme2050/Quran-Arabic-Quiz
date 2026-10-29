@@ -36,6 +36,7 @@ class Element {
     setAttribute(name, value) { this.attributes[name] = String(value); }
     addEventListener(event, handler) { (this.events[event] ??= []).push(handler); }
     focus() { this.focused = true; }
+    blur() { this.focused = false; }
     select() { this.selected = true; }
     contains(element) { return element === this || this.children.some(child => child.contains(element)); }
     querySelectorAll(selector) {

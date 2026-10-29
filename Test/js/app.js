@@ -4,7 +4,7 @@ import { shuffleArray, getRandomSubset } from './utils.js';
 import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
 import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=20261026-peaches2';
 import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=20261028-peaches-search3';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=20261028-peaches-option1';
 import { copyScreenshotToClipboard } from './platform.js';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
