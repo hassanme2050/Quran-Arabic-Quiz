@@ -534,7 +534,7 @@ button.exit-btn:hover {
 .dictionary-search { visibility:hidden; display:block; width:100%; height:var(--dictionary-control-size); min-width:0; margin:0; padding:6px 28px 6px 38px; box-sizing:border-box; font-size:16px; opacity:0; transition:opacity .2s ease; }
 .dictionary-search[dir="rtl"] { font-family:var(--arabic-font); }
 .dictionary-search-close { visibility:hidden; position:absolute !important; right:0; top:0; width:28px; height:var(--dictionary-control-size); padding:0 !important; flex:none !important; color:var(--counter-teal) !important; background:transparent; box-shadow:none; font-size:22px !important; }
-.search-open > button { flex:0 0 48px; font-size:11px; padding:0 1px; }
+.search-open > button { flex:0 0 var(--dictionary-control-size); font-size:11px; padding:0 1px; }
 .search-open .dictionary-search-control { flex:1 1 0%; }
 .search-open .dictionary-search { visibility:visible; opacity:1; }
 .search-open .dictionary-search-toggle { background:var(--button-gold); color:#1a1002; box-shadow:0 2px 8px rgba(0,0,0,.2); width:36px; font-size:22px; border-radius:8px 0 0 8px; }
@@ -550,4 +550,4 @@ button.exit-btn:hover {
 @media(prefers-reduced-motion:reduce) { .dictionary-sort > button,.dictionary-search-control,.dictionary-search { transition:none; } }
 
 /* Toolbar highlighting changes color only; never lifts or scales controls. */
-#dictionary-toolbar button,#dictionary-toolbar button:hover,#dictionary-toolbar button:active { transform:none !important; }
+#dictionary-toolbar button,#dictionary-toolbar button:hover,#dictionary-toolbar button:active { transform:none !important; box-sizing:border-box; }
