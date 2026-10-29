@@ -1,5 +1,5 @@
 import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
-import {replaceLughatRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor5';
+import {replaceLughatRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor6';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';

@@ -1,16 +1,14 @@
-import {state} from './state.js?v=1029.26-editor5';
+import {state} from './state.js?v=1029.26-editor6';
 import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry1';
-import {refreshArabicFontControls} from './font.js?v=1029.26-editor5';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor5';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor6';
 
 const byId=id=>document.getElementById(id);
 const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-meaning-field','commit-save-btn','publish-words-btn'];
 export function refreshRecordStatus(locked=false) {
     const bookB=state.activeBook==='book_b',index=state.loadedIndex,record=state.records[index];
-    byId('editor-availability').classList.toggle('hidden',!bookB);
-    byId('editor-availability-status').textContent=state.availableThrough
-        ?'Available to students through word '+state.availableThrough+'.':'No words are available to students yet.';
-    byId('publish-words-btn').textContent=record?'Make available through word '+state.loadedNumber:'Make words available';
+    byId('editor-availability-status').textContent=!bookB?'Select Book B at login to manage its ----- marker.':state.availableCount
+        ?'----- is after word '+state.availableThrough+' ('+state.availableCount+' entries available to students).':'No words are available to students yet.';
+    byId('publish-words-btn').textContent='Make available';
     byId('publish-words-btn').disabled=locked||state.saving||!bookB||!record;
     if(!record){byId('editor-record-status').textContent='';return;}
     const duplicates=bookB?state.records.filter(item=>item.number===record.number).length:1;
@@ -19,7 +17,7 @@ export function refreshRecordStatus(locked=false) {
 }
 export function setEditorLocked(locked) {
     controls.forEach(id=>{byId(id).disabled=locked;});
-    refreshArabicFontControls();refreshRecordStatus(locked);
+    refreshRecordStatus(locked);
 }
 export function disableEditorControls(){setEditorLocked(true);}
 export function hasUnsavedEdits() {
@@ -55,7 +53,7 @@ export function navigateWord(direction) {
 }
 export function applySavedText(text,number,occurrence=1) {
     const parsed=parseEditorBook(text,state.activeBook);
-    state.records=parsed.records;state.availableThrough=parsed.availableThrough;
+    state.records=parsed.records;state.availableThrough=parsed.availableThrough;state.availableCount=parsed.availableCount;
     state.loadedIndex=matchingRecordIndex(state.records,number,occurrence);
     if(state.loadedIndex<0)state.loadedIndex=0;
     const record=state.records[state.loadedIndex];

@@ -72,9 +72,9 @@ Production release: the user-approved Peaches build is published at https://hass
 - Quest supports Book A and verified Book B words, with a book selector, independent stages and saved positions, Urdu meanings and original Book B word numbers.
 - Export progress backs up both books in one JSON file. Import restores both together; older single-book backups restore only their book and preserve the other book. Existing browser Book A saves migrate automatically.
 - Book B Editor is enabled for all entries, including unverified words. Repeated source numbers remain accessible in source order with Previous/Next. Urdu meanings and parenthesized notes are edited together.
-- Editor login uses the configured passwords in CP.txt, with visible validation errors, Enter-key submission and retry after file-loading errors. A GitHub token is still required for saving edits. GO and Enter load the typed word number; Arabic font controls change text by two points while preserving input dimensions, with a default two points smaller than the original. Original Arabic line spacing preserves harakat, and enlargement stops before the line outgrows the box.
+- Editor login uses the configured passwords in CP.txt, with visible validation errors, Enter-key submission and retry after file-loading errors. A GitHub token is still required for saving edits. GO and Enter load the typed word number.
 
 ## Book B student availability
-Save corrections with Save Changes. Make available through word N moves the verification marker after the selected entry only when N exceeds the latest available word number on GitHub. Equal or earlier targets make no commit. Unsaved edits must be saved first; concurrent changes are detected. The operation preserves the rest of the source text and uses the app folder as its GitHub save destination.
+Save corrections with Save Changes. The Make available button sits directly under Save Changes. It checks the marker location in the latest GitHub file and moves it to the line immediately after the selected entry only when the old marker is before that entry. Equal or earlier targets make no commit. Unsaved edits must be saved first; concurrent changes are detected. The operation preserves the rest of the source text and uses the app folder as its GitHub save destination.
 
-The Arabic field has 12px additional padding above and below. Its size remains fixed while using the font controls.
+The Arabic field uses its original Peaches sizing, line spacing and padding. Font size controls have been removed.

@@ -1,6 +1,6 @@
-import { state } from './state.js?v=1029.26-editor5';
+import { state } from './state.js?v=1029.26-editor6';
 import { BOOK_FILES, fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
-import { initializeVocabularyDataStream } from './vocabulary.js?v=1029.26-editor5';
+import { initializeVocabularyDataStream } from './vocabulary.js?v=1029.26-editor6';
 // Use the same configured passwords as the Test Generator. GitHub authorizes saves with the supplied token.
 export async function evaluateAdministrativeCredentials() {
     const button = document.getElementById('verify-open-btn');

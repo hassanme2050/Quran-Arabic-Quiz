@@ -1,14 +1,14 @@
-import { state } from './state.js?v=1029.26-editor5';
+import { state } from './state.js?v=1029.26-editor6';
 import { fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
-import {parseEditorBook,recordNumber} from './book.js?v=1029.26-editor5';
+import {parseEditorBook,recordNumber} from './book.js?v=1029.26-editor6';
 import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1029.26-editor5';
+import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1029.26-editor6';
 export async function initializeVocabularyDataStream() {
     state.loadedIndex=null;state.loadedNumber=null;state.records=[];
     disableEditorControls();
     try {
         const parsed=parseEditorBook(await fetchRootText(state.activeFile),state.activeBook);
-        state.records=parsed.records;state.availableThrough=parsed.availableThrough;
+        state.records=parsed.records;state.availableThrough=parsed.availableThrough;state.availableCount=parsed.availableCount;
         if (!state.records.length) {
             disableEditorControls();
             launchToastAlert('⚠️ Vocabulary file is empty or has no valid word = meaning rows.');

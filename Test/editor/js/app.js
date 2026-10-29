@@ -1,11 +1,10 @@
 import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor5';
-import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor5';
-import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor5';
-import { changeArabicFontSize, refreshArabicFontControls } from './font.js?v=1029.26-editor5';
-bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, makeWordsAvailable, changeArabicFontSize });
-refreshArabicFontControls();
-window.addEventListener('resize', refreshArabicFontControls);
+import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor6';
+import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor6';
+import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor6';
+bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, makeWordsAvailable });
+const requestedBook=new URLSearchParams(window.location?.search||'').get('book');
+if(['book_a','book_b'].includes(requestedBook))document.getElementById('login-book-selector').value=requestedBook;
 document.getElementById('editor-login-form').addEventListener('submit', event => {
     event.preventDefault();
     evaluateAdministrativeCredentials();

@@ -4,14 +4,15 @@ import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry1';
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;
 export function parseEditorBook(text,book) {
-    if(book==='book_a')return {records:parseVocabularyRecords(text),availableThrough:0};
+    if(book==='book_a')return {records:parseVocabularyRecords(text),availableThrough:0,availableCount:0};
     if(book!=='book_b')throw new Error('This book is not available in the Editor.');
     const parsed=parseLughatBook(text),occurrences=new Map();
     const records=parsed.records.map(record=>{
         const occurrence=(occurrences.get(record.number)||0)+1;occurrences.set(record.number,occurrence);
         return {...record,occurrence};
     });
-    return {records,availableThrough:Math.max(0,...records.filter(record=>record.verified).map(record=>record.number))};
+    const available=records.filter(record=>record.verified);
+    return {records,availableThrough:available.at(-1)?.number||0,availableCount:available.length};
 }
 export function matchingRecordIndex(records,number,occurrence=1) {
     return records.findIndex((record,index)=>recordNumber(record,index)===number&&(record.occurrence??1)===occurrence);
@@ -42,16 +43,15 @@ export function moveVerificationBoundary(text,number,expected) {
     const parsed=parseEditorBook(text,'book_b');
     const index=matchingRecordIndex(parsed.records,number,expected?.occurrence??1),record=parsed.records[index];
     if(!record)throw new Error('The selected entry is no longer in the source. Reload the Editor.');
-    if(number<=parsed.availableThrough)return {text,changed:false,availableThrough:parsed.availableThrough};
-    if(expected&&(record.word!==expected.word||record.rawMeaning!==editableMeaning(expected)))
-        throw new Error('This entry changed on GitHub. Reload and review it before making it available.');
     const bom=text.startsWith('\uFEFF')?'\uFEFF':'';
     const parts=text.slice(bom.length).split(/(\r\n|\n|\r)/),lines=[];
     for(let i=0;i<parts.length;i+=2)lines.push({text:parts[i],eol:parts[i+1]||''});
     const markers=lines.flatMap((line,index)=>/^\s*-{5,}(?:\s.*)?$/.test(line.text)?[index]:[]);
     if(markers.length>1)throw new Error('The file contains more than one verification marker. Please resolve the extra markers first.');
     const old=markers[0]??-1,target=record.sourceLine-1;
-    if(old>=target)throw new Error('The verification marker cannot move backwards in the source.');
+    if(old>=target)return {text,changed:false,availableThrough:parsed.availableThrough};
+    if(expected&&(record.word!==expected.word||record.rawMeaning!==editableMeaning(expected)))
+        throw new Error('This entry changed on GitHub. Reload and review it before making it available.');
     const marker=old<0?{text:'-----',eol:''}:lines.splice(old,1)[0];
     const insertAt=target+1-(old>=0&&old<target?1:0),previous=lines[insertAt-1];
     const newline=previous.eol||text.match(/\r\n|\n|\r/)?.[0]||'\n';

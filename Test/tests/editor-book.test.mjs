@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseEditorBook,replaceLughatRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1029.26-editor5';
-import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1029.26-editor5';
+import {parseEditorBook,replaceLughatRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1029.26-editor6';
+import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1029.26-editor6';
 import {withVerificationAt} from './book-b-fixture.mjs';
 
 const source=withVerificationAt(fs.readFileSync(new URL('../Lughat-AlQuran-word-meaning.txt',import.meta.url),'utf8'),20);
@@ -68,6 +68,15 @@ test('real verification move preserves saved corrections and all other source co
     assert.equal(record(moved.text,25).rawMeaning,record(corrected,25).rawMeaning);
     assert.deepEqual(nonMarkers(moved.text),nonMarkers(corrected));
     assert.equal((moved.text.split(/\r\n|\n|\r/).filter(line=>line==='-----')).length,1);
+});
+test('marker position controls publication even when source numbers repeat or go out of order',()=>{
+    const text=[row(1),'-----',row(5),row(1,'second occurrence'),row(6)].join('\n');
+    const moved=moveVerificationBoundary(text,1,record(text,1,2));
+    assert(moved.changed,'a marker before the selected entry must move to its next line');
+    assert.equal(moved.text,[row(1),row(5),row(1,'second occurrence'),'-----',row(6)].join('\n'));
+    assert.equal(parseEditorBook(moved.text,'book_b').availableCount,3);
+    const alreadyAhead=moveVerificationBoundary(moved.text,5,record(moved.text,5));
+    assert.equal(alreadyAhead.changed,false);assert.equal(alreadyAhead.text,moved.text);
 });
 test('GitHub edits preserve source and forward-only publication reads the newest boundary before committing',async t=>{
     const original=globalThis.fetch;t.after(()=>{globalThis.fetch=original;});

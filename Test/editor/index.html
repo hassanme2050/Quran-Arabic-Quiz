@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="../shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor5">
+    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor6">
 </head>
 <body>
     <!-- Book selection and authentication -->
@@ -33,7 +33,7 @@
     <!-- Editor -->
     <main class="editor-wrapper" id="word-editor">
         <h1>Word Editor</h1>
-        <div class="subtitle">Vocabulary Database Modification Console — BetaV.100526</div>
+        <div class="subtitle">Quran Arabic Quiz · Strawberry v1029.26</div>
 
         <div class="lookup-control-row" aria-label="Word navigation">
             <div class="target-field-wrap">
@@ -48,13 +48,7 @@
         <p id="editor-record-status" class="editor-record-status" role="status" aria-live="polite"></p>
         <div class="workspace-editing-panel">
             <div>
-                <div class="arabic-field-header">
-                    <label class="field-label-header" for="edit-arabic-field">Arabic Word</label>
-                    <div class="arabic-font-controls" role="group" aria-label="Arabic word font size">
-                        <button id="arabic-font-smaller" class="font-step-button" type="button" data-action="changeArabicFontSize" data-value="-1" aria-label="Decrease Arabic font size" aria-controls="edit-arabic-field" title="Smaller Arabic text" disabled>−</button>
-                        <button id="arabic-font-larger" class="font-step-button" type="button" data-action="changeArabicFontSize" data-value="1" aria-label="Increase Arabic font size" aria-controls="edit-arabic-field" title="Larger Arabic text" disabled>+</button>
-                    </div>
-                </div>
+                <label class="field-label-header" for="edit-arabic-field">Arabic Word</label>
                 <input type="text" class="admin-text-field large-arabic-input" id="edit-arabic-field" placeholder="—" disabled>
             </div>
 
@@ -64,16 +58,16 @@
             </div>
 
             <button id="commit-save-btn" style="width: 100%; margin-top: 8px;" data-action="saveWordUpdateToGitHub" disabled>Save Changes</button>
-            <section id="editor-availability" class="editor-availability hidden" aria-label="Student availability">
+            <button id="publish-words-btn" type="button" data-action="makeWordsAvailable" aria-describedby="editor-availability-status" disabled>Make available</button>
+            <section id="editor-availability" class="editor-availability" aria-label="Student availability">
                 <p id="editor-availability-status" role="status" aria-live="polite"></p>
-                <button id="publish-words-btn" type="button" data-action="makeWordsAvailable" disabled>Make words available</button>
-                <p class="availability-help">Save corrections first, then make words available through the selected word. Availability only moves forward.</p>
+                <p class="availability-help">For Book B, save corrections first. Make available places ----- immediately after the current word, before the next word. If the marker is already there or farther ahead, nothing changes.</p>
             </section>
         </div>
     </main>
 
     <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
 
-    <script type="module" src="js/app.js?v=1029.26-editor5"></script>
+    <script type="module" src="js/app.js?v=1029.26-editor6"></script>
 </body>
 </html>
