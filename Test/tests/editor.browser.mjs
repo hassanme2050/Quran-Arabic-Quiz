@@ -4,9 +4,12 @@ import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1029.26-strawberry1';
+import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry1';
+import {withVerificationAt} from './book-b-fixture.mjs';
 
 const root=new URL('../',import.meta.url);
 const vocabulary=fs.readFileSync(new URL('Vocabulary-File.txt',root),'utf8');
+const bookBSource=withVerificationAt(fs.readFileSync(new URL('Lughat-AlQuran-word-meaning.txt',root),'utf8'),20);
 const records=parseVocabularyRecords(vocabulary),firstWord=records[0];
 const password='test-only-\u0627\u0644\u0641';
 const cp='\uFEFF'+Buffer.from('another-test-password').toString('base64')+'\r\n\r\n'+Buffer.from(password).toString('base64')+'\r\n';
@@ -81,7 +84,7 @@ try {
         await page.locator('#editor-login-form').waitFor();
         await page.locator('#verify-open-btn:enabled').waitFor();
         assert(new URL(page.url()).pathname.endsWith('/editor/index.html'));
-        assert(await page.locator('#login-book-selector option[value="book_b"]').isDisabled());
+        assert(await page.locator('#login-book-selector option[value="book_b"]').isEnabled());
         assert(await page.locator('#edit-arabic-field').isDisabled());
         assert(await page.locator('#lookup-go-btn').isDisabled());
         assert(await page.locator('#arabic-font-smaller').isDisabled());
@@ -121,7 +124,8 @@ try {
         const oldSize=viewport.width<=520?Math.max(36,Math.min(60,viewport.width*.11)):Math.max(40,Math.min(80,viewport.width*.07));
         const step=2*96/72;
         assert(Math.abs(initial.font-(oldSize-step))<.1,'default must be two points smaller');
-        assert(Math.abs(initial.height-Math.max(viewport.width<=520?120:155,oldSize*1.8+20))<.1,'initial input size must match the previous layout');
+        assert(Math.abs(initial.height-Math.max(viewport.width<=520?144:179,oldSize*1.8+44))<.1,'Arabic box must include the added top/bottom padding');
+        assert.equal(await page.locator('#edit-arabic-field').evaluate(el=>getComputedStyle(el).paddingTop),'20px');
         const sameBox=box=>{assert(Math.abs(box.width-initial.width)<.1);assert(Math.abs(box.height-initial.height)<.1);};
         await page.locator('#arabic-font-larger').click();
         const larger=await geometry();sameBox(larger);assert(Math.abs(larger.font-initial.font-step)<.1);
@@ -170,9 +174,69 @@ try {
         assert.deepEqual(githubRequests,[],'login must not write to GitHub');
         assert.deepEqual(errors,[]);
         await page.screenshot({path:'artifacts/editor-open-'+viewport.width+'.png',fullPage:true});
+        let bookBText=bookBSource,revision=1,puts=0,gets=0,conflict=false;
+        await page.unroute('https://api.github.com/**');
+        await page.route('**/Lughat-AlQuran-word-meaning.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:bookBText}));
+        await page.route('https://api.github.com/**',async route=>{
+            assert(new URL(route.request().url()).pathname.endsWith('/Lughat-AlQuran-word-meaning.txt'));
+            if(route.request().method()==='GET') {
+                gets++;return route.fulfill({status:200,json:{sha:'book-b-'+revision,content:Buffer.from(bookBText).toString('base64')}});
+            }
+            assert.equal(route.request().method(),'PUT');
+            const body=route.request().postDataJSON();assert.equal(body.sha,'book-b-'+revision);assert.equal(body.branch,'main');
+            if(conflict)return route.fulfill({status:409,json:{message:'Simulated conflict'}});
+            puts++;revision++;bookBText=Buffer.from(body.content,'base64').toString('utf8');
+            return route.fulfill({status:200,json:{content:{sha:'book-b-'+revision}}});
+        });
+        await page.goto(url+'/editor/');await page.locator('#verify-open-btn:enabled').waitFor();
+        await page.selectOption('#login-book-selector','book_b');
+        await page.locator('#admin-passcode-box').fill(password);await page.locator('#admin-token-box').fill('test-only-token');
+        await page.locator('#verify-open-btn').click();await page.locator('#login-shield-gate').waitFor({state:'hidden'});
+        await page.locator('#editor-record-status').filter({hasText:'Entry 1 of 1858'}).waitFor();
+        assert.equal(await page.locator('#edit-meaning-field').getAttribute('dir'),'rtl');
+        assert.equal(await page.locator('#word-target-index').getAttribute('max'),'1844');
+        await page.locator('#word-target-index').fill('25');await page.locator('#lookup-go-btn').click();
+        const original25=parseLughatBook(bookBText).records.find(record=>record.number===25);
+        assert.equal(await page.locator('#edit-meaning-field').inputValue(),original25.rawMeaning);
+        const correction=original25.rawMeaning+' (تجربہ)';
+        await page.locator('#edit-meaning-field').fill(correction);
+        await page.locator('#publish-words-btn').click();
+        await page.locator('#toast-alert').filter({hasText:'Save your corrections'}).waitFor();
+        assert.equal(gets,0);assert.equal(puts,0);
+        await page.locator('#commit-save-btn').click();
+        await page.locator('#toast-alert').filter({hasText:'Word #25 saved to GitHub.'}).waitFor();
+        assert.equal(puts,1);
+        assert.equal(parseLughatBook(bookBText).records.find(record=>record.number===25).rawMeaning,correction);
+        assert.equal(parseLughatBook(bookBText).records.filter(record=>record.verified).length,20);
+        await page.locator('#publish-words-btn').click();
+        await page.locator('#editor-availability-status').filter({hasText:'through word 25'}).waitFor();
+        assert.equal(puts,2);assert.equal(parseLughatBook(bookBText).records.filter(record=>record.verified).length,25);
+        await page.locator('#publish-words-btn').click();
+        await page.locator('#toast-alert').filter({hasText:'already available'}).waitFor();assert.equal(puts,2);
+        await page.locator('#word-target-index').fill('20');await page.locator('#lookup-go-btn').click();
+        await page.locator('#publish-words-btn').click();
+        await page.locator('#toast-alert').filter({hasText:'already available'}).waitFor();assert.equal(puts,2);
+        // A newer server-side boundary must win over this browser's earlier state.
+        const remoteLines=bookBText.split(/\r\n|\n|\r/).filter(line=>line.trim()!=='-----');
+        remoteLines.splice(remoteLines.findIndex(line=>line.startsWith('0035 '))+1,0,'-----');bookBText=remoteLines.join('\n');revision++;
+        await page.locator('#word-target-index').fill('30');await page.locator('#lookup-go-btn').click();
+        await page.locator('#publish-words-btn').click();
+        await page.locator('#editor-availability-status').filter({hasText:'through word 35'}).waitFor();assert.equal(puts,2);
+        await page.locator('#word-target-index').fill('40');await page.locator('#lookup-go-btn').click();
+        conflict=true;await page.locator('#publish-words-btn').click();
+        await page.locator('#toast-alert').filter({hasText:'changed while saving'}).waitFor();
+        assert.equal(puts,2);assert.equal(parseLughatBook(bookBText).records.filter(record=>record.verified).length,35);
+        conflict=false;await page.locator('#publish-words-btn').click();
+        await page.locator('#editor-availability-status').filter({hasText:'through word 40'}).waitFor();assert.equal(puts,3);
+        await page.screenshot({path:'artifacts/editor-book-b-'+viewport.width+'.png',fullPage:true});
+        await page.locator('#word-target-index').fill('1844');await page.locator('#lookup-go-btn').click();
+        await page.locator('#editor-record-status').filter({hasText:'Entry 1858 of 1858'}).waitFor();
+        assert.equal(await page.locator('#edit-arabic-field').inputValue(),parseLughatBook(bookBText).records.at(-1).word);
+        assert(await page.locator('#commit-save-btn').isEnabled());
+        assert.deepEqual(errors,[]);
         await context.close();page=null;
     }
-    console.log('PASS: Editor desktop/mobile login and GO, fixed-box font controls, complete top/bottom harakat compared with an unclipped reference at default/min/max, unsaved edit protection and no GitHub writes.');
+    console.log('PASS: Editor desktop/mobile all Book B entries, notes-preserving corrections, forward-only availability, no-op/backward protection, fresh server boundary, conflicts/retry, added padding and unclipped harakat at all font limits. GitHub writes mocked.');
 } catch(error) {
     console.error('Editor browser diagnostics:',JSON.stringify({pageErrors,url:page?.url(),loginError:await page?.locator('#login-error').textContent().catch(()=>null)}));
     if(page)await page.screenshot({path:'artifacts/editor-failure.png',fullPage:true}).catch(()=>{});

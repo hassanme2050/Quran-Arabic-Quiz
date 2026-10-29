@@ -1,9 +1,9 @@
 import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor4';
-import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor4';
-import { saveWordUpdateToGitHub } from './save.js?v=1029.26-editor4';
-import { changeArabicFontSize, refreshArabicFontControls } from './font.js?v=1029.26-editor4';
-bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, changeArabicFontSize });
+import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor5';
+import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor5';
+import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor5';
+import { changeArabicFontSize, refreshArabicFontControls } from './font.js?v=1029.26-editor5';
+bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, makeWordsAvailable, changeArabicFontSize });
 refreshArabicFontControls();
 window.addEventListener('resize', refreshArabicFontControls);
 document.getElementById('editor-login-form').addEventListener('submit', event => {

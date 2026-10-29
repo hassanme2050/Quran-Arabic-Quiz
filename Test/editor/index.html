@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="../shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor4">
+    <link rel="stylesheet" href="css/editor.css?v=1029.26-editor5">
 </head>
 <body>
     <!-- Book selection and authentication -->
@@ -19,7 +19,7 @@
             <form class="password-input-wrapper" id="editor-login-form">
                 <select class="custom-select-menu" id="login-book-selector" aria-label="Select book">
                     <option value="book_a" selected>Book A - Arabic to English</option>
-                    <option value="book_b" disabled>Book B - Arabic to Urdu (Disabled)</option>
+                    <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
                     <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
                 </select>
                 <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" aria-label="System password" aria-describedby="login-error" autocomplete="current-password">
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Editor -->
-    <main class="editor-wrapper">
+    <main class="editor-wrapper" id="word-editor">
         <h1>Word Editor</h1>
         <div class="subtitle">Vocabulary Database Modification Console — BetaV.100526</div>
 
@@ -45,6 +45,7 @@
             <button class="nav-button" id="lookup-next-btn" type="button" data-action="navigateWord" data-value="1" aria-label="Next word" title="Next word" disabled>&#8250;</button>
         </div>
 
+        <p id="editor-record-status" class="editor-record-status" role="status" aria-live="polite"></p>
         <div class="workspace-editing-panel">
             <div>
                 <div class="arabic-field-header">
@@ -58,16 +59,21 @@
             </div>
 
             <div>
-                <div class="field-label-header">English Translation Meaning</div>
-                <input type="text" class="admin-text-field large-meaning-input" id="edit-meaning-field" placeholder="—" disabled>
+                <label class="field-label-header" id="meaning-field-label" for="edit-meaning-field">English Translation Meaning</label>
+                <textarea rows="1" class="admin-text-field large-meaning-input" id="edit-meaning-field" placeholder="—" disabled></textarea>
             </div>
 
             <button id="commit-save-btn" style="width: 100%; margin-top: 8px;" data-action="saveWordUpdateToGitHub" disabled>Save Changes</button>
+            <section id="editor-availability" class="editor-availability hidden" aria-label="Student availability">
+                <p id="editor-availability-status" role="status" aria-live="polite"></p>
+                <button id="publish-words-btn" type="button" data-action="makeWordsAvailable" disabled>Make words available</button>
+                <p class="availability-help">Save corrections first, then make words available through the selected word. Availability only moves forward.</p>
+            </section>
         </div>
     </main>
 
     <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
 
-    <script type="module" src="js/app.js?v=1029.26-editor4"></script>
+    <script type="module" src="js/app.js?v=1029.26-editor5"></script>
 </body>
 </html>

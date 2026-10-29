@@ -1,73 +1,66 @@
-import { state } from './state.js?v=1029.26-editor4';
-import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { refreshArabicFontControls } from './font.js?v=1029.26-editor4';
-export function disableEditorControls() {
-    document.getElementById('word-target-index').disabled = true;
-    document.getElementById('lookup-go-btn').disabled = true;
-    document.getElementById('lookup-prev-btn').disabled = true;
-    document.getElementById('lookup-next-btn').disabled = true;
-    document.getElementById('edit-arabic-field').disabled = true;
-    document.getElementById('edit-meaning-field').disabled = true;
-    document.getElementById('commit-save-btn').disabled = true;
-    refreshArabicFontControls();
-}
+import {state} from './state.js?v=1029.26-editor5';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry1';
+import {refreshArabicFontControls} from './font.js?v=1029.26-editor5';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor5';
 
+const byId=id=>document.getElementById(id);
+const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-meaning-field','commit-save-btn','publish-words-btn'];
+export function refreshRecordStatus(locked=false) {
+    const bookB=state.activeBook==='book_b',index=state.loadedIndex,record=state.records[index];
+    byId('editor-availability').classList.toggle('hidden',!bookB);
+    byId('editor-availability-status').textContent=state.availableThrough
+        ?'Available to students through word '+state.availableThrough+'.':'No words are available to students yet.';
+    byId('publish-words-btn').textContent=record?'Make available through word '+state.loadedNumber:'Make words available';
+    byId('publish-words-btn').disabled=locked||state.saving||!bookB||!record;
+    if(!record){byId('editor-record-status').textContent='';return;}
+    const duplicates=bookB?state.records.filter(item=>item.number===record.number).length:1;
+    byId('editor-record-status').textContent='Entry '+(index+1)+' of '+state.records.length+
+        (duplicates>1?' · Word '+record.number+', occurrence '+record.occurrence+' of '+duplicates:'');
+}
+export function setEditorLocked(locked) {
+    controls.forEach(id=>{byId(id).disabled=locked;});
+    refreshArabicFontControls();refreshRecordStatus(locked);
+}
+export function disableEditorControls(){setEditorLocked(true);}
 export function hasUnsavedEdits() {
-    if (state.loadedNumber === null) return false;
-    const originalRecord = state.records[state.loadedNumber - 1];
-    if (!originalRecord) return false;
-    return document.getElementById('edit-arabic-field').value !== originalRecord.word ||
-           document.getElementById('edit-meaning-field').value !== originalRecord.meaning;
+    const record=state.records[state.loadedIndex];
+    return !!record&&(byId('edit-arabic-field').value!==record.word||byId('edit-meaning-field').value!==editableMeaning(record));
 }
-
+function showRecord(index,checkEdits=true) {
+    if(state.saving)return;
+    const record=state.records[index];if(!record)return;
+    if(checkEdits&&hasUnsavedEdits()&&!window.confirm('You have unsaved edits. Discard them and move to another word?')) {
+        byId('word-target-index').value=state.loadedNumber;return;
+    }
+    state.loadedIndex=index;state.loadedNumber=recordNumber(record,index);
+    byId('word-target-index').value=state.loadedNumber;
+    byId('edit-arabic-field').value=record.word;
+    byId('edit-meaning-field').value=editableMeaning(record);
+    setEditorLocked(false);
+}
 export function loadTargetInventoryRecord() {
-    if (state.saving) return;
-    if (state.records.length === 0) {
-        launchToastAlert("⚠️ No vocabulary records are loaded.");
-        return;
-    }
-
-    const targetInput = document.getElementById('word-target-index');
-    let indexPointer = parseInt(targetInput.value, 10) || 1;
-
-    if (indexPointer < 1) indexPointer = 1;
-    if (indexPointer > state.records.length) indexPointer = state.records.length;
-
-    if (state.loadedNumber !== null && hasUnsavedEdits()) {
-        const shouldDiscard = window.confirm("You have unsaved edits. Discard them and move to another word?");
-        if (!shouldDiscard) {
-            targetInput.value = state.loadedNumber;
-            return;
-        }
-    }
-
-    targetInput.value = indexPointer;
-
-    const activeRecord = state.records[indexPointer - 1];
-    if (!activeRecord) {
-        launchToastAlert("⚠️ That word number could not be found.");
-        return;
-    }
-
-    document.getElementById('edit-arabic-field').value = activeRecord.word;
-    document.getElementById('edit-meaning-field').value = activeRecord.meaning;
-    document.getElementById('edit-arabic-field').disabled = false;
-    document.getElementById('edit-meaning-field').disabled = false;
-    document.getElementById('commit-save-btn').disabled = false;
-    state.loadedNumber = indexPointer;
-
-    // Keep Previous/Next enabled; navigation clamps to the first/last record.
-    document.getElementById('lookup-go-btn').disabled = false;
-    document.getElementById('lookup-prev-btn').disabled = false;
-    document.getElementById('lookup-next-btn').disabled = false;
-    refreshArabicFontControls();
+    if(state.saving)return;
+    if(!state.records.length){launchToastAlert('No vocabulary records are loaded.');return;}
+    const input=byId('word-target-index'),maximum=Math.max(...state.records.map(recordNumber));
+    const number=Math.max(1,Math.min(maximum,parseInt(input.value,10)||1));
+    const current=state.records[state.loadedIndex];
+    const index=current&&state.loadedNumber===number?state.loadedIndex:
+        state.records.findIndex((record,i)=>recordNumber(record,i)===number);
+    if(index<0){launchToastAlert('Word '+number+' was not found. Use the arrows to browse the source entries.');input.value=state.loadedNumber;return;}
+    showRecord(index);
 }
-
 export function navigateWord(direction) {
-    if (state.saving || state.records.length === 0) return;
-    const targetInput = document.getElementById('word-target-index');
-    const current = parseInt(targetInput.value, 10) || 1;
-    const next = Math.max(1, Math.min(state.records.length, current + direction));
-    targetInput.value = next;
-    loadTargetInventoryRecord();
+    if(state.saving||!state.records.length)return;
+    showRecord(Math.max(0,Math.min(state.records.length-1,(state.loadedIndex??0)+direction)));
+}
+export function applySavedText(text,number,occurrence=1) {
+    const parsed=parseEditorBook(text,state.activeBook);
+    state.records=parsed.records;state.availableThrough=parsed.availableThrough;
+    state.loadedIndex=matchingRecordIndex(state.records,number,occurrence);
+    if(state.loadedIndex<0)state.loadedIndex=0;
+    const record=state.records[state.loadedIndex];
+    state.loadedNumber=recordNumber(record,state.loadedIndex);
+    byId('word-target-index').value=state.loadedNumber;
+    byId('edit-arabic-field').value=record.word;
+    byId('edit-meaning-field').value=editableMeaning(record);
 }

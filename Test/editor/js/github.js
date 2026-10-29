@@ -1,4 +1,5 @@
 import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
+import {replaceLughatRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor5';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';
@@ -35,7 +36,7 @@ export function replaceVocabularyRecord(text, number, expected, updated) {
     }
     throw new Error('Book number was not found.');
 }
-export async function saveVocabularyRecord({ filename, token, number, expected, updated }) {
+async function updateVocabularyFile({filename,token,message,transform}) {
     if (!Object.values(BOOK_FILES).includes(filename)) throw new Error('Unknown vocabulary file.');
     const destination = repositoryVocabularyPath(filename).split('/').map(encodeURIComponent).join('/');
     const apiUrl = 'https://api.github.com/repos/' + OWNER + '/' + REPOSITORY + '/contents/' + destination;
@@ -44,12 +45,25 @@ export async function saveVocabularyRecord({ filename, token, number, expected, 
     if (!response.ok) throw new Error('GitHub read failed (' + response.status + ').');
     const file = await response.json();
     const bytes = Uint8Array.from(atob(file.content.replace(/\s/g,'')), char => char.charCodeAt(0));
-    const text = new TextDecoder().decode(bytes);
-    const content = replaceVocabularyRecord(text, number, expected, updated);
+    const text = new TextDecoder('utf-8',{ignoreBOM:true}).decode(bytes);
+    const result = transform(text);
+    const content = result.text;
+    if(!result.changed)return result;
     const encoded = btoa(Array.from(new TextEncoder().encode(content), byte => String.fromCharCode(byte)).join(''));
     const saved = await fetch(apiUrl, {
         method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: 'Update vocabulary word #' + number, content: encoded, sha: file.sha, branch: BRANCH })
+        body: JSON.stringify({ message, content: encoded, sha: file.sha, branch: BRANCH })
     });
     if (!saved.ok) throw new Error(saved.status === 409 ? 'Vocabulary changed while saving. Reload and retry.' : 'GitHub save failed (' + saved.status + ').');
+    return result;
+}
+export function saveVocabularyRecord({filename,token,number,expected,updated}) {
+    return updateVocabularyFile({filename,token,message:'Update vocabulary word #'+number,transform:text=>({
+        text:filename===BOOK_FILES.book_b?replaceLughatRecord(text,number,expected,updated):replaceVocabularyRecord(text,number,expected,updated),changed:true
+    })});
+}
+export function saveVerificationBoundary({filename,token,number,expected}) {
+    if(filename!==BOOK_FILES.book_b)throw new Error('Student availability is managed for Book B.');
+    return updateVocabularyFile({filename,token,message:'Make Book B words available through #'+number,
+        transform:text=>moveVerificationBoundary(text,number,expected)});
 }

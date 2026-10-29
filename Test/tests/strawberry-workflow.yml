@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '24'
       - name: Quest and Peaches regression checks
-        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs Test/tests/lughat.test.mjs Test/tests/dictionary-search.test.mjs
+        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs Test/tests/lughat.test.mjs Test/tests/dictionary-search.test.mjs Test/tests/editor-book.test.mjs
       - name: Install browser runtime
         run: |
           npm install --prefix Test --no-save --package-lock=false playwright@1.56.1
@@ -54,7 +54,7 @@ jobs:
             const base64=fs.readFileSync(file).toString('base64');
             for(let start=0;start<base64.length;start+=48000) console.log('QUEST_IMAGE|'+name+'|'+String(start/48000).padStart(4,'0')+'|'+base64.slice(start,start+48000));
           }
-          for(const name of ['editor-open-1280.png','editor-open-390.png','editor-harakat-min-1280.png','editor-harakat-max-1280.png','editor-harakat-min-390.png','editor-harakat-max-390.png','editor-failure.png']) {
+          for(const name of ['editor-open-1280.png','editor-open-390.png','editor-book-b-1280.png','editor-book-b-390.png','editor-harakat-min-1280.png','editor-harakat-max-1280.png','editor-harakat-min-390.png','editor-harakat-max-390.png','editor-failure.png']) {
             const file=path.join('artifacts',name);
             if(!fs.existsSync(file))continue;
             const base64=fs.readFileSync(file).toString('base64');

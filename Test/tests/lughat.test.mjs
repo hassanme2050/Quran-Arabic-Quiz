@@ -12,12 +12,12 @@ test('real source preserves all entries, duplicate numbers, metadata, Urdu and e
  assert.equal(parsed.records[0].number,1); assert.equal(parsed.records.at(-1).number,1844);
  assert.equal(parsed.records[0].juzz.number,1); assert.equal(parsed.records[0].surah.number,1);
  assert.equal(parsed.records.at(-1).juzz.number,3); assert.equal(parsed.records.at(-1).surah.number,3);
- assert(parsed.records[0].explanation); assert(!parsed.records[0].meaning.includes('('));
+ for(const record of parsed.records)assert(record.explanation?record.rawMeaning.endsWith(record.explanation):record.rawMeaning===record.meaning);
  assert.equal(parsed.records.filter(item=>item.number===952).length,2);
  assert.equal(parsed.warnings.filter(w=>w.startsWith('Duplicate')).length,14);
  assert.equal(parsed.warnings.filter(w=>w.startsWith('Unrecognized')).length,0);
- assert.equal(parsed.records.filter(item=>item.verified).length,20);
- assert(parsed.records.filter(item=>item.verified).every(item=>item.number<=20));
+ const boundary=source.replace(/^\uFEFF/,'').split(/\r\n|\n|\r/).findIndex(line=>/^\s*-{5,}(?:\s.*)?$/.test(line));
+ for(const record of parsed.records)assert.equal(record.verified,boundary>=0&&record.sourceLine-1<boundary);
 });
 test('first boundary controls verification, including subsequent headings and repeated boundaries',()=>{
  const parsed=parseLughatBook('\uFEFF'+headings+'\r\n'+row(1,'meaning (root)')+'\r\n  ----- All words above this line are verified.\r\n'+row(2)+'\r\n'+headings+'\r\n-----\r\n'+row(3));
