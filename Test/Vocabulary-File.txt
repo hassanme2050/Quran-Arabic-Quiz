@@ -69,7 +69,7 @@
 لَوْلَا = If not, Why not
 ذُو ، ذَا ، ذِي = have-has
 ذَاتَ = endowed with; owner
-أُولِي ، أُولُوا = people of ;owners of
+أُولِي ، أُولُوا = people of ;owners ofX
 أَهْل = People of; relatives
 آل = Family, Relatives, People
 أَلَّا = not / do not
