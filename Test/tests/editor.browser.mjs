@@ -212,7 +212,7 @@ try {
         assert.deepEqual(errors,[]);
         await context.close();page=null;
     }
-    console.log('PASS: Editor desktop/mobile all Book B entries, notes-preserving corrections, forward-only availability, no-op/backward protection, fresh server boundary, conflicts/retry, original Arabic styling, visible availability button directly under Save and complete harakat. GitHub writes mocked.');
+    console.log('PASS: Editor desktop/mobile Book B entries, source-preserving saves, marker advancement/no-op/conflicts, original styling and availability button under Save. Remaining original-input glyph differences logged separately. GitHub writes mocked.');
 } catch(error) {
     console.error('Editor browser diagnostics:',JSON.stringify({pageErrors,url:page?.url(),loginError:await page?.locator('#login-error').textContent().catch(()=>null)}));
     if(page)await page.screenshot({path:'artifacts/editor-failure.png',fullPage:true}).catch(()=>{});
