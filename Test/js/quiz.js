@@ -1,11 +1,11 @@
 import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1029.26-strawberry3';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry3';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry3';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry3';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry3';
-import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry3';
+import { state } from './state.js?v=1029.26-strawberry4';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry4';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry4';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry4';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry4';
+import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry4';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
@@ -19,7 +19,7 @@ export function startQuizWithCode() {
     }
 
     const codeBook = enteredCode.startsWith('B2:') ? 'book_b' : 'book_a';
-    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_b' ? 'Book B' : 'Book A') + ' for this quiz code.'); return; }
+    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_b' ? 'Book B' : 'Book A - 500 Arabic Word (Arabic to English)') + ' for this quiz code.'); return; }
     const selectedQuestionNumbers = enteredCode ? decodeTeacherQuizCode(enteredCode) : null;
     if (!selectedQuestionNumbers) {
         showQuizCodeError('Invalid quiz code. Please try again or check with your teacher.');
@@ -54,7 +54,7 @@ export function startQuizWithCode() {
     state.quizAttempt={phase:'ready',code:enteredCode,book:activeBook,name:'',startedAt:null,startClock:null,elapsedMs:0};
     document.getElementById('participant-name').value='';
     document.getElementById('participant-error').textContent='';
-    document.getElementById('participant-quiz-info').textContent=(activeBook==='book_b'?'Book B':'Book A')+' · '+selectedWords.length+' questions';
+    document.getElementById('participant-quiz-info').textContent=(activeBook==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · '+selectedWords.length+' questions';
     document.getElementById('participant-start-btn').disabled=false;
     document.getElementById('status-message').classList.add('hidden');
     document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
@@ -213,7 +213,7 @@ export function displayQuizSummary() {
         document.getElementById('scorecard-participant-name').textContent=attempt.name;
         document.getElementById('scorecard-date').textContent=new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'short'}).format(new Date(attempt.startedAt));
         document.getElementById('scorecard-time').textContent=formatDuration(attempt.elapsedMs);
-        document.getElementById('scorecard-code').textContent=(attempt.book==='book_b'?'Book B':'Book A')+' · Quiz code: '+attempt.code;
+        document.getElementById('scorecard-code').textContent=(attempt.book==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · Quiz code: '+attempt.code;
     }
     const totalCorrect = state.quizHistory.filter(h => h.isCorrect).length;
     const percentage = Math.round((totalCorrect / state.sessionWords.length) * 100);

@@ -1,4 +1,4 @@
-import {launchToastAlert} from './ui.js?v=1029.26-strawberry3';
+import {launchToastAlert} from './ui.js?v=1029.26-strawberry4';
 let rendererPromise,lastCapture,busy=false;
 function loadScorecardRenderer() {
     if(globalThis.html2canvas)return Promise.resolve(globalThis.html2canvas);
@@ -18,7 +18,7 @@ function status(message) {
 }
 function setBusy(value) {
     busy=value;
-    for(const id of ['scorecard-copy-btn','scorecard-share-btn','scorecard-download-btn'])document.getElementById(id).disabled=value;
+    document.getElementById('scorecard-copy-btn').disabled=value;
 }
 function captureScorecard() {
     const target=document.getElementById('screenshot-target-scorecard');
@@ -55,36 +55,22 @@ export async function copyScreenshotToClipboard() {
     try {
         const image=captureScorecard();
         if(navigator.clipboard?.write&&typeof globalThis.ClipboardItem==='function') {
+            let copied=false;
             try {
                 // Begin the clipboard write during the click, before asynchronous image rendering.
                 await navigator.clipboard.write([new ClipboardItem({'image/png':image})]);
-                status('Copied! Paste the image into WhatsApp or email for your teacher.');return;
-            } catch {}
+                copied=true;
+            } catch(error) {
+                // Some browsers accept a Blob but reject promise-backed ClipboardItems.
+                if(error.name==='TypeError')try {
+                    await navigator.clipboard.write([new ClipboardItem({'image/png':await image})]);
+                    copied=true;
+                } catch {}
+            }
+            if(copied){status('Copied! Paste the image into WhatsApp or email for your teacher.');return;}
         }
         saveBlob(await image);
         status('Clipboard unavailable. Image saved—attach it in WhatsApp or email.');
     } catch(error){status(error.message);}
     finally {setBusy(false);}
-}
-export async function downloadScorecardImage() {
-    if(busy)return;setBusy(true);
-    try {saveBlob(await captureScorecard());status('Scorecard saved. Attach the image in WhatsApp or email.');}
-    catch(error){status(error.message);}
-    finally {setBusy(false);}
-}
-export async function shareScorecardImage() {
-    if(busy)return;setBusy(true);
-    let blob;
-    try {
-        blob=await captureScorecard();
-        const file=new File([blob],'Quran_Quiz_Scorecard.png',{type:'image/png'}),files=[file];
-        if(navigator.share&&(!navigator.canShare||navigator.canShare({files}))) {
-            await navigator.share({files,title:'Quran Arabic Quiz scorecard'});
-            status('Image opened in your share app.');
-        } else {saveBlob(blob);status('Sharing unavailable. Image saved—attach it in WhatsApp or email.');}
-    } catch(error) {
-        if(error.name==='AbortError')status('Sharing cancelled. You can still copy or save the image.');
-        else if(blob){saveBlob(blob);status('Image saved—attach it in WhatsApp or email.');}
-        else status(error.message);
-    } finally {setBusy(false);}
 }

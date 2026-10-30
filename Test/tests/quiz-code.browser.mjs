@@ -18,12 +18,17 @@ try {
   page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.clock.install({time:new Date('2026-10-29T12:00:00Z')});
   await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();
+  const bookLabel='Book A - 500 Arabic Word (Arabic to English)';
+  assert.equal(await page.locator('#vocabulary-book-selector option[value="book_a"]').textContent(),bookLabel);
+  assert.equal(await page.locator('#quest-book-selector option[value="book_a"]').textContent(),bookLabel);
   await page.clock.pauseAt(new Date('2026-10-29T13:00:00Z'));
   const code=encodeQuizCode(Array.from({length:20},(_,i)=>i+1));
   await page.locator('#quiz-code-field').fill('bad-code');await page.locator('#quiz-code-btn').click();
   assert(await page.locator('#quiz-code-error').isVisible());assert(await page.locator('#quiz-participant-view').isHidden());
   await page.locator('#quiz-code-field').fill(code);await page.locator('#quiz-code-btn').click();
   await page.locator('#quiz-participant-view:not(.hidden)').waitFor();
+  assert.equal(await page.locator('#participant-name').evaluate(el=>getComputedStyle(el).textAlign),'center');
+  assert.equal(await page.locator('.participant-note').count(),0);
   await page.locator('#participant-start-btn').click();assert(await page.locator('#participant-error').textContent());
   await page.locator('#participant-name').fill('Cancelled attempt');await page.locator('#participant-start-btn').click();
   assert.equal(await page.locator('#quiz-countdown-number').textContent(),'3');
@@ -34,12 +39,17 @@ try {
   await page.locator('#participant-name').fill('Noor Hassan');await page.locator('#participant-name').press('Enter');
   for(const next of ['2','1']){await page.clock.fastForward(1000);assert.equal(await page.locator('#quiz-countdown-number').textContent(),next);assert(await page.locator('#quiz-view').isHidden());}
   await page.clock.fastForward(1000);await page.locator('#quiz-view:not(.hidden)').waitFor();
+  assert.equal(await page.locator('.quiz-word-card #quiz-time-badge').count(),1);
+  assert.equal(await page.locator('.quiz-time-caption').count(),0);
+  assert.equal(await page.locator('#quiz-time-badge').evaluate(el=>getComputedStyle(el).borderTopWidth),'0px');
+  assert((await page.locator('#quiz-time-badge').boundingBox()).height<30);
+  assert((await page.locator('#quiz-counter').boundingBox()).y<(await page.locator('#quiz-arabic-field').boundingBox()).y);
   assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:00');
   await page.clock.fastForward(2500);assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:02');
   await page.screenshot({path:'artifacts/coded-quiz-timer-'+viewport.width+'.png',fullPage:true});
   async function answerAll(count) {
    for(let i=0;i<count;i++){
-    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry3');return state.sessionWords[state.currentIndex];});
+    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry4');return state.sessionWords[state.currentIndex];});
     const choices=await page.locator('#quiz-options-box button').allTextContents();
     const index=choices.indexOf(item.meaning);assert(index>=0);
     await page.locator('#quiz-options-box button').nth(index).click();
@@ -53,6 +63,8 @@ try {
   assert((await page.locator('#scorecard-date').textContent()).includes('Oct 29, 2026'));
   assert.equal(await page.locator('#scorecard-time').textContent(),'00:25','countdown/name wait and final feedback must be excluded');
   assert((await page.locator('#scorecard-code').textContent()).includes(code));
+  assert((await page.locator('#scorecard-code').textContent()).includes(bookLabel));
+  assert.equal(await page.locator('#scorecard-share-btn, #scorecard-download-btn').count(),0);
   await page.clock.fastForward(60000);assert.equal(await page.locator('#scorecard-time').textContent(),'00:25');
   await page.clock.resume();
   await page.locator('#scorecard-copy-btn').click();
@@ -71,17 +83,22 @@ try {
   await page.locator('#teacher-message-test').focus();await page.keyboard.press('Control+V');
   await page.waitForFunction(()=>window.pastedScoreType==='image/png');
   await page.locator('#teacher-message-test').evaluate(el=>el.remove());
+  await page.evaluate(()=>{
+   const NativeItem=window.ClipboardItem;window.nativeScoreClipboardItem=NativeItem;
+   window.ClipboardItem=function(data){
+    if(data['image/png'] instanceof Promise)throw new TypeError('Promise items unsupported');
+    window.usedBlobClipboardFallback=true;return new NativeItem(data);
+   };
+  });
+  await page.locator('#scorecard-copy-btn').click();
+  await page.waitForFunction(()=>window.usedBlobClipboardFallback===true);
+  await page.locator('#scorecard-copy-btn:not([disabled])').waitFor();
+  assert((await page.locator('#scorecard-export-status').textContent()).includes('Copied!'));
+  await page.evaluate(()=>{window.ClipboardItem=window.nativeScoreClipboardItem;});
   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{write(){return Promise.reject(new DOMException('Blocked','NotAllowedError'));}}}));
   const fallbackEvent=page.waitForEvent('download');await page.locator('#scorecard-copy-btn').click();
   const fallback=await fallbackEvent;assert(fallback.suggestedFilename().endsWith('.png'));
   await page.locator('#scorecard-export-status').filter({hasText:'Clipboard unavailable'}).waitFor();
-  const savedEvent=page.waitForEvent('download');await page.locator('#scorecard-download-btn').click();assert((await savedEvent).suggestedFilename().endsWith('.png'));
-  await page.evaluate(()=>{
-   Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});
-   Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.sharedScore={type:data.files[0].type,size:data.files[0].size};}});
-  });
-  await page.locator('#scorecard-share-btn').click();await page.locator('#scorecard-export-status').filter({hasText:'share app'}).waitFor();
-  const shared=await page.evaluate(()=>window.sharedScore);assert.equal(shared.type,'image/png');assert(shared.size>1000);
   assert.equal(await page.locator('#scorecard-time').textContent(),'00:25');
   await page.screenshot({path:'artifacts/coded-quiz-result-'+viewport.width+'.png',fullPage:true});
   await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
@@ -101,8 +118,12 @@ try {
   await page.getByRole('button',{name:'Quiz Mode',exact:true}).click();
   assert(await page.locator('#quiz-view').isVisible());assert(await page.locator('#quiz-time-badge').isHidden());
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
+  for(const app of ['editor','test-generator']){
+   await page.goto(url+'/'+app+'/');
+   assert.equal(await page.locator('option[value="book_a"]').textContent(),bookLabel);
+  }
   await context.close();page=null;
  }
- console.log('PASS: code-to-name screen, 3-2-1 countdown, cancellation, elapsed timing and freeze, Book A 20 and Book B 10 questions, actual PNG clipboard write/read/paste, download fallback and share-file path on desktop/mobile.');
+ console.log('PASS: centered participant name, compact in-card timer, code-to-name/countdown/timing, both books, renamed Book A across all apps, actual PNG clipboard write/read/paste, Blob compatibility retry, download fallback and simplified scorecard on desktop/mobile.');
 }catch(error){if(page)await page.screenshot({path:'artifacts/coded-quiz-failure.png',fullPage:true}).catch(()=>{});throw error;}
 finally{if(browser)await browser.close();server.kill();}

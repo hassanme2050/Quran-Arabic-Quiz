@@ -1,12 +1,12 @@
-import { state } from './state.js?v=1029.26-strawberry3';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry3';
+import { state } from './state.js?v=1029.26-strawberry4';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry4';
 import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry1';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry3';
-import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry3';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry3';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry4';
+import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry4';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry4';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry3';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry3';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry4';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry4';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -240,7 +240,7 @@ async function importProgress(event) {
         const counts=Object.fromEntries(await Promise.all(QUEST_BOOKS.map(async book=>[book,
             book===activeBook?vocabularyList.length:(await loadBookRecords(book)).filter(item=>item.verified!==false).length])));
         const imported=parseQuestBackup(await file.text(),counts);
-        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A':'Book B').join(' and ');
+        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A - 500 Arabic Word (Arabic to English)':'Book B').join(' and ');
         if(!window.confirm('Replace Quest progress for '+names+' in this browser with this backup?'))return;
         store.importBooks(imported);
         progress=store.loadBook(activeBook,vocabularyList.length);currentId=null;renderQuestMap();

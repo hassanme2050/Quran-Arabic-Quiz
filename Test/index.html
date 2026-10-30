@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry3">
-    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry3">
+    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry4">
+    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry4">
 </head>
 <body>
     <div class="app-wrapper">
@@ -43,7 +43,7 @@
 
             <!-- Book Selection Dropdown element positioned under Quiz Mode -->
             <select class="custom-select-menu" id="vocabulary-book-selector">
-                <option value="book_a" selected>Book A - Arabic to English</option>
+                <option value="book_a" selected>Book A - 500 Arabic Word (Arabic to English)</option>
                 <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
                 <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
             </select>
@@ -109,7 +109,6 @@
                     <p id="participant-error" class="quiz-code-error" role="alert"></p>
                     <button id="participant-start-btn" type="submit">Start Quiz</button>
                 </form>
-                <p class="participant-note">A 3–2–1 countdown comes first. Your time starts with the first question.</p>
             </div>
             <button class="exit-btn quiz-wide" type="button" data-action="exitToHome">Back to Menu</button>
         </section>
@@ -122,13 +121,13 @@
         </section>
 
         <div id="quiz-view" class="hidden">
-            <div class="quiz-topline">
-                <div class="counter-label-text" id="quiz-counter"></div>
-                <div id="quiz-time-badge" class="quiz-time-badge hidden" role="timer" aria-label="Elapsed time">
-                    <span class="quiz-time-caption">Time</span><span id="quiz-elapsed-time">00:00</span>
+            <div class="display-card-frame quiz-word-card" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
+                <div class="quiz-topline">
+                    <div class="counter-label-text" id="quiz-counter"></div>
+                    <div id="quiz-time-badge" class="quiz-time-badge hidden" role="timer" aria-label="Elapsed time">
+                        <span id="quiz-elapsed-time">00:00</span>
+                    </div>
                 </div>
-            </div>
-            <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
                 <div class="arabic-text-render" id="quiz-arabic-field">-</div>
             </div>
             <div class="quiz-options" id="quiz-options-box"></div>
@@ -161,10 +160,6 @@
 
             <div class="navigation-buttons">
                 <button id="scorecard-copy-btn" data-action="copyScreenshotToClipboard">📋 Copy Screenshot to Clipboard</button>
-                <div class="scorecard-secondary-actions">
-                    <button class="exit-btn" id="scorecard-share-btn" data-action="shareScorecardImage">Share Image</button>
-                    <button class="exit-btn" id="scorecard-download-btn" data-action="downloadScorecardImage">Save Image</button>
-                </div>
                 <p id="scorecard-export-status" class="scorecard-export-status" role="status" aria-live="polite"></p>
                 <button class="exit-btn" data-action="exitToHome">🏠 Go to Home</button>
             </div>
@@ -181,7 +176,7 @@
         </div>
         <section id="quest-map-view" class="quest-shell hidden" aria-label="Quest map">
             <select class="custom-select-menu" id="quest-book-selector" aria-label="Quest book">
-                <option value="book_a">Book A - Arabic to English</option>
+                <option value="book_a">Book A - 500 Arabic Word (Arabic to English)</option>
                 <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
             </select>
 
@@ -258,6 +253,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=1029.26-strawberry3"></script>
+    <script type="module" src="js/app.js?v=1029.26-strawberry4"></script>
 </body>
 </html>
