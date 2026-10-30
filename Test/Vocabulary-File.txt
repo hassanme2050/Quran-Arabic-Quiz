@@ -22,7 +22,7 @@
 دُونَ = Besides, Less than
 إِلَّا = Except, only
 نَعَمْ = YES
-هُ = His
+هُ = HIS
 هُمْ = They
 كُمْ = Your
 يِي (نِي) = My (Me)
@@ -69,7 +69,7 @@
 لَوْلَا = If not, Why not
 ذُو ، ذَا ، ذِي = have-has
 ذَاتَ = endowed with; owner
-أُولِي ، أُولُوا = people of ;owners ofX
+أُولِي ، أُولُوا = people of ;owners of
 أَهْل = People of; relatives
 آل = Family, Relatives, People
 أَلَّا = not / do not
@@ -86,3 +86,13 @@
 إِذَا = When (for future)
 ثُمَّ = Then
 فَ = Then, Thus, Therefore
+بَلْ = However, But, rather
+عِنْدَ، لَدَى، لَدُنْ = Near, with
+إِنْ... إِلَّا = nothing but
+مَا... إِلَّا = Nothing but
+أَلَّا (أَنْ + لَا) = That... not, so as not to
+بِمَا = With what / because
+عَمَّا = About what
+فِيمَا = In what
+كَمَا = As / just as
+لِمَا = For what / that which
