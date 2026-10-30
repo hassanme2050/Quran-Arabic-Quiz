@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry3';
 const root=new URL('../',import.meta.url);
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 const api=/https:\/\/(api\.alquran\.cloud|alquran\.api\.islamic\.network)\/v1\/ayah\//;
@@ -73,6 +74,22 @@ try{
   assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isEnabled());assert(await page.locator('[data-action="openDictionaryMode"]').isEnabled());
   await page.locator('[data-value="flashcard"][data-action="triggerSelectedSession"]').click();assert(await page.locator('#card-details-btn').isHidden());assert.deepEqual(errors,[]);await context.close();
  }
+ // Exercise the extra editable field through the real Editor UI with mocked GitHub writes.
+ const editorContext=await browser.newContext({viewport:{width:390,height:844}});page=await editorContext.newPage();
+ let bank=fs.readFileSync(new URL('Quran-Vocabulary-Meaning-Arabic-English.txt',root),'utf8'),writes=0;
+ const first=parseQuranVocabulary(bank).records[0];
+ await page.route('**/CP.txt',route=>route.fulfill({status:200,body:Buffer.from('test-only').toString('base64')}));
+ await page.route('https://api.github.com/**',route=>{
+  assert(new URL(route.request().url()).pathname.endsWith('/Quran-Vocabulary-Meaning-Arabic-English.txt'));
+  if(route.request().method()==='PUT'){const body=route.request().postDataJSON();assert.equal(body.sha,'rev'+writes);bank=Buffer.from(body.content,'base64').toString('utf8');writes++;return route.fulfill({status:200,body:'{}'});}
+  return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha:'rev'+writes,content:Buffer.from(bank).toString('base64')})});
+ });
+ await page.goto(url+'/editor/?book=book_d');await page.locator('#admin-passcode-box').fill('test-only');await page.locator('#admin-token-box').fill('test-only-token');await page.locator('#verify-open-btn').click();await page.locator('#login-shield-gate').waitFor({state:'hidden'});
+ assert.equal(await page.locator('#edit-references-field').inputValue(),first.rawReferences);
+ await page.locator('#edit-references-field').fill('Broken reference');await page.locator('#commit-save-btn').click();await page.locator('#toast-alert').filter({hasText:'reference'}).waitFor();assert.equal(writes,0);
+ await page.locator('#edit-references-field').fill('Reviewed 2:255, Another 10: 10');await page.locator('#commit-save-btn').click();await page.locator('#toast-alert').filter({hasText:'saved to GitHub'}).waitFor();assert.equal(writes,1);
+ const saved=parseQuranVocabulary(bank).records;assert.equal(saved[0].references[0].key,'2:255');assert.equal(saved[0].references[1].key,'10:10');assert.equal(saved.length,9);
+ await page.screenshot({path:'artifacts/book-d-editor-390.png',fullPage:true});await editorContext.close();
  // Check real cross-origin Arabic + English retrieval separately from the deterministic UI fixtures.
  const live=await browser.newContext({viewport:{width:390,height:844}});page=await live.newPage();await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();
  await page.selectOption('#vocabulary-book-selector','book_d');await page.locator('#status-message').filter({hasText:'9 words'}).waitFor();await page.locator('[data-value="flashcard"][data-action="triggerSelectedSession"]').click();
