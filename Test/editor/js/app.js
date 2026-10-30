@@ -1,4 +1,4 @@
-import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry8';
+import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry9';
 import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor8';
 import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor8';
 import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor8';

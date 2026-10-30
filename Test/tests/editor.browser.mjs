@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1029.26-strawberry8';
-import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry8';
+import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1029.26-strawberry9';
+import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry9';
 import {withVerificationAt} from './book-b-fixture.mjs';
 
 const root=new URL('../',import.meta.url);

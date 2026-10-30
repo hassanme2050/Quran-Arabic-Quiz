@@ -1,8 +1,8 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry8';
-import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry8';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry8';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry8';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry8';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry9';
+import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry9';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry9';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry9';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry9';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -44,6 +44,7 @@ export function parseVocabulary(text, bookId = 'book_a') {
         ? vocabularyList.length + ' verified words for Quiz/Review; ' + parsed.records.length + ' in Dictionary.' + (parsed.hasBoundary ? '' : ' No verification line found: Book B is dictionary-only.')
         : 'Loaded ' + vocabularyList.length + (bookId==='book_c'?' Tajweed questions':' words');
     if (parsed.warnings.length) console.warn(bookId+':', ...parsed.warnings);
+    status.textContent='✅ '+status.textContent;
     const first = document.getElementById('range-input-start'), last = document.getElementById('range-input-end');
     first.value = 1; last.value = bookId !== 'book_a' ? Math.max(0,...vocabularyList.map(item=>item.number)) : vocabularyList.length; first.max = last.max = last.value;
     document.getElementById('dictionary-view').dataset.book = bookId;

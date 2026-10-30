@@ -1,5 +1,5 @@
 import { state } from './state.js?v=1029.26-editor8';
-import { BOOK_FILES, fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry8';
+import { BOOK_FILES, fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry9';
 import { initializeVocabularyDataStream } from './vocabulary.js?v=1029.26-editor8';
 // Use the same configured passwords as the Test Generator. GitHub authorizes saves with the supplied token.
 export async function evaluateAdministrativeCredentials() {
