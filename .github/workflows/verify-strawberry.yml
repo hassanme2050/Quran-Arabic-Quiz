@@ -24,10 +24,10 @@ jobs:
         run: |
           npm install --prefix Test --no-save --package-lock=false playwright@1.56.1
           Test/node_modules/.bin/playwright install --with-deps chromium
-      - name: Editor login desktop and mobile browser checks
-        run: node Test/tests/editor.browser.mjs
       - name: Named and timed quiz-code screenshot and clipboard checks
         run: node Test/tests/quiz-code.browser.mjs
+      - name: Editor login desktop and mobile browser checks
+        run: node Test/tests/editor.browser.mjs
       - name: Quest desktop and mobile browser checks
         env:
           PLAYWRIGHT_MODULE: ${{ github.workspace }}/Test/node_modules/playwright
