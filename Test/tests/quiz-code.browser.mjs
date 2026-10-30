@@ -45,7 +45,7 @@ try {
   assert.equal(await page.locator('#quiz-time-badge').evaluate(el=>getComputedStyle(el).borderTopWidth),'0px');
   assert((await page.locator('#quiz-time-badge').boundingBox()).height<30);
   assert((await page.locator('#quiz-counter').boundingBox()).y<(await page.locator('#quiz-arabic-field').boundingBox()).y);
-  assert((await page.locator('.quiz-topline').boundingBox()).y+(await page.locator('.quiz-topline').boundingBox()).height<=(await page.locator('.quiz-word-card').boundingBox()).y);
+  assert((await page.locator('#quiz-view > .quiz-topline').boundingBox()).y+(await page.locator('#quiz-view > .quiz-topline').boundingBox()).height<=(await page.locator('.quiz-word-card').boundingBox()).y);
   assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:00');
   await page.clock.fastForward(2500);assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:02');
   await page.screenshot({path:'artifacts/coded-quiz-timer-'+viewport.width+'.png',fullPage:true});

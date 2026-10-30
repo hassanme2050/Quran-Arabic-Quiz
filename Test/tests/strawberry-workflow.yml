@@ -24,10 +24,10 @@ jobs:
         run: |
           npm install --prefix Test --no-save --package-lock=false playwright@1.56.1
           Test/node_modules/.bin/playwright install --with-deps chromium
-      - name: Named and timed quiz-code screenshot and clipboard checks
-        run: node Test/tests/quiz-code.browser.mjs
       - name: Book D Review and verse details desktop/mobile and live API checks
         run: node Test/tests/book-d.browser.mjs
+      - name: Named and timed quiz-code screenshot and clipboard checks
+        run: node Test/tests/quiz-code.browser.mjs
       - name: Tajweed Student and Editor desktop and mobile checks
         run: node Test/tests/tajweed.browser.mjs
       - name: Editor login desktop and mobile browser checks
