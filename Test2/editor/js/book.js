@@ -1,11 +1,13 @@
-import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1030.26-strawberry2';
-import {parseLughatBook} from '../../shared/lughat.js?v=1030.26-strawberry2';
-import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1030.26-strawberry2';
+import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1030.26-strawberry3';
+import {parseLughatBook} from '../../shared/lughat.js?v=1030.26-strawberry3';
+import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1030.26-strawberry3';
+import {parseQuranVocabulary} from '../../shared/quran-vocabulary.js?v=1030.26-strawberry3';
 
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;
 export function parseEditorBook(text,book) {
     if(book==='book_a')return {records:parseVocabularyRecords(text),availableThrough:0,availableCount:0};
+    if(book==='book_d')return {records:parseQuranVocabulary(text).records,availableThrough:0,availableCount:0};
     if(book==='book_c'){const {records}=parseTajweedBook(text),available=records.filter(record=>record.verified);return {records,availableThrough:available.at(-1)?.number||0,availableCount:available.length};}
     if(book!=='book_b')throw new Error('This book is not available in the Editor.');
     const parsed=parseLughatBook(text),occurrences=new Map();
@@ -20,10 +22,23 @@ export function matchingRecordIndex(records,number,occurrence=1) {
     return records.findIndex((record,index)=>recordNumber(record,index)===number&&(record.occurrence??1)===occurrence);
 }
 export function validateEditorUpdate(updated,book) {
+    if(book==='book_d'){
+        if(/[\r\n=]/.test(updated.word)||/[\r\n]/.test(updated.meaning+updated.referenceText)||updated.meaning.includes('=>')||!updated.word.trim()||!updated.meaning.trim())throw new Error('Enter one word, meaning and reference list per source line.');
+        parseQuranVocabulary(updated.word+' = '+updated.meaning+(updated.referenceText.trim()?' => '+updated.referenceText:''));return;
+    }
     if(book==='book_c'){validateTajweedQuestion(updated);return;}
     if(!updated.word.trim()||!updated.meaning.trim()||/[\r\n]/.test(updated.word+updated.meaning)||
         (book==='book_b'?updated.word.includes('\u27F5'):updated.word.includes('=')))
         throw new Error('Enter a word and meaning on one source line.');
+}
+export function replaceQuranVocabularyRecord(text,number,expected,updated){
+    validateEditorUpdate(updated,'book_d');
+    const record=parseQuranVocabulary(text).records[number-1];
+    if(!record||record.word!==expected.word||record.meaning!==expected.meaning||record.rawReferences!==expected.rawReferences)throw new Error('This entry changed on GitHub. Reload before saving.');
+    const parts=text.split(/(\r\n|\n|\r)/),position=(record.sourceLine-1)*2;
+    const old=parts[position],equal=old.match(/\s*=\s*/)?.[0]||' = ',arrow=old.match(/\s*=>\s*/)?.[0]||' => ';
+    parts[position]=(old.match(/^\s*/)?.[0]||'')+updated.word.trim()+equal+updated.meaning.trim()+(updated.referenceText.trim()?arrow+updated.referenceText.trim():'');
+    const result=parts.join('');parseQuranVocabulary(result);return result;
 }
 
 export function replaceTajweedRecord(text,number,expected,updated) {

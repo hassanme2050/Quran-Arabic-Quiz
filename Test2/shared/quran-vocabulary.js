@@ -18,7 +18,7 @@ export function parseQuranVocabulary(text){
                 throw new Error('Invalid chapter/verse on Book D line '+(index+1));
             return {meaning:match[1].trim(),surah,ayah,key:surah+':'+ayah};
         });
-        records.push({number:records.length+1,word,meaning,references,category,subcategory,sourceLine:index+1,language:'en',verified:true});
+        records.push({rawReferences:arrow<0?'':remaining.slice(arrow+2).trim(),number:records.length+1,word,meaning,references,category,subcategory,sourceLine:index+1,language:'en',verified:true});
     });
     return {records,warnings};
 }

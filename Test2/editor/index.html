@@ -6,8 +6,8 @@
     <title>Quran Arabic Quiz - Word Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="../shared/typography.css?v=1030.26-strawberry2">
-    <link rel="stylesheet" href="css/editor.css?v=1030.26-editor2">
+    <link rel="stylesheet" href="../shared/typography.css?v=1030.26-strawberry3">
+    <link rel="stylesheet" href="css/editor.css?v=1030.26-editor3">
 </head>
 <body>
     <!-- Book selection and authentication -->
@@ -21,6 +21,7 @@
                     <option value="book_a" selected>Book A - 500 Arabic Word (Arabic to English)</option>
                     <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
                     <option value="book_c">Book C - Quran Tajweed</option>
+                <option value="book_d">Book D - Quran Vocabulary (Arabic to English)</option>
                 </select>
                 <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" aria-label="System password" aria-describedby="login-error" autocomplete="current-password">
                 <input type="password" class="admin-text-field" id="admin-token-box" placeholder="Paste GitHub Token (ghp_...)" aria-label="GitHub token" aria-describedby="login-error" autocomplete="off">
@@ -76,6 +77,7 @@
                 <textarea id="edit-wrong-answer-6" class="admin-text-field wrong-answer-input" rows="2" dir="auto" disabled></textarea>
             </section>
 
+            <section id="editor-references" class="hidden"><label for="edit-references-field" class="field-label-header">Meanings and Quran references (after =&gt;)</label><textarea id="edit-references-field" class="admin-text-field" rows="4" dir="auto" disabled></textarea></section>
             <button id="commit-save-btn" style="width: 100%; margin-top: 8px;" data-action="saveWordUpdateToGitHub" disabled>Save Changes</button>
             <button id="publish-words-btn" type="button" data-action="makeWordsAvailable" aria-describedby="editor-availability-status" disabled>Make available</button>
             <section id="editor-availability" class="editor-availability" aria-label="Student availability">
@@ -87,6 +89,6 @@
 
     <div class="toast-popup" id="toast-alert" role="status" aria-live="polite">Notification Popup</div>
 
-    <script type="module" src="js/app.js?v=1030.26-editor2"></script>
+    <script type="module" src="js/app.js?v=1030.26-editor3"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-import { state } from './state.js?v=1030.26-strawberry2';
-import { toggleWordSelection, updateStickyCounterBanner } from './selection.js?v=1030.26-strawberry2';
+import { state } from './state.js?v=1030.26-strawberry3';
+import { toggleWordSelection, updateStickyCounterBanner } from './selection.js?v=1030.26-strawberry3';
 export function renderInventoryTilesGrid() {
     const gridBox = document.getElementById('tiles-matrix-box');
     gridBox.replaceChildren();

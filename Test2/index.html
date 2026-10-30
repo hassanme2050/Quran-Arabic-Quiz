@@ -6,9 +6,9 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=1030.26-strawberry2">
-    <link rel="stylesheet" href="css/app.css?v=1030.26-strawberry2">
-    <link rel="stylesheet" href="css/quest.css?v=1030.26-strawberry2">
+    <link rel="stylesheet" href="shared/typography.css?v=1030.26-strawberry3">
+    <link rel="stylesheet" href="css/app.css?v=1030.26-strawberry3">
+    <link rel="stylesheet" href="css/quest.css?v=1030.26-strawberry3">
 </head>
 <body>
     <div class="app-wrapper">
@@ -93,17 +93,17 @@
                         <line class="eye-slash-path" x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2.5"></line>
                     </svg>
                 </div>
+                                <button id="card-details-btn" type="button" class="card-details-icon hidden" data-action="openWordDetails" aria-label="More details: Quran verses"><span aria-hidden="true">&#9432;</span></button>
                 <div class="arabic-text-render" id="card-arabic-field">-</div>
                 <div class="meaning-text-render hidden" id="card-meaning-field">-</div>
             </div>
             <div class="navigation-buttons">
                 <button id="card-action-btn" data-action="handleCardProgression">Show Meaning</button>
-                <button id="card-details-btn" type="button" class="exit-btn hidden" data-action="openWordDetails" aria-label="More details: Quran verses"><span aria-hidden="true">ⓘ</span> Details</button>
                 <button class="exit-btn" data-action="exitToHome">← Exit to Menu</button>
             </div>
         </div>
 
-        <section id="verse-details-view" class="hidden" aria-label="Quran verse details">
+        <section id="verse-details-view" class="verse-modal hidden" role="dialog" aria-modal="true" aria-label="Quran verse details">
             <p id="verse-context" class="question-context hidden"></p>
             <div class="quiz-topline"><span id="verse-counter" class="counter-label-text"></span><span id="verse-reference"></span></div>
             <p id="verse-word-meaning" class="verse-word-meaning"></p>
@@ -119,7 +119,7 @@
                 <button id="verse-prev-btn" type="button" data-action="navigateWordVerse" data-value="-1" aria-label="Previous verse">←</button>
                 <button id="verse-next-btn" type="button" data-action="navigateWordVerse" data-value="1" aria-label="Next verse">→</button>
             </div>
-            <button class="exit-btn quiz-wide" id="verse-back-btn" type="button" data-action="closeWordDetails">← Back to word</button>
+            <button class="exit-btn quiz-wide" id="verse-back-btn" aria-label="Close verse details" type="button" data-action="closeWordDetails">&#215;</button>
             <p class="verse-source">Arabic and English translation via <a href="https://alquran.cloud/api" target="_blank" rel="noopener noreferrer">Al Quran Cloud</a></p>
         </section>
 
@@ -204,7 +204,7 @@
                 <option value="book_a">Book A - 500 Arabic Word (Arabic to English)</option>
                 <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
                 <option value="book_c">Book C - Quran Tajweed</option>
-            </select>
+            <option value="book_d">Book D - Quran Vocabulary (Arabic to English)</option></select>
 
             <div class="quest-map-scroll" id="quest-map-scroll" tabindex="0" role="region" aria-label="Quest stages, scroll left or right">
             <div class="quest-map-landscape">
@@ -283,6 +283,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=1030.26-strawberry2"></script>
+    <script type="module" src="js/app.js?v=1030.26-strawberry3"></script>
 </body>
 </html>

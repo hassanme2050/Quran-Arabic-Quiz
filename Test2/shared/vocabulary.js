@@ -1,6 +1,6 @@
-import { parseLughatBook } from './lughat.js?v=1030.26-strawberry2';
-import { parseTajweedBook } from './tajweed.js?v=1030.26-strawberry2';
-import {parseQuranVocabulary} from './quran-vocabulary.js?v=1030.26-strawberry2';
+import { parseLughatBook } from './lughat.js?v=1030.26-strawberry3';
+import { parseTajweedBook } from './tajweed.js?v=1030.26-strawberry3';
+import {parseQuranVocabulary} from './quran-vocabulary.js?v=1030.26-strawberry3';
 // The application root is resolved relative to this module, never to the page URL.
 export const BOOK_FILES = Object.freeze({
     book_a: 'Vocabulary-File.txt',

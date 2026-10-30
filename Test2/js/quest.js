@@ -1,13 +1,13 @@
-import { state } from './state.js?v=1030.26-strawberry2';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1030.26-strawberry2';
-import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1030.26-strawberry2';
-import { shuffleArray } from './utils.js?v=1030.26-strawberry2';
-import { generateQuizChoices } from './quiz.js?v=1030.26-strawberry2';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1030.26-strawberry2';
+import { state } from './state.js?v=1030.26-strawberry3';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1030.26-strawberry3';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1030.26-strawberry3';
+import { shuffleArray } from './utils.js?v=1030.26-strawberry3';
+import { generateQuizChoices } from './quiz.js?v=1030.26-strawberry3';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1030.26-strawberry3';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1030.26-strawberry2';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1030.26-strawberry2';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry2';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1030.26-strawberry3';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1030.26-strawberry3';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry3';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -57,7 +57,6 @@ function continuationNode() {
     return nextQuestNode(plan,progress);
 }
 export async function openQuest() {
-    if(activeBook==='book_d')return;
     if(!vocabularyList.length){launchToastAlert('No verified Quest words are available for this book yet.');return;}
     ensureProgress();
     renderQuestMap();
@@ -156,7 +155,7 @@ function renderReview() {
     byId('quest-review-word').textContent=item.word;
     byId('quest-review-word').dir=activeBook==='book_c'?'auto':'rtl';
     byId('quest-review-word').lang=activeBook==='book_c'?'en':'ar';
-    renderTajweedContext(byId('quest-review-context'),activeBook==='book_c'?item:null);
+    renderTajweedContext(byId('quest-review-context'),['book_c','book_d'].includes(activeBook)?item:null);
     byId('quest-review-meaning').textContent=activeBook==='book_c'?tajweedReviewAnswer(item.meaning):item.meaning;
     byId('quest-review-next').textContent=run.reviewIndex===run.order.length-1?'Start shuffled quiz →':activeBook==='book_c'?'Next question →':'Next word →';
     show('quest-review-view');
@@ -174,7 +173,7 @@ function renderQuestion() {
     byId('quest-question-word').textContent=item.word;
     byId('quest-question-word').dir=activeBook==='book_c'?'auto':'rtl';
     byId('quest-question-word').lang=activeBook==='book_c'?'en':'ar';
-    renderTajweedContext(byId('quest-question-context'),activeBook==='book_c'?item:null);
+    renderTajweedContext(byId('quest-question-context'),['book_c','book_d'].includes(activeBook)?item:null);
     byId('quest-feedback').textContent='';
     const options=byId('quest-answer-options');
     options.replaceChildren();
@@ -252,7 +251,7 @@ async function importProgress(event) {
         const counts=Object.fromEntries(await Promise.all(QUEST_BOOKS.map(async book=>[book,
             book===activeBook?vocabularyList.length:(await loadBookRecords(book)).filter(item=>item.verified!==false).length])));
         const imported=parseQuestBackup(await file.text(),counts);
-        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A - 500 Arabic Word (Arabic to English)':book==='book_c'?'Book C - Quran Tajweed':'Book B').join(' and ');
+        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A - 500 Arabic Word (Arabic to English)':book==='book_c'?'Book C - Quran Tajweed':book==='book_d'?'Book D':'Book B').join(' and ');
         if(!window.confirm('Replace Quest progress for '+names+' in this browser with this backup?'))return;
         store.importBooks(imported);
         progress=store.loadBook(activeBook,vocabularyList.length);currentId=null;renderQuestMap();

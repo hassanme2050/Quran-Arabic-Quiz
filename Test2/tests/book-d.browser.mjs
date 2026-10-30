@@ -26,7 +26,17 @@ try{
   });
   await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();await page.selectOption('#vocabulary-book-selector','book_d');
   await page.locator('#status-message').filter({hasText:'9 words'}).waitFor();
-  assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isDisabled());assert(await page.locator('[data-action="openQuest"]').isDisabled());assert(await page.locator('[data-action="openDictionaryMode"]').isDisabled());assert(await page.locator('#quiz-code-entry').isHidden());
+  assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isEnabled());assert(await page.locator('[data-action="openQuest"]').isEnabled());assert(await page.locator('[data-action="openDictionaryMode"]').isEnabled());assert(await page.locator('#quiz-code-entry').isVisible());
+  await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').click();
+  for(let i=0;i<9;i++){
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry3');return state.sessionWords[state.currentIndex];});
+   const choices=await page.locator('#quiz-options-box button').allTextContents();assert(choices.includes(item.meaning));assert(choices.every(value=>!value.includes('Alternative Choice')));
+   await page.locator('#quiz-options-box button').nth(choices.indexOf(item.meaning)).click();
+   if(i<8)await page.locator('#quiz-counter').filter({hasText:'Question '+(i+2)+' of 9'}).waitFor();
+  }
+  await page.locator('#quiz-finished-view:not(.hidden)').waitFor();assert.equal(await page.locator('#score-text-value').textContent(),'9/9');await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
+  await page.locator('[data-action="openDictionaryMode"]').click();assert.equal(await page.locator('.dictionary-entry').count(),9);await page.locator('#dictionary-view [data-action="exitToHome"]').click();
+  await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();assert(await page.locator('#quest-review-view').isVisible());await page.locator('#quest-review-view [data-quest-action="home"]').click();
   await page.locator('[data-value="flashcard"][data-action="triggerSelectedSession"]').click();
   async function findWord(word){
    for(let i=0;i<10;i++){
@@ -40,8 +50,11 @@ try{
   assert.equal(await page.locator('#card-context strong').textContent(),'Main Category');assert.equal(await page.locator('#card-context span').textContent(),'Sub Category');
   if(await page.locator('#card-action-btn').textContent()==='Show Meaning')await page.locator('#card-action-btn').click();
   assert.equal(await page.locator('#card-meaning-field').textContent(),'This, That, What');const counter=await page.locator('#card-counter').textContent();
+  const title=await page.locator('#app-title').boundingBox();assert(title.height<55);
+  assert.equal(await page.locator('#card-details-btn').evaluate(el=>el.parentElement.id),'review-card-frame');
   await page.locator('#card-details-btn').click();await page.locator('#verse-english:not(.hidden)').waitFor();
   assert.equal(await page.locator('#verse-reference').textContent(),'12:34');assert.equal(await page.locator('#verse-counter').textContent(),'Verse 1 of 4');assert(await page.locator('#verse-prev-btn').isDisabled());
+  assert.equal(await page.locator('#verse-details-view').getAttribute('aria-modal'),'true');assert(await page.locator('#flashcard-view').isVisible());
   assert.equal(await page.locator('#verse-english').textContent(),'English translation for 12:34');assert.equal(await page.locator('#verse-arabic').getAttribute('dir'),'rtl');
   await page.locator('#verse-next-btn').click();await page.locator('#verse-english').filter({hasText:'34:32'}).waitFor();
   const count=requests.length;await page.locator('#verse-prev-btn').click();await page.locator('#verse-english').filter({hasText:'12:34'}).waitFor();assert.equal(requests.length,count);

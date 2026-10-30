@@ -1,17 +1,18 @@
-import {state} from './state.js?v=1030.26-strawberry2';
-import {activeBook} from './vocabulary.js?v=1030.26-strawberry2';
-import {switchView} from './ui.js?v=1030.26-strawberry2';
-import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry2';
-import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry2';
+import {state} from './state.js?v=1030.26-strawberry3';
+import {activeBook} from './vocabulary.js?v=1030.26-strawberry3';
+import {switchView} from './ui.js?v=1030.26-strawberry3';
+import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry3';
+import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry3';
 let session=null,request=0,controller;
 const byId=id=>document.getElementById(id);
 function cancelRequest(){request++;controller?.abort();controller=null;}
-export function cancelWordDetails(){cancelRequest();session=null;}
+export function cancelWordDetails(){cancelRequest();session=null;byId('verse-details-view').classList.add('hidden');byId('flashcard-view').inert=false;}
 export function openWordDetails(){
     const record=state.sessionWords[state.currentIndex];
     if(activeBook!=='book_d'||state.currentMode!=='flashcard'||!record?.references?.length)return;
     cancelRequest();session={record,index:0,wordIndex:state.currentIndex};
-    renderTajweedContext(byId('verse-context'),record);switchView('verse-details-view');renderVerse();
+    byId('flashcard-view').inert=true;
+    renderTajweedContext(byId('verse-context'),record);byId('verse-details-view').classList.remove('hidden');renderVerse();
     byId('verse-back-btn').focus();
 }
 export function closeWordDetails(){

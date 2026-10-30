@@ -1,4 +1,4 @@
-import { emptyQuestProgress, reconcileQuestProgress } from './quest-model.js?v=1030.26-strawberry2';
+import { emptyQuestProgress, reconcileQuestProgress } from './quest-model.js?v=1030.26-strawberry3';
 // Saved per book and app URL so preview progress cannot overwrite live progress.
 export const QUEST_STORAGE_KEY='quranaq.quest.v1:book_a:'+new URL('../',import.meta.url).pathname;
 export function createQuestStorage(storage,key=QUEST_STORAGE_KEY) {
@@ -23,7 +23,7 @@ export function parseQuestImport(text,wordCount) {
     return reconcileQuestProgress(data,wordCount);
 }
 
-export const QUEST_BOOKS=['book_a','book_b','book_c'];
+export const QUEST_BOOKS=['book_a','book_b','book_c','book_d'];
 export const QUEST_LIBRARY_STORAGE_KEY='quranaq.quest.v2:books:'+new URL('../',import.meta.url).pathname;
 export function createQuestBackup(books) {
     return {schema:2,type:'quranaq-quest',savedAt:new Date().toISOString(),books:Object.fromEntries(

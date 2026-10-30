@@ -1,5 +1,5 @@
-import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1030.26-strawberry2';
-import {replaceLughatRecord,replaceTajweedRecord,moveVerificationBoundary} from './book.js?v=1030.26-editor2';
+import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1030.26-strawberry3';
+import {replaceLughatRecord,replaceTajweedRecord,replaceQuranVocabularyRecord,moveVerificationBoundary} from './book.js?v=1030.26-editor3';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';
@@ -59,7 +59,7 @@ async function updateVocabularyFile({filename,token,message,transform}) {
 }
 export function saveVocabularyRecord({filename,token,number,expected,updated}) {
     return updateVocabularyFile({filename,token,message:'Update vocabulary word #'+number,transform:text=>({
-        text:filename===BOOK_FILES.book_b?replaceLughatRecord(text,number,expected,updated):filename===BOOK_FILES.book_c?replaceTajweedRecord(text,number,expected,updated):replaceVocabularyRecord(text,number,expected,updated),changed:true
+        text:filename===BOOK_FILES.book_d?replaceQuranVocabularyRecord(text,number,expected,updated):filename===BOOK_FILES.book_b?replaceLughatRecord(text,number,expected,updated):filename===BOOK_FILES.book_c?replaceTajweedRecord(text,number,expected,updated):replaceVocabularyRecord(text,number,expected,updated),changed:true
     })});
 }
 export function saveVerificationBoundary({filename,token,number,expected}) {

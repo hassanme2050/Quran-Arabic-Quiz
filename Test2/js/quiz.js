@@ -1,19 +1,18 @@
-import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry2';
+import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry3';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1030.26-strawberry2';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry2';
-import { shuffleArray } from './utils.js?v=1030.26-strawberry2';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry2';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry2';
-import {preloadScorecardRenderer} from './platform.js?v=1030.26-strawberry2';
-import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry2';
+import { state } from './state.js?v=1030.26-strawberry3';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry3';
+import { shuffleArray } from './utils.js?v=1030.26-strawberry3';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry3';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry3';
+import {preloadScorecardRenderer} from './platform.js?v=1030.26-strawberry3';
+import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry3';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
     const input = document.getElementById('quiz-code-field');
     const enteredCode = input.value.trim().toUpperCase().replace(/\s+/g, '');
     clearQuizCodeError();
-    if(activeBook==='book_d'){showQuizCodeError('Book D is available in Review mode only.');return;}
     if(activeBook==='book_c'){showQuizCodeError('Book C quiz codes are planned for a future update.');return;}
 
     if (vocabularyList.length === 0) {
@@ -21,8 +20,8 @@ export function startQuizWithCode() {
         return;
     }
 
-    const codeBook = enteredCode.startsWith('B2:') ? 'book_b' : 'book_a';
-    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_b' ? 'Book B' : 'Book A - 500 Arabic Word (Arabic to English)') + ' for this quiz code.'); return; }
+    const codeBook = enteredCode.startsWith('D4:') ? 'book_d' : enteredCode.startsWith('B2:') ? 'book_b' : 'book_a';
+    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_d' ? 'Book D' : codeBook === 'book_b' ? 'Book B' : 'Book A - 500 Arabic Word (Arabic to English)') + ' for this quiz code.'); return; }
     const selectedQuestionNumbers = enteredCode ? decodeTeacherQuizCode(enteredCode) : null;
     if (!selectedQuestionNumbers) {
         showQuizCodeError('Invalid quiz code. Please try again or check with your teacher.');
@@ -31,8 +30,8 @@ export function startQuizWithCode() {
     }
     const selectedWords = [];
     for (const questionNumber of selectedQuestionNumbers) {
-        const matches = activeBook === 'book_b' ? vocabularyList.filter(item => item.number === questionNumber) : [];
-        const selected = activeBook === 'book_b' ? (matches.length === 1 ? matches[0] : null) : vocabularyList[questionNumber - 1];
+        const matches = activeBook !== 'book_a' ? vocabularyList.filter(item => item.number === questionNumber) : [];
+        const selected = activeBook !== 'book_a' ? (matches.length === 1 ? matches[0] : null) : vocabularyList[questionNumber - 1];
         if (!Number.isInteger(questionNumber) || questionNumber < 1 || !selected) {
             showQuizCodeError('This quiz code is not available with the current vocabulary file. Please check with your teacher.');
             return;
@@ -57,7 +56,7 @@ export function startQuizWithCode() {
     state.quizAttempt={phase:'ready',code:enteredCode,book:activeBook,name:'',startedAt:null,startClock:null,elapsedMs:0};
     document.getElementById('participant-name').value='';
     document.getElementById('participant-error').textContent='';
-    document.getElementById('participant-quiz-info').textContent=(activeBook==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · '+selectedWords.length+' questions';
+    document.getElementById('participant-quiz-info').textContent=(activeBook==='book_d'?'Book D':activeBook==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · '+selectedWords.length+' questions';
     document.getElementById('participant-start-btn').disabled=false;
     document.getElementById('status-message').classList.add('hidden');
     document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
@@ -121,6 +120,7 @@ export function generateQuizChoices(correctItem) {
         }
     }
 
+    if(activeBook==='book_d'){shuffleArray(choices);return choices;}
     while (choices.length < 4) {
         choices.push({ word: '—', meaning: 'Alternative Choice Option ' + (choices.length + 1) });
     }
@@ -219,7 +219,7 @@ export function displayQuizSummary() {
         document.getElementById('scorecard-participant-name').textContent=attempt.name;
         document.getElementById('scorecard-date').textContent=new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'short'}).format(new Date(attempt.startedAt));
         document.getElementById('scorecard-time').textContent=formatDuration(attempt.elapsedMs);
-        document.getElementById('scorecard-code').textContent=(attempt.book==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · Quiz code: '+attempt.code;
+        document.getElementById('scorecard-code').textContent=(attempt.book==='book_d'?'Book D':attempt.book==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · Quiz code: '+attempt.code;
     }
     const totalCorrect = state.quizHistory.filter(h => h.isCorrect).length;
     const percentage = Math.round((totalCorrect / state.sessionWords.length) * 100);

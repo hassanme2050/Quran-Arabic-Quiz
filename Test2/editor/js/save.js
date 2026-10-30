@@ -1,8 +1,8 @@
-import {state} from './state.js?v=1030.26-editor2';
-import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry2';
-import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1030.26-editor2';
-import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1030.26-editor2';
-import {validateEditorUpdate} from './book.js?v=1030.26-editor2';
+import {state} from './state.js?v=1030.26-editor3';
+import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry3';
+import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1030.26-editor3';
+import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1030.26-editor3';
+import {validateEditorUpdate} from './book.js?v=1030.26-editor3';
 
 function selectedRecord() {
     const record=state.records[state.loadedIndex];
@@ -17,6 +17,7 @@ export async function saveWordUpdateToGitHub() {
     const expected=selectedRecord();if(!expected)return;
     const number=state.loadedNumber;
     const updated={word:questionField().value.trim(),meaning:document.getElementById('edit-meaning-field').value.trim()};
+    if(state.activeBook==='book_d')updated.referenceText=document.getElementById('edit-references-field').value.trim();
     if(state.activeBook==='book_c')updated.wrongAnswers=wrongAnswerValues().map(answer=>answer.trim());
     try {validateEditorUpdate(updated,state.activeBook);}catch(error){launchToastAlert(error.message);return;}
     state.saving=true;setEditorLocked(true);launchToastAlert('Saving changes to GitHub...');

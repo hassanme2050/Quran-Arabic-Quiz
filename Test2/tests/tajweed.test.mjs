@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseTajweedBook,tajweedChoices} from '../shared/tajweed.js?v=1030.26-strawberry2';
-import {loadBook,BOOK_FILES} from '../shared/vocabulary.js?v=1030.26-strawberry2';
-import {parseEditorBook,replaceTajweedRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor2';
-import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor2';
+import {parseTajweedBook,tajweedChoices} from '../shared/tajweed.js?v=1030.26-strawberry3';
+import {loadBook,BOOK_FILES} from '../shared/vocabulary.js?v=1030.26-strawberry3';
+import {parseEditorBook,replaceTajweedRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor3';
+import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor3';
 import {withTajweedVerificationAt} from './book-c-fixture.mjs';
-import {createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1030.26-strawberry2';
-import {buildQuestPlan,beginQuestNode,advanceQuestReview} from '../js/quest-model.js?v=1030.26-strawberry2';
+import {createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1030.26-strawberry3';
+import {buildQuestPlan,beginQuestNode,advanceQuestReview} from '../js/quest-model.js?v=1030.26-strawberry3';
 const source=fs.readFileSync(new URL('../Tajweed-Question-Bank.txt',import.meta.url),'utf8');
 const records=parseTajweedBook(source).records;
 test('real Tajweed library preserves all 680 questions, 11 categories, 62 subcategories and bilingual answer commas',()=>{
@@ -91,9 +91,9 @@ test('all three books export in one file and old two-book backups preserve Tajwe
     const data=new Map(),storage={getItem:key=>data.get(key),setItem:(key,value)=>data.set(key,value)};
     const library=createQuestLibraryStorage(storage,'library','legacy'),c=library.loadBook('book_c',680);
     const plan=buildQuestPlan(680);beginQuestNode(plan,c,'stage-1',a=>a);advanceQuestReview(c,'stage-1',a=>a);library.save(c);
-    const backup=library.backup();assert.deepEqual(Object.keys(backup.books),['book_a','book_b','book_c']);
-    const imported=parseQuestBackup(JSON.stringify(backup),{book_a:98,book_b:20,book_c:680});
+    const backup=library.backup();assert.deepEqual(Object.keys(backup.books),['book_a','book_b','book_c','book_d']);
+    const imported=parseQuestBackup(JSON.stringify(backup),{book_a:98,book_b:20,book_c:680,book_d:9});
     const fresh=createQuestLibraryStorage(storage,'new-library','none');fresh.importBooks(imported);assert.equal(fresh.loadBook('book_c',680).runs['stage-1'].reviewIndex,1);
-    delete backup.books.book_c;fresh.importBooks(parseQuestBackup(JSON.stringify(backup),{book_a:98,book_b:20,book_c:680}));
+    delete backup.books.book_c;fresh.importBooks(parseQuestBackup(JSON.stringify(backup),{book_a:98,book_b:20,book_c:680,book_d:9}));
     assert.equal(fresh.loadBook('book_c',680).runs['stage-1'].reviewIndex,1);
 });

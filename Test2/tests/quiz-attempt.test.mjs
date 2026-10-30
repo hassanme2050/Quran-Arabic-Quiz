@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {formatDuration,elapsedMilliseconds,finishQuizAttempt,cancelQuizAttempt} from '../js/quiz-attempt.js?v=1030.26-strawberry2';
-import {state} from '../js/state.js?v=1030.26-strawberry2';
+import {formatDuration,elapsedMilliseconds,finishQuizAttempt,cancelQuizAttempt} from '../js/quiz-attempt.js?v=1030.26-strawberry3';
+import {state} from '../js/state.js?v=1030.26-strawberry3';
 
 test('elapsed clock excludes preparation and countdown, handles background gaps and freezes at completion',()=>{
     assert.equal(elapsedMilliseconds(null,90000),0);

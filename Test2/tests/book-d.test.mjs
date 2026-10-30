@@ -1,10 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry2';
-import {createVerseLoader,parseVerseResponse} from '../shared/quran-verses.js?v=1030.26-strawberry2';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry3';
+import {createVerseLoader,parseVerseResponse} from '../shared/quran-verses.js?v=1030.26-strawberry3';
+import {replaceQuranVocabularyRecord} from '../editor/js/book.js?v=1030.26-editor3';
+import {encodeQuizCode,decodeTeacherQuizCode} from '../shared/quiz-codes.js?v=1030.26-strawberry3';
 const source=fs.readFileSync(new URL('../Quran-Vocabulary-Meaning-Arabic-English.txt',import.meta.url),'utf8');
 const reference={surah:12,ayah:34,key:'12:34'};
+test('Book D Editor saves references and rejects stale or invalid changes while preserving other source rows',()=>{
+    const record=parseQuranVocabulary(source).records[0],updated={word:record.word,meaning:'Reviewed meaning',referenceText:'Example 2:255, Another 10: 10'};
+    const result=replaceQuranVocabularyRecord(source,1,record,updated),saved=parseQuranVocabulary(result).records;
+    assert.equal(saved[0].references[1].key,'10:10');assert.equal(saved[0].meaning,'Reviewed meaning');
+    assert.deepEqual(saved.slice(1),parseQuranVocabulary(source).records.slice(1));
+    assert.throws(()=>replaceQuranVocabularyRecord(result,1,record,updated),/changed/);
+    assert.throws(()=>replaceQuranVocabularyRecord(source,1,record,{...updated,referenceText:'Invalid reference'}),/reference/);
+});
+test('Book D codes identify their book and preserve the existing 10/20 question counts',()=>{
+    for(const count of [10,20]){const ids=Array.from({length:count},(_,i)=>i+1),code=encodeQuizCode(ids,'book_d');assert(code.startsWith('D4:'));assert.deepEqual(decodeTeacherQuizCode(code),ids);}
+});
 export const verseFixture=(surah=12,ayah=34)=>({code:200,data:[
     {surah:{number:surah,englishName:'Test chapter'},numberInSurah:ayah,text:'نص عربي للاختبار',edition:{identifier:'quran-uthmani'}},
     {surah:{number:surah},numberInSurah:ayah,text:'English test translation '+surah+':'+ayah,edition:{identifier:'en.sahih',englishName:'Saheeh International'}}

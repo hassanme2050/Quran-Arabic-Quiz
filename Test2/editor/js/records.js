@@ -1,14 +1,15 @@
-import {state} from './state.js?v=1030.26-editor2';
-import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry2';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1030.26-editor2';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1030.26-strawberry2';
+import {state} from './state.js?v=1030.26-editor3';
+import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry3';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1030.26-editor3';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1030.26-strawberry3';
 
 const byId=id=>document.getElementById(id);
 const wrongIds=Array.from({length:6},(_,index)=>'edit-wrong-answer-'+(index+1));
-const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-question-field','edit-meaning-field','commit-save-btn','publish-words-btn',...wrongIds];
+const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-question-field','edit-meaning-field','edit-references-field','commit-save-btn','publish-words-btn',...wrongIds];
 export const questionField=()=>byId(state.activeBook==='book_c'?'edit-question-field':'edit-arabic-field');
 export const wrongAnswerValues=()=>wrongIds.map(id=>byId(id).value);
 function writeRecord(record){
+    if(state.activeBook==='book_d'){byId('edit-references-field').value=record.rawReferences;renderTajweedContext(byId('editor-question-context'),record);}
     questionField().value=record.word;byId('edit-meaning-field').value=editableMeaning(record);
     if(state.activeBook==='book_c'){
         wrongIds.forEach((id,index)=>{byId(id).value=record.wrongAnswers[index];});
@@ -34,6 +35,7 @@ export function disableEditorControls(){setEditorLocked(true);}
 export function hasUnsavedEdits() {
     const record=state.records[state.loadedIndex];
     return !!record&&(questionField().value!==record.word||byId('edit-meaning-field').value!==editableMeaning(record)||
+        (state.activeBook==='book_d'&&byId('edit-references-field').value!==record.rawReferences)||
         (state.activeBook==='book_c'&&JSON.stringify(wrongAnswerValues())!==JSON.stringify(record.wrongAnswers)));
 }
 function showRecord(index,checkEdits=true) {

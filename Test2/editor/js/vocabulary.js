@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1030.26-editor2';
-import { fetchRootText } from '../../shared/vocabulary.js?v=1030.26-strawberry2';
-import {parseEditorBook,recordNumber} from './book.js?v=1030.26-editor2';
-import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry2';
-import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1030.26-editor2';
+import { state } from './state.js?v=1030.26-editor3';
+import { fetchRootText } from '../../shared/vocabulary.js?v=1030.26-strawberry3';
+import {parseEditorBook,recordNumber} from './book.js?v=1030.26-editor3';
+import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry3';
+import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1030.26-editor3';
 export async function initializeVocabularyDataStream() {
     state.loadedIndex=null;state.loadedNumber=null;state.records=[];
     disableEditorControls();
@@ -18,6 +18,7 @@ export async function initializeVocabularyDataStream() {
         input.disabled = false;
         input.max = Math.max(...state.records.map(recordNumber));
         input.value = recordNumber(state.records[0],0);
+        document.getElementById('editor-references').classList.toggle('hidden',state.activeBook!=='book_d');
         const bookB=state.activeBook==='book_b',bookC=state.activeBook==='book_c';
         document.getElementById('word-editor').dataset.book=state.activeBook;
         document.getElementById('editor-title').textContent=bookC?'Tajweed Question Editor':'Word Editor';
@@ -27,7 +28,7 @@ export async function initializeVocabularyDataStream() {
         document.getElementById('edit-arabic-field').classList.toggle('hidden',bookC);
         document.getElementById('edit-question-field').classList.toggle('hidden',!bookC);
         document.getElementById('editor-wrong-answers').classList.toggle('hidden',!bookC);
-        document.getElementById('editor-question-context').classList.toggle('hidden',!bookC);
+        document.getElementById('editor-question-context').classList.toggle('hidden',!bookC&&state.activeBook!=='book_d');
         document.getElementById('publish-words-btn').classList.remove('hidden');
         document.getElementById('availability-help').classList.remove('hidden');
         document.getElementById('availability-help').textContent=bookC?'Save corrections first. Make available places ----- immediately after the current question, before the next question. If the marker is already there or farther ahead, nothing changes.':'For Book B, save corrections first. Make available places ----- immediately after the current word, before the next word. If the marker is already there or farther ahead, nothing changes.';

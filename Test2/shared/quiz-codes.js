@@ -3,9 +3,9 @@ export const GENERATOR_QUESTION_COUNT = 20;
 export const SUPPORTED_QUESTION_COUNTS = Object.freeze([10, 20]);
 const MAX_BOOK_NUMBER = 999;
 export function encodeQuizCode(numbers, bookId = 'book_a') {
-    if (bookId === 'book_b') {
+    if (['book_b','book_d'].includes(bookId)) {
         if (!Array.isArray(numbers) || !SUPPORTED_QUESTION_COUNTS.includes(numbers.length) || new Set(numbers).size !== numbers.length || numbers.some(n => !Number.isInteger(n) || n < 1 || n > 9999)) throw new Error('Select 10 or 20 distinct Book B word numbers.');
-        return 'B2:' + [...numbers].sort((a,b)=>a-b).map(n=>String(n).padStart(4,'0')).join('.');
+        return (bookId==='book_d'?'D4:':'B2:') + [...numbers].sort((a,b)=>a-b).map(n=>String(n).padStart(4,'0')).join('.');
     }
     if (bookId !== 'book_a') throw new Error('Unknown book.');
     if (!Array.isArray(numbers) || !SUPPORTED_QUESTION_COUNTS.includes(numbers.length) ||
@@ -17,8 +17,8 @@ export function encodeQuizCode(numbers, bookId = 'book_a') {
     return BigInt(sequence).toString(16).toUpperCase();
 }
 export function decodeTeacherQuizCode(code) {
-    if (typeof code === 'string' && /^B2:/i.test(code)) {
-        if (!/^B2:\d{4}(?:\.\d{4}){9}(?:(?:\.\d{4}){10})?$/i.test(code)) return null;
+    if (typeof code === 'string' && /^(B2|D4):/i.test(code)) {
+        if (!/^(B2|D4):\d{4}(?:\.\d{4}){9}(?:(?:\.\d{4}){10})?$/i.test(code)) return null;
         const numbers = code.slice(3).split('.').map(Number);
         return numbers.every(n=>n > 0) && new Set(numbers).size === numbers.length ? numbers : null;
     }
