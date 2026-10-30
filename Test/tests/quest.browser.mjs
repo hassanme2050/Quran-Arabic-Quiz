@@ -179,7 +179,7 @@ try {
     await page.locator('#quest-review-view [data-quest-action="map"]').click();
     page.once('dialog',dialog=>dialog.accept());
     await page.locator('#quest-import-file').setInputFiles({name:'Legacy-Book-A.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported.books.book_a))});
-    await page.locator('#toast-alert').filter({hasText:'Quest progress imported for Book A.'}).waitFor();
+    await page.locator('#toast-alert').filter({hasText:'Quest progress imported for Book A - 500 Arabic Word (Arabic to English).'}).waitFor();
     await page.locator('#quest-continue').click();
     assert.equal(await page.locator('#quest-review-number').textContent(),'Book word #'+bookB[12].number,'legacy import must preserve Book B');
     await page.reload();await page.locator('#menu-view:not(.hidden)').waitFor();
