@@ -1,6 +1,6 @@
-import {state} from './state.js?v=1029.26-editor8';
+import {state} from './state.js?v=1029.26-editor9';
 import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry9';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor8';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor9';
 import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1029.26-strawberry9';
 
 const byId=id=>document.getElementById(id);

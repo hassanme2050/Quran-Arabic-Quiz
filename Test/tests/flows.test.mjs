@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process';
 import {withVerificationAt} from './book-b-fixture.mjs';
 import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry9';
 import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry9';
-import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor8';
+import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor9';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -244,8 +244,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor rejects missing credentials and passwords absent from CP.txt', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor8');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor8');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor9');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor9');
         state.token='';
         const requests=[];
         globalThis.fetch = async (url,options) => {
@@ -276,8 +276,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor uses current UTF-8 passwords from CP.txt and blocks duplicate submissions', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor8');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor8');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor9');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor9');
         const configured='test-only-\u0627\u0644\u0641';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value=' '+configured+' ';
@@ -307,8 +307,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor stays gated after password-file or vocabulary failures and can retry', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor8');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor8');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1029.26-editor9');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor9');
         state.token='';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
@@ -336,11 +336,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Editor loads and navigates book numbers, rejects mismatched save target, and blocks conflicts', async () => {
         dom('editor/index.html');
-        await import('../editor/js/app.js?v=1029.26-editor8');
-        const {state} = await import('../editor/js/state.js?v=1029.26-editor8');
-        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-editor8');
-        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-editor8');
-        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-editor8');
+        await import('../editor/js/app.js?v=1029.26-editor9');
+        const {state} = await import('../editor/js/state.js?v=1029.26-editor9');
+        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1029.26-editor9');
+        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1029.26-editor9');
+        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1029.26-editor9');
         let requests = 0;
         globalThis.fetch = async () => { requests++; return {ok:true,text:async()=>vocabularyText}; };
         assert(await initializeVocabularyDataStream());
@@ -385,9 +385,9 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Book B Editor loads all entries, including unverified and repeated source numbers', async () => {
         dom('editor/index.html');
-        const {state}=await import('../editor/js/state.js?v=1029.26-editor8');
-        const {initializeVocabularyDataStream}=await import('../editor/js/vocabulary.js?v=1029.26-editor8');
-        const {navigateWord,loadTargetInventoryRecord}=await import('../editor/js/records.js?v=1029.26-editor8');
+        const {state}=await import('../editor/js/state.js?v=1029.26-editor9');
+        const {initializeVocabularyDataStream}=await import('../editor/js/vocabulary.js?v=1029.26-editor9');
+        const {navigateWord,loadTargetInventoryRecord}=await import('../editor/js/records.js?v=1029.26-editor9');
         const text=withVerificationAt(read('Lughat-AlQuran-word-meaning.txt'),20);
         state.activeBook='book_b';state.activeFile='Lughat-AlQuran-word-meaning.txt';
         globalThis.fetch=async()=>({ok:true,text:async()=>text});

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {parseTajweedBook} from '../shared/tajweed.js?v=1029.26-strawberry9';
-import {replaceTajweedRecord} from '../editor/js/book.js?v=1029.26-editor8';
+import {replaceTajweedRecord} from '../editor/js/book.js?v=1029.26-editor9';
 import {withTajweedVerificationAt} from './book-c-fixture.mjs';
 const root=new URL('../',import.meta.url),realSource=fs.readFileSync(new URL('Tajweed-Question-Bank.txt',root),'utf8'),source=withTajweedVerificationAt(realSource,20),records=parseTajweedBook(source).records;
 const password='test-only-tajweed',cp=Buffer.from(password).toString('base64');
