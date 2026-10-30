@@ -1,0 +1,10 @@
+{
+  "version": "QuranAQ-v1030.26 Strawberry",
+  "date": "2026-10-30",
+  "basedOn": "QuranAQ-v1029.26 Strawberry",
+  "sourceRepository": "hassanme2050/Quran-Arabic-Quiz",
+  "sourceFolder": "Test/",
+  "sourceCommit": "c692db8b740264cb49a7657fbbeb6ae421b0db88",
+  "librarySource": "Existing GitHub Test/ files; Book B marker synchronized forward",
+  "bookAEntries": 98
+}

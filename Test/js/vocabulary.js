@@ -1,8 +1,10 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry9';
-import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry9';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry9';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry9';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry9';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-strawberry2';
+import { parseLughatBook } from '../shared/lughat.js?v=1030.26-strawberry2';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-strawberry2';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry2';
+import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry2';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1030.26-strawberry2';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry2';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -11,6 +13,7 @@ export async function loadVocabulary(bookId = 'book_a') {
     const sequence = ++loadSequence;
     cancelPendingAnswer();
     cancelQuizAttempt();
+    cancelWordDetails();
     vocabularyList = []; dictionaryVocabularyList = [];
     const status = document.getElementById('status-message');
     status.classList.remove('hidden'); status.textContent = 'Loading selected book...';
@@ -28,12 +31,16 @@ export async function loadVocabulary(bookId = 'book_a') {
 }
 function setSessionAvailability(available) {
     document.querySelectorAll('[data-action]').forEach(element => {
-        if (['triggerSelectedSession','startQuizWithCode','openQuest'].includes(element.dataset.action)) element.disabled = !available || (activeBook==='book_c'&&element.dataset.action==='startQuizWithCode');
+        const action=element.dataset.action,reviewOnly=activeBook==='book_d';
+        if (['triggerSelectedSession','startQuizWithCode','openQuest'].includes(action)) element.disabled = !available ||
+            (action==='startQuizWithCode'&&['book_c','book_d'].includes(activeBook))||
+            (reviewOnly&&(action==='openQuest'||(action==='triggerSelectedSession'&&element.dataset.value!=='flashcard')));
+        if(action==='openDictionaryMode')element.disabled=['book_c','book_d'].includes(activeBook)||!dictionaryVocabularyList.length;
     });
 }
 export function parseVocabulary(text, bookId = 'book_a') {
     activeBook = bookId;
-    const parsed = bookId === 'book_b' ? parseLughatBook(text) : bookId === 'book_c' ? parseTajweedBook(text) : {records:parseVocabularyRecords(text), warnings:[]};
+    const parsed = bookId === 'book_b' ? parseLughatBook(text) : bookId === 'book_c' ? parseTajweedBook(text) : bookId==='book_d'?parseQuranVocabulary(text):{records:parseVocabularyRecords(text), warnings:[]};
     dictionaryVocabularyList = parsed.records;
     vocabularyList = parsed.records.filter(item => item.verified !== false);
     const status = document.getElementById('status-message');
@@ -42,7 +49,7 @@ export function parseVocabulary(text, bookId = 'book_a') {
         ? vocabularyList.length+' verified Tajweed questions for Quiz/Review; '+parsed.records.length+' in Dictionary.'+(parsed.hasBoundary?'':' No verification line found: Book C is dictionary-only.')
         : bookId === 'book_b'
         ? vocabularyList.length + ' verified words for Quiz/Review; ' + parsed.records.length + ' in Dictionary.' + (parsed.hasBoundary ? '' : ' No verification line found: Book B is dictionary-only.')
-        : 'Loaded ' + vocabularyList.length + (bookId==='book_c'?' Tajweed questions':' words');
+        : 'Loaded ' + vocabularyList.length + (bookId==='book_d'?' words · Review mode':' words');
     if (parsed.warnings.length) console.warn(bookId+':', ...parsed.warnings);
     status.textContent='✅ '+status.textContent;
     const first = document.getElementById('range-input-start'), last = document.getElementById('range-input-end');
@@ -56,9 +63,8 @@ export function parseVocabulary(text, bookId = 'book_a') {
     document.getElementById('dict-sort-arabic').textContent=bookId==='book_c'?'Question':'Arabic';
     document.getElementById('opt-all').textContent=bookId==='book_c'?'All Questions':'All Words';
     document.getElementById('opt-last').textContent=bookId==='book_c'?'Last 10':'Last 10 Words';
-    document.querySelectorAll('[data-action="openDictionaryMode"]').forEach(button=>{button.disabled=bookId==='book_c';});
-    document.getElementById('quiz-code-entry').classList.toggle('hidden',bookId==='book_c');
-    document.getElementById('quiz-code-field').disabled=bookId==='book_c';
+    document.getElementById('quiz-code-entry').classList.toggle('hidden',['book_c','book_d'].includes(bookId));
+    document.getElementById('quiz-code-field').disabled=['book_c','book_d'].includes(bookId);
     setSessionAvailability(vocabularyList.length > 0);
     clearQuizCodeError();
     switchView('menu-view');

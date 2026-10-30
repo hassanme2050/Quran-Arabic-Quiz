@@ -1,13 +1,13 @@
-import { state } from './state.js?v=1029.26-strawberry9';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry9';
-import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry9';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry9';
-import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry9';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry9';
+import { state } from './state.js?v=1030.26-strawberry2';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1030.26-strawberry2';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1030.26-strawberry2';
+import { shuffleArray } from './utils.js?v=1030.26-strawberry2';
+import { generateQuizChoices } from './quiz.js?v=1030.26-strawberry2';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1030.26-strawberry2';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry9';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry9';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1029.26-strawberry9';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1030.26-strawberry2';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1030.26-strawberry2';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry2';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -57,6 +57,7 @@ function continuationNode() {
     return nextQuestNode(plan,progress);
 }
 export async function openQuest() {
+    if(activeBook==='book_d')return;
     if(!vocabularyList.length){launchToastAlert('No verified Quest words are available for this book yet.');return;}
     ensureProgress();
     renderQuestMap();

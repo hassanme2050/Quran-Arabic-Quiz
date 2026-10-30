@@ -1,6 +1,6 @@
-import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry9';
-import { switchView, launchToastAlert } from './ui.js?v=1029.26-strawberry9';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1029.26-strawberry9';
+import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry2';
+import { switchView, launchToastAlert } from './ui.js?v=1030.26-strawberry2';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1030.26-strawberry2';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -57,7 +57,7 @@ function scheduleDictionaryMarker() {
 }
 
 export function openDictionaryMode() {
-    if(activeBook==='book_c')return;
+    if(['book_c','book_d'].includes(activeBook))return;
     if (!vocabularyList.length) {
         launchToastAlert('Vocabulary is not loaded yet. Please wait and try again.');
         return;

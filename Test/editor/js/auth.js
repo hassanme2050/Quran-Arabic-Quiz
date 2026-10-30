@@ -1,6 +1,6 @@
-import { state } from './state.js?v=1029.26-editor9';
-import { BOOK_FILES, fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry9';
-import { initializeVocabularyDataStream } from './vocabulary.js?v=1029.26-editor9';
+import { state } from './state.js?v=1030.26-editor2';
+import { BOOK_FILES, fetchRootText } from '../../shared/vocabulary.js?v=1030.26-strawberry2';
+import { initializeVocabularyDataStream } from './vocabulary.js?v=1030.26-editor2';
 // Use the same configured passwords as the Test Generator. GitHub authorizes saves with the supplied token.
 export async function evaluateAdministrativeCredentials() {
     const button = document.getElementById('verify-open-btn');
@@ -13,7 +13,7 @@ export async function evaluateAdministrativeCredentials() {
     const plaintextPassword = passwordBox.value.trim();
     const inputToken = tokenBox.value.trim();
 
-    if (!selectedBook || !BOOK_FILES[selectedBook]) {
+    if (!['book_a','book_b','book_c'].includes(selectedBook)) {
         errorBox.textContent = 'Please select a valid book.';
         return;
     }

@@ -1,7 +1,7 @@
-import {state} from './state.js?v=1029.26-editor9';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry9';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor9';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1029.26-strawberry9';
+import {state} from './state.js?v=1030.26-editor2';
+import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry2';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1030.26-editor2';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1030.26-strawberry2';
 
 const byId=id=>document.getElementById(id);
 const wrongIds=Array.from({length:6},(_,index)=>'edit-wrong-answer-'+(index+1));

@@ -1,13 +1,14 @@
-import { openQuest, initializeQuest } from './quest.js?v=1029.26-strawberry9';
-import { state } from './state.js?v=1029.26-strawberry9';
-import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1029.26-strawberry9';
-import { shuffleArray, getRandomSubset } from './utils.js?v=1029.26-strawberry9';
-import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry9';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1029.26-strawberry9';
-import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1029.26-strawberry9';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry9';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1029.26-strawberry9';
-import { copyScreenshotToClipboard } from './platform.js?v=1029.26-strawberry9';
+import { openQuest, initializeQuest } from './quest.js?v=1030.26-strawberry2';
+import { state } from './state.js?v=1030.26-strawberry2';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1030.26-strawberry2';
+import { shuffleArray, getRandomSubset } from './utils.js?v=1030.26-strawberry2';
+import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry2';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1030.26-strawberry2';
+import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1030.26-strawberry2';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry2';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1030.26-strawberry2';
+import { copyScreenshotToClipboard } from './platform.js?v=1030.26-strawberry2';
+import {openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse} from './word-details.js?v=1030.26-strawberry2';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
 export function normalizeCustomRange() {
@@ -66,6 +67,7 @@ export function updateSegmentSelection(targetStrategy) {
 }
 
 export function startSession(strategy, mode) {
+    if(activeBook==='book_d'&&mode!=='flashcard')return;
     if (!vocabularyList.length) return;
     cancelPendingAnswer();
     cancelQuizAttempt();
@@ -120,7 +122,8 @@ function initializeApp() {
         openQuest, updateSegmentSelection, validateLiveCustomBounds, triggerSelectedSession,
         startQuizWithCode, openDictionaryMode, setDictionarySort, exitToHome,
         handleFlashCardBodyClick, handleEyeToggleIntercept, handleCardProgression,
-        toggleSummaryTableVisibility, copyScreenshotToClipboard
+        toggleSummaryTableVisibility, copyScreenshotToClipboard,
+        openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse
     };
     document.querySelectorAll('[data-action]').forEach(element => {
         element.addEventListener(element.dataset.event || 'click', event => {
