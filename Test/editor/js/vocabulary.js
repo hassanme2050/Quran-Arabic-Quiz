@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1029.26-editor7';
-import { fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry5';
-import {parseEditorBook,recordNumber} from './book.js?v=1029.26-editor7';
-import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry5';
-import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1029.26-editor7';
+import { state } from './state.js?v=1029.26-editor8';
+import { fetchRootText } from '../../shared/vocabulary.js?v=1029.26-strawberry6';
+import {parseEditorBook,recordNumber} from './book.js?v=1029.26-editor8';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry6';
+import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1029.26-editor8';
 export async function initializeVocabularyDataStream() {
     state.loadedIndex=null;state.loadedNumber=null;state.records=[];
     disableEditorControls();
@@ -28,8 +28,9 @@ export async function initializeVocabularyDataStream() {
         document.getElementById('edit-question-field').classList.toggle('hidden',!bookC);
         document.getElementById('editor-wrong-answers').classList.toggle('hidden',!bookC);
         document.getElementById('editor-question-context').classList.toggle('hidden',!bookC);
-        document.getElementById('publish-words-btn').classList.toggle('hidden',bookC);
-        document.getElementById('availability-help').classList.toggle('hidden',bookC);
+        document.getElementById('publish-words-btn').classList.remove('hidden');
+        document.getElementById('availability-help').classList.remove('hidden');
+        document.getElementById('availability-help').textContent=bookC?'Save corrections first. Make available places ----- immediately after the current question, before the next question. If the marker is already there or farther ahead, nothing changes.':'For Book B, save corrections first. Make available places ----- immediately after the current word, before the next word. If the marker is already there or farther ahead, nothing changes.';
         document.getElementById('meaning-field-label').textContent=bookC?'Correct answer':bookB?'Urdu Meaning / Notes':'English Translation Meaning';
         const meaning=document.getElementById('edit-meaning-field');
         meaning.dir=bookB?'rtl':'auto';meaning.lang=bookB?'ur':'en';

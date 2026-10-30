@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseTajweedBook} from '../shared/tajweed.js?v=1029.26-strawberry5';
-import {replaceTajweedRecord} from '../editor/js/book.js?v=1029.26-editor7';
-const root=new URL('../',import.meta.url),source=fs.readFileSync(new URL('Tajweed-Question-Bank.txt',root),'utf8'),records=parseTajweedBook(source).records;
+import {parseTajweedBook} from '../shared/tajweed.js?v=1029.26-strawberry6';
+import {replaceTajweedRecord} from '../editor/js/book.js?v=1029.26-editor8';
+import {withTajweedVerificationAt} from './book-c-fixture.mjs';
+const root=new URL('../',import.meta.url),realSource=fs.readFileSync(new URL('Tajweed-Question-Bank.txt',root),'utf8'),source=withTajweedVerificationAt(realSource,20),records=parseTajweedBook(source).records;
 const password='test-only-tajweed',cp=Buffer.from(password).toString('base64');
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 let browser,page;
@@ -14,13 +15,14 @@ try{
  browser=await chromium.launch({headless:true});fs.mkdirSync('artifacts',{recursive:true});
  for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
   const context=await browser.newContext({viewport,acceptDownloads:true});page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/Tajweed-Question-Bank.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:source}));
   await page.clock.install({time:new Date('2026-10-29T12:00:00Z')});await page.goto(url);await page.locator('#menu-view:not(.hidden)').waitFor();await page.clock.pauseAt(new Date('2026-10-29T13:00:00Z'));
-  async function selectC(){await page.selectOption('#vocabulary-book-selector','book_c');await page.locator('#status-message').filter({hasText:'680 Tajweed questions'}).waitFor();}
+  async function selectC(){await page.selectOption('#vocabulary-book-selector','book_c');await page.locator('#status-message').filter({hasText:'20 verified Tajweed questions'}).waitFor();}
   await selectC();assert(await page.locator('#quiz-code-entry').isHidden());assert(await page.locator('#quiz-code-btn').isDisabled());
   await page.locator('[data-action="triggerSelectedSession"][data-value="quiz"]').click();
   for(let i=0;i<10;i++){
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry5');return state.sessionWords[state.currentIndex];});
-   assert.equal(await page.locator('#quiz-arabic-field').textContent(),item.word);assert((await page.locator('#quiz-question-context').textContent()).includes(item.subcategory.name));
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry6');return state.sessionWords[state.currentIndex];});
+   assert(item.number<=20);assert.equal(await page.locator('#quiz-arabic-field').textContent(),item.word);assert((await page.locator('#quiz-question-context').textContent()).includes(item.subcategory.name));
    const options=await page.locator('#quiz-options-box button').allTextContents();assert.equal(options.length,4);assert.equal(new Set(options).size,4);
    assert.equal(options.filter(a=>a===item.meaning).length,1);options.filter(a=>a!==item.meaning).forEach(a=>assert(item.wrongAnswers.includes(a)));
    if(i===0)await page.screenshot({path:'artifacts/tajweed-quiz-'+viewport.width+'.png',fullPage:true});
@@ -31,14 +33,14 @@ try{
   await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
   await page.locator('[data-action="updateSegmentSelection"][data-value="last"]').click();
   await page.locator('[data-action="triggerSelectedSession"][data-value="flashcard"]').click();
-  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry5');return state.sessionWords[0];});assert(review.number>670);
+  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry6');return state.sessionWords[0];});assert(review.number>10&&review.number<=20);
   assert.equal(await page.locator('#card-action-btn').textContent(),'Show Answer');await page.locator('#card-action-btn').click();assert.equal(await page.locator('#card-meaning-field').textContent(),review.meaning);
   await page.locator('#flashcard-view [data-action="exitToHome"]').click();await page.locator('[data-action="openDictionaryMode"]').click();
   assert.equal(await page.locator('#dictionary-count').textContent(),'680 questions');assert.equal(await page.locator('#dict-sort-arabic').textContent(),'Question');
   await page.locator('#dictionary-search-toggle').click();await page.locator('#dictionary-search').fill('التحسين');assert(await page.locator('.dictionary-entry').count()>0);
   assert.equal(await page.locator('.dictionary-word').first().getAttribute('dir'),'auto');
   await page.locator('#dictionary-view [data-action="exitToHome"]').click();await page.locator('[data-action="openQuest"]').click();
-  assert.equal(await page.locator('.quest-node').count(),81);await page.locator('#quest-continue').click();
+  assert.equal(await page.locator('.quest-node').count(),2);await page.locator('#quest-continue').click();
   assert.equal(await page.locator('#quest-review-number').textContent(),'Book question #1');
   for(let i=0;i<3;i++)await page.locator('#quest-review-next').click();
   await page.reload();await page.locator('#menu-view:not(.hidden)').waitFor();await selectC();await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();
@@ -57,6 +59,7 @@ try{
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);await page.clock.resume();
 
   page=await context.newPage();const editorErrors=[];page.on('pageerror',error=>editorErrors.push(error.message));let remote=source,revision=1,puts=0;
+  await page.route('**/Tajweed-Question-Bank.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:source}));
   await page.route('**/CP.txt',route=>route.fulfill({status:200,contentType:'text/plain; charset=utf-8',body:cp}));
   await page.route('https://api.github.com/repos/hassanme2050/Quran-Arabic-Quiz/contents/**',async route=>{
    assert(decodeURIComponent(new URL(route.request().url()).pathname).endsWith('/Tajweed-Question-Bank.txt'),'Editor must never write another book');
@@ -69,7 +72,7 @@ try{
   await page.goto(url+'/editor/?book=book_c');assert.equal(await page.locator('#login-book-selector').inputValue(),'book_c');
   await page.locator('#admin-passcode-box').fill(password);await page.locator('#admin-token-box').fill('test-only-token');await page.locator('#verify-open-btn').click();await page.locator('#login-shield-gate').waitFor({state:'hidden'});
   assert.equal(await page.locator('#edit-question-field').inputValue(),records[0].word);assert.equal(await page.locator('#edit-meaning-field').inputValue(),records[0].meaning);
-  assert(await page.locator('#edit-arabic-field').isHidden());assert(await page.locator('#publish-words-btn').isHidden());assert.equal(await page.locator('#editor-wrong-answers textarea').count(),6);
+  assert(await page.locator('#edit-arabic-field').isHidden());assert(await page.locator('#publish-words-btn').isEnabled());assert.equal(await page.locator('#editor-wrong-answers textarea').count(),6);
   for(let i=0;i<6;i++)assert.equal(await page.locator('#edit-wrong-answer-'+(i+1)).inputValue(),records[0].wrongAnswers[i]);
   await page.locator('#word-target-index').fill('680');await page.locator('#lookup-go-btn').click();assert.equal(await page.locator('#edit-question-field').inputValue(),records.at(-1).word);
   assert((await page.locator('#editor-question-context').textContent()).includes(records.at(-1).subcategory.name));
@@ -87,10 +90,15 @@ try{
   await page.locator('#edit-wrong-answer-1').fill(records[0].wrongAnswers[0]);
   remote=replaceTajweedRecord(remote,1,saved.records[0],{...saved.records[0],word:'A newer teacher question?'});revision++;
   await page.locator('#edit-question-field').fill('Local older edit?');await page.locator('#commit-save-btn').click();await page.locator('#toast-alert').filter({hasText:'changed on GitHub'}).waitFor();assert.equal(puts,1);
+  page.once('dialog',dialog=>dialog.accept());await page.locator('#word-target-index').fill('30');await page.locator('#lookup-go-btn').click();
+  await page.locator('#publish-words-btn').click();await page.locator('#toast-alert').filter({hasText:'Questions through #30'}).waitFor();assert.equal(puts,2);
+  assert.equal(parseTajweedBook(remote).records.filter(r=>r.verified).length,30);
+  await page.locator('#publish-words-btn').click();await page.locator('#toast-alert').filter({hasText:'already available'}).waitFor();assert.equal(puts,2);
+  await page.locator('#lookup-prev-btn').click();await page.locator('#publish-words-btn').click();await page.locator('#publish-words-btn:not([disabled])').waitFor();assert.equal(puts,2);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(editorErrors,[]);
   await page.goto(url+'/test-generator/');assert(await page.locator('option[value="book_c"]').isDisabled());
   await context.close();
  }
- console.log('PASS: Tajweed 680-question library, per-question 1+3 shuffled choices, quiz/review/dictionary, Quest resume and three-book backup/import, Editor all answers/navigation/validation/conflicts and source-preserving mocked saves, Generator exclusion, desktop/mobile without overflow or JavaScript errors.');
+ console.log('PASS: Tajweed 680-question library and verification cutoff, per-question 1+3 shuffled choices, quiz/review/dictionary, Quest resume and three-book backup/import, Editor all answers/navigation/validation/conflicts, source-preserving saves and forward-only Make available (mocked GitHub), Generator exclusion, desktop/mobile without overflow or JavaScript errors.');
 }catch(error){if(page)await page.screenshot({path:'artifacts/tajweed-failure.png',fullPage:true}).catch(()=>{});throw error;}
 finally{if(browser)await browser.close();server.kill();}

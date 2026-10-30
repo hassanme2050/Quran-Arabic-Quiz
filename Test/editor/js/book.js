@@ -1,12 +1,12 @@
-import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1029.26-strawberry5';
-import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry5';
-import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1029.26-strawberry5';
+import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1029.26-strawberry6';
+import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry6';
+import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1029.26-strawberry6';
 
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;
 export function parseEditorBook(text,book) {
     if(book==='book_a')return {records:parseVocabularyRecords(text),availableThrough:0,availableCount:0};
-    if(book==='book_c'){const {records}=parseTajweedBook(text);return {records,availableThrough:records.at(-1)?.number||0,availableCount:records.length};}
+    if(book==='book_c'){const {records}=parseTajweedBook(text),available=records.filter(record=>record.verified);return {records,availableThrough:available.at(-1)?.number||0,availableCount:available.length};}
     if(book!=='book_b')throw new Error('This book is not available in the Editor.');
     const parsed=parseLughatBook(text),occurrences=new Map();
     const records=parsed.records.map(record=>{
@@ -54,9 +54,10 @@ export function replaceLughatRecord(text,number,expected,updated) {
     return content;
 }
 
-export function moveVerificationBoundary(text,number,expected) {
+export function moveVerificationBoundary(text,number,expected,book='book_b') {
     if(!Number.isInteger(number)||number<1)throw new Error('Load a valid word number first.');
-    const parsed=parseEditorBook(text,'book_b');
+    if(!['book_b','book_c'].includes(book))throw new Error('Student availability is managed for Book B and Book C.');
+    const parsed=parseEditorBook(text,book);
     const index=matchingRecordIndex(parsed.records,number,expected?.occurrence??1),record=parsed.records[index];
     if(!record)throw new Error('The selected entry is no longer in the source. Reload the Editor.');
     const bom=text.startsWith('\uFEFF')?'\uFEFF':'';
@@ -66,7 +67,8 @@ export function moveVerificationBoundary(text,number,expected) {
     if(markers.length>1)throw new Error('The file contains more than one verification marker. Please resolve the extra markers first.');
     const old=markers[0]??-1,target=record.sourceLine-1;
     if(old>=target)return {text,changed:false,availableThrough:parsed.availableThrough};
-    if(expected&&(record.word!==expected.word||record.rawMeaning!==editableMeaning(expected)))
+    if(expected&&(record.word!==expected.word||editableMeaning(record)!==editableMeaning(expected)||
+        (book==='book_c'&&JSON.stringify(record.wrongAnswers)!==JSON.stringify(expected.wrongAnswers))))
         throw new Error('This entry changed on GitHub. Reload and review it before making it available.');
     const marker=old<0?{text:'-----',eol:''}:lines.splice(old,1)[0];
     const insertAt=target+1-(old>=0&&old<target?1:0),previous=lines[insertAt-1];
@@ -75,5 +77,5 @@ export function moveVerificationBoundary(text,number,expected) {
     marker.eol=insertAt<lines.length?(marker.eol||newline):(/(?:\r\n|\n|\r)$/.test(text)?newline:'');
     lines.splice(insertAt,0,marker);
     const content=bom+lines.map(line=>line.text+line.eol).join('');
-    return {text:content,changed:true,availableThrough:parseEditorBook(content,'book_b').availableThrough};
+    return {text:content,changed:true,availableThrough:parseEditorBook(content,book).availableThrough};
 }

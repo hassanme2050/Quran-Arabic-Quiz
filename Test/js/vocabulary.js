@@ -1,8 +1,8 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry5';
-import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry5';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry5';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry5';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry5';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry6';
+import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry6';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry6';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry6';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry6';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -38,7 +38,9 @@ export function parseVocabulary(text, bookId = 'book_a') {
     vocabularyList = parsed.records.filter(item => item.verified !== false);
     const status = document.getElementById('status-message');
     status.classList.remove('hidden');
-    status.textContent = bookId === 'book_b'
+    status.textContent = bookId==='book_c'
+        ? vocabularyList.length+' verified Tajweed questions for Quiz/Review; '+parsed.records.length+' in Dictionary.'+(parsed.hasBoundary?'':' No verification line found: Book C is dictionary-only.')
+        : bookId === 'book_b'
         ? vocabularyList.length + ' verified words for Quiz/Review; ' + parsed.records.length + ' in Dictionary.' + (parsed.hasBoundary ? '' : ' No verification line found: Book B is dictionary-only.')
         : 'Loaded ' + vocabularyList.length + (bookId==='book_c'?' Tajweed questions':' words');
     if (parsed.warnings.length) console.warn(bookId+':', ...parsed.warnings);

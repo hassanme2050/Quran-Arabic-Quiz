@@ -1,7 +1,7 @@
-import {state} from './state.js?v=1029.26-editor7';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry5';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor7';
-import {tajweedContext} from '../../shared/tajweed.js?v=1029.26-strawberry5';
+import {state} from './state.js?v=1029.26-editor8';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry6';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor8';
+import {tajweedContext} from '../../shared/tajweed.js?v=1029.26-strawberry6';
 
 const byId=id=>document.getElementById(id);
 const wrongIds=Array.from({length:6},(_,index)=>'edit-wrong-answer-'+(index+1));
@@ -16,11 +16,11 @@ function writeRecord(record){
     }
 }
 export function refreshRecordStatus(locked=false) {
-    const bookB=state.activeBook==='book_b',index=state.loadedIndex,record=state.records[index];
-    byId('editor-availability-status').textContent=state.activeBook==='book_c'?'All '+state.records.length+' Tajweed questions are available to students.':!bookB?'Select Book B at login to manage its ----- marker.':state.availableCount
-        ?'----- is after word '+state.availableThrough+' ('+state.availableCount+' entries available to students).':'No words are available to students yet.';
+    const bookB=state.activeBook==='book_b',bookC=state.activeBook==='book_c',managed=bookB||bookC,index=state.loadedIndex,record=state.records[index];
+    byId('editor-availability-status').textContent=!managed?'Select Book B or Book C at login to manage its ----- marker.':state.availableCount
+        ?'----- is after '+(bookC?'question ':'word ')+state.availableThrough+' ('+state.availableCount+' entries available to students).':'No '+(bookC?'questions':'words')+' are available to students yet.';
     byId('publish-words-btn').textContent='Make available';
-    byId('publish-words-btn').disabled=locked||state.saving||!bookB||!record;
+    byId('publish-words-btn').disabled=locked||state.saving||!managed||!record;
     if(!record){byId('editor-record-status').textContent='';return;}
     const duplicates=bookB?state.records.filter(item=>item.number===record.number).length:1;
     byId('editor-record-status').textContent='Entry '+(index+1)+' of '+state.records.length+

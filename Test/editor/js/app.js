@@ -1,7 +1,7 @@
-import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry5';
-import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor7';
-import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor7';
-import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor7';
+import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry6';
+import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor8';
+import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor8';
+import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor8';
 bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, makeWordsAvailable });
 const requestedBook=new URLSearchParams(window.location?.search||'').get('book');
 if(['book_a','book_b','book_c'].includes(requestedBook))document.getElementById('login-book-selector').value=requestedBook;

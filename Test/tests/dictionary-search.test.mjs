@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchDictionary, normalizeSearch } from '../js/dictionary-search.js?v=1029.26-strawberry5';
+import { searchDictionary, normalizeSearch } from '../js/dictionary-search.js?v=1029.26-strawberry6';
 
 test('searches every field regardless of selected sort and keeps stable relevance order', () => {
     const items = [

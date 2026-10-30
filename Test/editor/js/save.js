@@ -1,8 +1,8 @@
-import {state} from './state.js?v=1029.26-editor7';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry5';
-import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1029.26-editor7';
-import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1029.26-editor7';
-import {validateEditorUpdate} from './book.js?v=1029.26-editor7';
+import {state} from './state.js?v=1029.26-editor8';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry6';
+import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1029.26-editor8';
+import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1029.26-editor8';
+import {validateEditorUpdate} from './book.js?v=1029.26-editor8';
 
 function selectedRecord() {
     const record=state.records[state.loadedIndex];
@@ -28,7 +28,7 @@ export async function saveWordUpdateToGitHub() {
     finally {state.saving=false;setEditorLocked(false);}
 }
 export async function makeWordsAvailable() {
-    if(state.saving||state.activeBook!=='book_b')return;
+    if(state.saving||!['book_b','book_c'].includes(state.activeBook))return;
     const expected=selectedRecord();if(!expected)return;
     if(hasUnsavedEdits()){launchToastAlert('Save your corrections before making this word available.');return;}
     const number=state.loadedNumber;
@@ -36,7 +36,8 @@ export async function makeWordsAvailable() {
     try {
         const result=await saveVerificationBoundary({filename:state.activeFile,token:state.token,number,expected});
         applySavedText(result.text,number,expected.occurrence??1);
-        launchToastAlert(result.changed?'Words through #'+result.availableThrough+' are now available to students.':'These words are already available to students (through #'+result.availableThrough+').');
+        const noun=state.activeBook==='book_c'?'Questions':'Words';
+        launchToastAlert(result.changed?noun+' through #'+result.availableThrough+' are now available to students.':'These '+noun.toLowerCase()+' are already available to students (through #'+result.availableThrough+').');
     } catch(error){launchToastAlert('Could not update availability: '+error.message);}
     finally {state.saving=false;setEditorLocked(false);}
 }

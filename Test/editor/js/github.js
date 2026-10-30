@@ -1,5 +1,5 @@
-import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry5';
-import {replaceLughatRecord,replaceTajweedRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor7';
+import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry6';
+import {replaceLughatRecord,replaceTajweedRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor8';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';
@@ -63,7 +63,8 @@ export function saveVocabularyRecord({filename,token,number,expected,updated}) {
     })});
 }
 export function saveVerificationBoundary({filename,token,number,expected}) {
-    if(filename!==BOOK_FILES.book_b)throw new Error('Student availability is managed for Book B.');
-    return updateVocabularyFile({filename,token,message:'Make Book B words available through #'+number,
-        transform:text=>moveVerificationBoundary(text,number,expected)});
+    const book=filename===BOOK_FILES.book_b?'book_b':filename===BOOK_FILES.book_c?'book_c':null;
+    if(!book)throw new Error('Student availability is managed for Book B and Book C.');
+    return updateVocabularyFile({filename,token,message:'Make '+(book==='book_c'?'Book C questions':'Book B words')+' available through #'+number,
+        transform:text=>moveVerificationBoundary(text,number,expected,book)});
 }

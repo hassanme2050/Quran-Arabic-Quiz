@@ -1,7 +1,7 @@
-import { activeBook } from './vocabulary.js?v=1029.26-strawberry5';
-import { state } from './state.js?v=1029.26-strawberry5';
-import { switchView } from './ui.js?v=1029.26-strawberry5';
-import {tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry5';
+import { activeBook } from './vocabulary.js?v=1029.26-strawberry6';
+import { state } from './state.js?v=1029.26-strawberry6';
+import { switchView } from './ui.js?v=1029.26-strawberry6';
+import {tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry6';
 
 export function showCard() {
     document.getElementById('card-counter').textContent = (activeBook==='book_c'?'Question ':'Word ') + (state.currentIndex + 1) + " of " + state.sessionWords.length;
