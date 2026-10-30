@@ -1,8 +1,8 @@
-import {state} from './state.js?v=1030.26-strawberry3';
-import {activeBook} from './vocabulary.js?v=1030.26-strawberry3';
-import {switchView} from './ui.js?v=1030.26-strawberry3';
-import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry3';
-import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry3';
+import {state} from './state.js?v=1030.26-strawberry4';
+import {activeBook} from './vocabulary.js?v=1030.26-strawberry4';
+import {switchView} from './ui.js?v=1030.26-strawberry4';
+import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry4';
+import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry4';
 let session=null,request=0,controller;
 const byId=id=>document.getElementById(id);
 function cancelRequest(){request++;controller?.abort();controller=null;}

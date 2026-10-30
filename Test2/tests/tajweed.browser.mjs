@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseTajweedBook} from '../shared/tajweed.js?v=1030.26-strawberry3';
-import {replaceTajweedRecord} from '../editor/js/book.js?v=1030.26-editor3';
+import {parseTajweedBook} from '../shared/tajweed.js?v=1030.26-strawberry4';
+import {replaceTajweedRecord} from '../editor/js/book.js?v=1030.26-editor4';
 import {withTajweedVerificationAt} from './book-c-fixture.mjs';
 const root=new URL('../',import.meta.url),realSource=fs.readFileSync(new URL('Tajweed-Question-Bank.txt',root),'utf8'),source=withTajweedVerificationAt(realSource,20),records=parseTajweedBook(source).records;
 const password='test-only-tajweed',cp=Buffer.from(password).toString('base64');
@@ -21,7 +21,7 @@ try{
   await selectC();assert(await page.locator('#quiz-code-entry').isHidden());assert(await page.locator('#quiz-code-btn').isDisabled());
   await page.locator('[data-action="triggerSelectedSession"][data-value="quiz"]').click();
   for(let i=0;i<10;i++){
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry3');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry4');return state.sessionWords[state.currentIndex];});
    assert(item.number<=20);assert.equal(await page.locator('#quiz-arabic-field').textContent(),item.word);assert((await page.locator('#quiz-question-context').textContent()).includes(item.subcategory.name));
    const options=await page.locator('#quiz-options-box button').allTextContents();assert.equal(options.length,4);assert.equal(new Set(options).size,4);
    assert.equal(options.filter(a=>a===item.meaning).length,1);options.filter(a=>a!==item.meaning).forEach(a=>assert(item.wrongAnswers.includes(a)));
@@ -33,7 +33,7 @@ try{
   await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
   await page.locator('[data-action="updateSegmentSelection"][data-value="last"]').click();
   await page.locator('[data-action="triggerSelectedSession"][data-value="flashcard"]').click();
-  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry3');return state.sessionWords[0];});assert(review.number>10&&review.number<=20);
+  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry4');return state.sessionWords[0];});assert(review.number>10&&review.number<=20);
   assert.equal(await page.locator('#card-action-btn').textContent(),'Show Answer');await page.locator('#card-action-btn').click();assert.equal(await page.locator('#card-meaning-field').textContent(),(/[\u0600-\u06ff]/.test(review.meaning)&&/[A-Za-z]/.test(review.meaning)?review.meaning.replace(/[,\u060c]\s*/, '\n'):review.meaning));
   await page.locator('#flashcard-view [data-action="exitToHome"]').click();assert(await page.locator('[data-action="openDictionaryMode"]').isDisabled());
   await page.locator('[data-action="openQuest"]').click();

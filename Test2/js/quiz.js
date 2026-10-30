@@ -1,12 +1,12 @@
-import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry3';
+import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry4';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1030.26-strawberry3';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry3';
-import { shuffleArray } from './utils.js?v=1030.26-strawberry3';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry3';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry3';
-import {preloadScorecardRenderer} from './platform.js?v=1030.26-strawberry3';
-import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry3';
+import { state } from './state.js?v=1030.26-strawberry4';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry4';
+import { shuffleArray } from './utils.js?v=1030.26-strawberry4';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry4';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry4';
+import {preloadScorecardRenderer} from './platform.js?v=1030.26-strawberry4';
+import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry4';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
@@ -145,7 +145,7 @@ export function showQuizQuestion() {
     document.getElementById('quiz-counter').textContent = "Question " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('quiz-arabic-field').textContent = currentItem.word;
     const context=document.getElementById('quiz-question-context');
-    renderTajweedContext(context,activeBook==='book_c'?currentItem:null);
+    renderTajweedContext(context,['book_c','book_d'].includes(activeBook)?currentItem:null);
 
     const optionsBox = document.getElementById('quiz-options-box');
     optionsBox.innerHTML = '';

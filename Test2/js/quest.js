@@ -1,13 +1,13 @@
-import { state } from './state.js?v=1030.26-strawberry3';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1030.26-strawberry3';
-import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1030.26-strawberry3';
-import { shuffleArray } from './utils.js?v=1030.26-strawberry3';
-import { generateQuizChoices } from './quiz.js?v=1030.26-strawberry3';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1030.26-strawberry3';
+import { state } from './state.js?v=1030.26-strawberry4';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1030.26-strawberry4';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1030.26-strawberry4';
+import { shuffleArray } from './utils.js?v=1030.26-strawberry4';
+import { generateQuizChoices } from './quiz.js?v=1030.26-strawberry4';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1030.26-strawberry4';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1030.26-strawberry3';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1030.26-strawberry3';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry3';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1030.26-strawberry4';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1030.26-strawberry4';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry4';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);

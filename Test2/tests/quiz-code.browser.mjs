@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {encodeQuizCode} from '../shared/quiz-codes.js?v=1030.26-strawberry3';
+import {encodeQuizCode} from '../shared/quiz-codes.js?v=1030.26-strawberry4';
 const root=new URL('../',import.meta.url);
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 let browser,page;
@@ -51,7 +51,7 @@ try {
   await page.screenshot({path:'artifacts/coded-quiz-timer-'+viewport.width+'.png',fullPage:true});
   async function answerAll(count) {
    for(let i=0;i<count;i++){
-    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry3');return state.sessionWords[state.currentIndex];});
+    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry4');return state.sessionWords[state.currentIndex];});
     const choices=await page.locator('#quiz-options-box button').allTextContents();
     const index=choices.indexOf(item.meaning);assert(index>=0);
     await page.locator('#quiz-options-box button').nth(index).click();

@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseTajweedBook,tajweedChoices} from '../shared/tajweed.js?v=1030.26-strawberry3';
-import {loadBook,BOOK_FILES} from '../shared/vocabulary.js?v=1030.26-strawberry3';
-import {parseEditorBook,replaceTajweedRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor3';
-import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor3';
+import {parseTajweedBook,tajweedChoices} from '../shared/tajweed.js?v=1030.26-strawberry4';
+import {loadBook,BOOK_FILES} from '../shared/vocabulary.js?v=1030.26-strawberry4';
+import {parseEditorBook,replaceTajweedRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor4';
+import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor4';
 import {withTajweedVerificationAt} from './book-c-fixture.mjs';
-import {createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1030.26-strawberry3';
-import {buildQuestPlan,beginQuestNode,advanceQuestReview} from '../js/quest-model.js?v=1030.26-strawberry3';
+import {createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1030.26-strawberry4';
+import {buildQuestPlan,beginQuestNode,advanceQuestReview} from '../js/quest-model.js?v=1030.26-strawberry4';
 const source=fs.readFileSync(new URL('../Tajweed-Question-Bank.txt',import.meta.url),'utf8');
 const records=parseTajweedBook(source).records;
 test('real Tajweed library preserves all 680 questions, 11 categories, 62 subcategories and bilingual answer commas',()=>{

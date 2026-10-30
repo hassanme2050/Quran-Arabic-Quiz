@@ -1,4 +1,4 @@
-import { emptyQuestProgress, reconcileQuestProgress } from './quest-model.js?v=1030.26-strawberry3';
+import { emptyQuestProgress, reconcileQuestProgress } from './quest-model.js?v=1030.26-strawberry4';
 // Saved per book and app URL so preview progress cannot overwrite live progress.
 export const QUEST_STORAGE_KEY='quranaq.quest.v1:book_a:'+new URL('../',import.meta.url).pathname;
 export function createQuestStorage(storage,key=QUEST_STORAGE_KEY) {

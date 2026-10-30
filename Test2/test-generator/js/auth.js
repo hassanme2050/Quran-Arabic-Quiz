@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1030.26-strawberry3';
-import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js?v=1030.26-strawberry3';
-import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry3';
-import { renderInventoryTilesGrid } from './grid.js?v=1030.26-strawberry3';
-import { resetOutputCodeState } from './selection.js?v=1030.26-strawberry3';
+import { state } from './state.js?v=1030.26-strawberry4';
+import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js?v=1030.26-strawberry4';
+import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry4';
+import { renderInventoryTilesGrid } from './grid.js?v=1030.26-strawberry4';
+import { resetOutputCodeState } from './selection.js?v=1030.26-strawberry4';
 let bannerTimer;
 export async function evaluateTeacherCredentials() {
     const passwordBox = document.getElementById('admin-passcode-box');

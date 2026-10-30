@@ -1,10 +1,10 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-strawberry3';
-import { parseLughatBook } from '../shared/lughat.js?v=1030.26-strawberry3';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-strawberry3';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry3';
-import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry3';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1030.26-strawberry3';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry3';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-strawberry4';
+import { parseLughatBook } from '../shared/lughat.js?v=1030.26-strawberry4';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-strawberry4';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry4';
+import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry4';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1030.26-strawberry4';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry4';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -31,10 +31,9 @@ export async function loadVocabulary(bookId = 'book_a') {
 }
 function setSessionAvailability(available) {
     document.querySelectorAll('[data-action]').forEach(element => {
-        const action=element.dataset.action,reviewOnly=false;
+        const action=element.dataset.action;
         if (['triggerSelectedSession','startQuizWithCode','openQuest'].includes(action)) element.disabled = !available ||
-            (action==='startQuizWithCode'&&activeBook==='book_c')||
-            (reviewOnly&&(action==='openQuest'||(action==='triggerSelectedSession'&&element.dataset.value!=='flashcard')));
+            (action==='startQuizWithCode'&&activeBook==='book_c');
         if(action==='openDictionaryMode')element.disabled=activeBook==='book_c'||!dictionaryVocabularyList.length;
     });
 }
@@ -49,7 +48,7 @@ export function parseVocabulary(text, bookId = 'book_a') {
         ? vocabularyList.length+' verified Tajweed questions for Quiz/Review; '+parsed.records.length+' in Dictionary.'+(parsed.hasBoundary?'':' No verification line found: Book C is dictionary-only.')
         : bookId === 'book_b'
         ? vocabularyList.length + ' verified words for Quiz/Review; ' + parsed.records.length + ' in Dictionary.' + (parsed.hasBoundary ? '' : ' No verification line found: Book B is dictionary-only.')
-        : 'Loaded ' + vocabularyList.length + (bookId==='book_d'?' words · Review mode':' words');
+        : 'Loaded ' + vocabularyList.length + ' words';
     if (parsed.warnings.length) console.warn(bookId+':', ...parsed.warnings);
     status.textContent='✅ '+status.textContent;
     const first = document.getElementById('range-input-start'), last = document.getElementById('range-input-end');

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseEditorBook,replaceLughatRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor3';
-import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor3';
+import {parseEditorBook,replaceLughatRecord,moveVerificationBoundary} from '../editor/js/book.js?v=1030.26-editor4';
+import {saveVocabularyRecord,saveVerificationBoundary,repositoryVocabularyPath} from '../editor/js/github.js?v=1030.26-editor4';
 import {withVerificationAt} from './book-b-fixture.mjs';
 
 const source=withVerificationAt(fs.readFileSync(new URL('../Lughat-AlQuran-word-meaning.txt',import.meta.url),'utf8'),20);

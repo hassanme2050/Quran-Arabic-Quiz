@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry3';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry4';
 const root=new URL('../',import.meta.url);
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 const api=/https:\/\/(api\.alquran\.cloud|alquran\.api\.islamic\.network)\/v1\/ayah\//;
@@ -30,14 +30,14 @@ try{
   assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isEnabled());assert(await page.locator('[data-action="openQuest"]').isEnabled());assert(await page.locator('[data-action="openDictionaryMode"]').isEnabled());assert(await page.locator('#quiz-code-entry').isVisible());
   await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').click();
   for(let i=0;i<9;i++){
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry3');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry4');return state.sessionWords[state.currentIndex];});
    const choices=await page.locator('#quiz-options-box button').allTextContents();assert(choices.includes(item.meaning));assert(choices.every(value=>!value.includes('Alternative Choice')));
    await page.locator('#quiz-options-box button').nth(choices.indexOf(item.meaning)).click();
    if(i<8)await page.locator('#quiz-counter').filter({hasText:'Question '+(i+2)+' of 9'}).waitFor();
   }
   await page.locator('#quiz-finished-view:not(.hidden)').waitFor();assert.equal(await page.locator('#score-text-value').textContent(),'9/9');await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
   await page.locator('[data-action="openDictionaryMode"]').click();assert.equal(await page.locator('.dictionary-entry').count(),9);await page.locator('#dictionary-view [data-action="exitToHome"]').click();
-  await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();assert(await page.locator('#quest-review-view').isVisible());await page.locator('#quest-review-view [data-quest-action="home"]').click();
+  await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();assert(await page.locator('#quest-review-view').isVisible());await page.locator('#quest-review-view [data-quest-action="map"]').click();await page.locator('#quest-map-view [data-quest-action="home"]').click();
   await page.locator('[data-value="flashcard"][data-action="triggerSelectedSession"]').click();
   async function findWord(word){
    for(let i=0;i<10;i++){

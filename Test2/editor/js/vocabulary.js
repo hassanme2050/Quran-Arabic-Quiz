@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1030.26-editor3';
-import { fetchRootText } from '../../shared/vocabulary.js?v=1030.26-strawberry3';
-import {parseEditorBook,recordNumber} from './book.js?v=1030.26-editor3';
-import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry3';
-import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1030.26-editor3';
+import { state } from './state.js?v=1030.26-editor4';
+import { fetchRootText } from '../../shared/vocabulary.js?v=1030.26-strawberry4';
+import {parseEditorBook,recordNumber} from './book.js?v=1030.26-editor4';
+import { launchToastAlert } from '../../shared/ui.js?v=1030.26-strawberry4';
+import { disableEditorControls, loadTargetInventoryRecord } from './records.js?v=1030.26-editor4';
 export async function initializeVocabularyDataStream() {
     state.loadedIndex=null;state.loadedNumber=null;state.records=[];
     disableEditorControls();

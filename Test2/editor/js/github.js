@@ -1,5 +1,5 @@
-import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1030.26-strawberry3';
-import {replaceLughatRecord,replaceTajweedRecord,replaceQuranVocabularyRecord,moveVerificationBoundary} from './book.js?v=1030.26-editor3';
+import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1030.26-strawberry4';
+import {replaceLughatRecord,replaceTajweedRecord,replaceQuranVocabularyRecord,moveVerificationBoundary} from './book.js?v=1030.26-editor4';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';
