@@ -1,9 +1,11 @@
 import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1029.26-strawberry2';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry2';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry2';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry2';
+import { state } from './state.js?v=1029.26-strawberry3';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry3';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry3';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry3';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry3';
+import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry3';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
@@ -41,6 +43,7 @@ export function startQuizWithCode() {
     }
 
     cancelPendingAnswer();
+    cancelQuizAttempt();
     // Keep the teacher's exact selection, but randomize the order for each student.
     state.sessionWords = [...selectedWords];
     shuffleArray(state.sessionWords);
@@ -48,10 +51,43 @@ export function startQuizWithCode() {
     state.currentMode = 'quiz';
     state.currentIndex = 0;
     state.quizHistory = [];
+    state.quizAttempt={phase:'ready',code:enteredCode,book:activeBook,name:'',startedAt:null,startClock:null,elapsedMs:0};
+    document.getElementById('participant-name').value='';
+    document.getElementById('participant-error').textContent='';
+    document.getElementById('participant-quiz-info').textContent=(activeBook==='book_b'?'Book B':'Book A')+' · '+selectedWords.length+' questions';
+    document.getElementById('participant-start-btn').disabled=false;
     document.getElementById('status-message').classList.add('hidden');
     document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
-    switchView('quiz-view');
-    showQuizQuestion();
+    switchView('quiz-participant-view');
+    document.getElementById('participant-name').focus();
+    preloadScorecardRenderer();
+}
+
+export function startParticipantQuiz() {
+    const attempt=state.quizAttempt;
+    if(attempt?.phase!=='ready')return;
+    const input=document.getElementById('participant-name'),name=input.value.trim().replace(/\s+/g,' ');
+    if(!name||name.length>80){document.getElementById('participant-error').textContent='Please enter your name (up to 80 characters).';input.focus();return;}
+    attempt.name=name;attempt.phase='countdown';attempt.countdown=3;
+    document.getElementById('participant-error').textContent='';
+    document.getElementById('participant-start-btn').disabled=true;
+    document.getElementById('quiz-countdown-name').textContent='Get ready, '+name;
+    document.getElementById('quiz-countdown-number').textContent='3';
+    switchView('quiz-countdown-view');
+    const tick=()=>{
+        if(state.quizAttempt!==attempt||attempt.phase!=='countdown')return;
+        attempt.countdown--;
+        if(attempt.countdown>0){document.getElementById('quiz-countdown-number').textContent=attempt.countdown;state.countdownTimer=setTimeout(tick,1000);return;}
+        state.countdownTimer=null;attempt.phase='running';attempt.startedAt=new Date().toISOString();attempt.startClock=performance.now();
+        switchView('quiz-view');showQuizQuestion();updateQuizClock();
+    };
+    state.countdownTimer=setTimeout(tick,1000);
+}
+function updateQuizClock() {
+    const attempt=state.quizAttempt;
+    if(attempt?.phase!=='running')return;
+    document.getElementById('quiz-elapsed-time').textContent=formatDuration(elapsedMilliseconds());
+    state.quizClockTimer=setTimeout(updateQuizClock,250);
 }
 
 export function generateQuizChoices(correctItem) {
@@ -99,6 +135,8 @@ export function getMeaningTokens(meaningString) {
 }
 
 export function showQuizQuestion() {
+    document.getElementById('quiz-time-badge').classList.toggle('hidden',state.quizAttempt?.phase!=='running');
+    document.getElementById('quiz-view').classList.toggle('coded-quiz-running',state.quizAttempt?.phase==='running');
     const currentItem = state.sessionWords[state.currentIndex];
     document.getElementById('quiz-counter').textContent = "Question " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('quiz-arabic-field').textContent = currentItem.word;
@@ -119,6 +157,7 @@ export function showQuizQuestion() {
 }
 
 export function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
+    if(selectedButton.disabled)return;
     const optionsBox = document.getElementById('quiz-options-box');
     const buttons = optionsBox.getElementsByTagName('button');
     
@@ -135,6 +174,10 @@ export function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
         correct: correctItem.meaning,
         isCorrect: isCorrect
     });
+    if(state.currentIndex===state.sessionWords.length-1){
+        finishQuizAttempt();
+        if(state.quizAttempt?.phase==='finished')document.getElementById('quiz-elapsed-time').textContent=formatDuration(state.quizAttempt.elapsedMs);
+    }
 
     if (isCorrect) {
         selectedButton.classList.add('correct-choice');
@@ -159,6 +202,19 @@ export function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
 }
 
 export function displayQuizSummary() {
+    finishQuizAttempt();
+    const attempt=state.quizAttempt,hasParticipant=attempt?.phase==='finished';
+    const target=document.getElementById('screenshot-target-scorecard');
+    target.classList.toggle('participant-scorecard',hasParticipant);
+    document.getElementById('scorecard-participant-details').classList.toggle('hidden',!hasParticipant);
+    document.getElementById('scorecard-code').classList.toggle('hidden',!hasParticipant);
+    document.getElementById('scorecard-export-status').textContent='';
+    if(hasParticipant){
+        document.getElementById('scorecard-participant-name').textContent=attempt.name;
+        document.getElementById('scorecard-date').textContent=new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeStyle:'short'}).format(new Date(attempt.startedAt));
+        document.getElementById('scorecard-time').textContent=formatDuration(attempt.elapsedMs);
+        document.getElementById('scorecard-code').textContent=(attempt.book==='book_b'?'Book B':'Book A')+' · Quiz code: '+attempt.code;
+    }
     const totalCorrect = state.quizHistory.filter(h => h.isCorrect).length;
     const percentage = Math.round((totalCorrect / state.sessionWords.length) * 100);
     

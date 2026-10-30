@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="shared/typography.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry1">
-    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry2">
+    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry3">
+    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry3">
 </head>
 <body>
     <div class="app-wrapper">
@@ -99,8 +99,35 @@
             </div>
         </div>
 
+        <section id="quiz-participant-view" class="hidden" aria-label="Participant details">
+            <div class="participant-card">
+                <h2>Ready to start?</h2>
+                <p id="participant-quiz-info"></p>
+                <form id="quiz-participant-form">
+                    <label for="participant-name">Participant name</label>
+                    <input id="participant-name" class="custom-text-input" type="text" maxlength="80" autocomplete="name" dir="auto" aria-describedby="participant-error" placeholder="Enter your name">
+                    <p id="participant-error" class="quiz-code-error" role="alert"></p>
+                    <button id="participant-start-btn" type="submit">Start Quiz</button>
+                </form>
+                <p class="participant-note">A 3–2–1 countdown comes first. Your time starts with the first question.</p>
+            </div>
+            <button class="exit-btn quiz-wide" type="button" data-action="exitToHome">Back to Menu</button>
+        </section>
+
+        <section id="quiz-countdown-view" class="hidden" aria-label="Quiz countdown">
+            <p id="quiz-countdown-name"></p>
+            <div id="quiz-countdown-number" class="quiz-countdown-number" role="timer" aria-live="assertive">3</div>
+            <p>Your quiz is about to begin</p>
+            <button class="exit-btn quiz-wide" type="button" data-action="exitToHome">Cancel</button>
+        </section>
+
         <div id="quiz-view" class="hidden">
-            <div class="counter-label-text" id="quiz-counter"></div>
+            <div class="quiz-topline">
+                <div class="counter-label-text" id="quiz-counter"></div>
+                <div id="quiz-time-badge" class="quiz-time-badge hidden" role="timer" aria-label="Elapsed time">
+                    <span class="quiz-time-caption">Time</span><span id="quiz-elapsed-time">00:00</span>
+                </div>
+            </div>
             <div class="display-card-frame" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
                 <div class="arabic-text-render" id="quiz-arabic-field">-</div>
             </div>
@@ -115,17 +142,30 @@
             <div id="screenshot-target-scorecard">
                 <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
                 <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
-                <div class="summary-metric-circle">
-                    <div class="summary-score-big" id="score-text-value">0/10</div>
-                    <div class="summary-percent-small" id="percent-text-value">0%</div>
+                <div class="scorecard-content">
+                    <div class="summary-metric-circle">
+                        <div class="summary-score-big" id="score-text-value">0/10</div>
+                        <div class="summary-percent-small" id="percent-text-value">0%</div>
+                    </div>
+                    <dl id="scorecard-participant-details" class="scorecard-participant-details hidden">
+                        <dt>Name</dt><dd id="scorecard-participant-name" class="scorecard-participant-name" dir="auto"></dd>
+                        <dt>Date</dt><dd id="scorecard-date"></dd>
+                        <dt>Total time</dt><dd id="scorecard-time"></dd>
+                    </dl>
                 </div>
+                <p id="scorecard-code" class="scorecard-code hidden"></p>
             </div>
             
             <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" data-action="toggleSummaryTableVisibility">📊 Show Performance Summary</button>
             <div id="summary-table-container" class="hidden" style="margin-bottom: 25px; overflow-x: auto;"></div>
 
             <div class="navigation-buttons">
-                <button data-action="copyScreenshotToClipboard">📋 Copy Screenshot to Clipboard</button>
+                <button id="scorecard-copy-btn" data-action="copyScreenshotToClipboard">📋 Copy Screenshot to Clipboard</button>
+                <div class="scorecard-secondary-actions">
+                    <button class="exit-btn" id="scorecard-share-btn" data-action="shareScorecardImage">Share Image</button>
+                    <button class="exit-btn" id="scorecard-download-btn" data-action="downloadScorecardImage">Save Image</button>
+                </div>
+                <p id="scorecard-export-status" class="scorecard-export-status" role="status" aria-live="polite"></p>
                 <button class="exit-btn" data-action="exitToHome">🏠 Go to Home</button>
             </div>
         </div>
@@ -218,6 +258,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=1029.26-strawberry2"></script>
+    <script type="module" src="js/app.js?v=1029.26-strawberry3"></script>
 </body>
 </html>

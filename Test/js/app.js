@@ -1,12 +1,13 @@
-import { openQuest, initializeQuest } from './quest.js?v=1029.26-strawberry2';
-import { state } from './state.js?v=1029.26-strawberry2';
-import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1029.26-strawberry2';
-import { shuffleArray, getRandomSubset } from './utils.js?v=1029.26-strawberry2';
-import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry2';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1029.26-strawberry2';
-import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js?v=1029.26-strawberry2';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1029.26-strawberry2';
-import { copyScreenshotToClipboard } from './platform.js?v=1029.26-strawberry2';
+import { openQuest, initializeQuest } from './quest.js?v=1029.26-strawberry3';
+import { state } from './state.js?v=1029.26-strawberry3';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1029.26-strawberry3';
+import { shuffleArray, getRandomSubset } from './utils.js?v=1029.26-strawberry3';
+import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry3';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1029.26-strawberry3';
+import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1029.26-strawberry3';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry3';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1029.26-strawberry3';
+import { copyScreenshotToClipboard, downloadScorecardImage, shareScorecardImage } from './platform.js?v=1029.26-strawberry3';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
 export function normalizeCustomRange() {
@@ -67,6 +68,7 @@ export function updateSegmentSelection(targetStrategy) {
 export function startSession(strategy, mode) {
     if (!vocabularyList.length) return;
     cancelPendingAnswer();
+    cancelQuizAttempt();
     state.currentMode = mode;
     state.quizHistory = [];
     
@@ -118,7 +120,7 @@ function initializeApp() {
         openQuest, updateSegmentSelection, validateLiveCustomBounds, triggerSelectedSession,
         startQuizWithCode, openDictionaryMode, setDictionarySort, exitToHome,
         handleFlashCardBodyClick, handleEyeToggleIntercept, handleCardProgression,
-        toggleSummaryTableVisibility, copyScreenshotToClipboard
+        toggleSummaryTableVisibility, copyScreenshotToClipboard, downloadScorecardImage, shareScorecardImage
     };
     document.querySelectorAll('[data-action]').forEach(element => {
         element.addEventListener(element.dataset.event || 'click', event => {
@@ -128,6 +130,7 @@ function initializeApp() {
         });
     });
     const input = document.getElementById('quiz-code-field');
+    document.getElementById('quiz-participant-form').addEventListener('submit',event=>{event.preventDefault();startParticipantQuiz();});
     input.addEventListener('keydown', event => {
         if (event.key === 'Enter') startQuizWithCode();
     });

@@ -78,3 +78,6 @@ Production release: the user-approved Peaches build is published at https://hass
 Save corrections with Save Changes. The Make available button sits directly under Save Changes. It checks the marker location in the latest GitHub file and moves it to the line immediately after the selected entry only when the old marker is before that entry. Equal or earlier targets make no commit. Unsaved edits must be saved first; concurrent changes are detected. The operation preserves the rest of the source text and uses the app folder as its GitHub save destination.
 
 The Arabic field uses its original Peaches sizing, line spacing and padding. Font size controls have been removed.
+
+## Named quiz-code tests
+A valid quiz code opens participant name entry. Start shows 3-2-1; elapsed timing runs from the first question to the final answer. The scorecard includes name, date, total time, score and quiz code. Copy Image writes PNG to the clipboard; blocked clipboard access downloads the image. Save Image and native Share Image are also available. Participant details stay in the current session.
