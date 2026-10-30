@@ -1,6 +1,6 @@
-import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1030.26-strawberry2';
-import {parseLughatBook} from '../../shared/lughat.js?v=1030.26-strawberry2';
-import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1030.26-strawberry2';
+import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1029.26-strawberry9';
+import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry9';
+import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1029.26-strawberry9';
 
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;

@@ -1,0 +1,12 @@
+QuranAQ-v1030.26 Strawberry - October 30, 2026
+Base: QuranAQ-v1029.26 Strawberry, including its October 30 card refinements.
+Continue new development in this dated folder. The October 29 folder is preserved as the previous version.
+Includes Strawberry Quest and the requested horizontal layout, shared buttons, score-detail weak words and bottom progress bar.
+Original QuranAQ-v1025.26 Strawberry preserved separately.
+Preview destination: GitHub Test2/.
+Book D - Quran Vocabulary: Quran-Vocabulary-Meaning-Arabic-English.txt. Review flashcards only; categories/subcategories and ordered => meaning chapter:verse references are preserved. Details uses one Arabic ayah plus Saheeh International English translation at a time through Al Quran Cloud, with previous/next, retry and return to the same word. Preserve this TXT on later code deployments.
+Book C - Quran Tajweed: Tajweed-Question-Bank.txt; Student modes and Editor enabled; Test Generator/quiz codes deferred.
+Book C follows the same first- ----- verification boundary as Book B. Student Quiz/Review/Quest use verified entries; Dictionary/Editor retain all questions. Editor Make available advances the marker after the current question, never backwards. Initial user-provided Book C marker is after question 10.
+Deploy code files separately from live data. Never overwrite GitHub Vocabulary-File.txt with the local copy. If local Book A has more entries than GitHub, ask the user before any data replacement. Book B data and CP.txt must also be excluded from code deployments.
+October 29 library check: GitHub Book A had 98 entries; local had 88. Downloaded the newer GitHub copy locally and preserved the old file in History Archive.
+Android image clipboard support is deferred; saving the PNG is accepted for now. See the parent Future-Notes file.

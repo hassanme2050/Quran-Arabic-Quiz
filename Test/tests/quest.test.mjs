@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildQuestPlan,emptyQuestProgress,isNodeUnlocked,nextQuestNode,beginQuestNode,advanceQuestReview,
-    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1030.26-strawberry2';
-import {createQuestStorage,parseQuestImport,createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1030.26-strawberry2';
+    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1029.26-strawberry9';
+import {createQuestStorage,parseQuestImport,createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1029.26-strawberry9';
 const shuffle=array=>array.reverse();
 function finish(plan,progress,id,correctCount=10) {
     const run=beginQuestNode(plan,progress,id,shuffle);

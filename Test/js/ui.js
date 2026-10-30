@@ -1,8 +1,7 @@
-export { launchToastAlert } from '../shared/ui.js?v=1030.26-strawberry2';
-import { state } from './state.js?v=1030.26-strawberry2';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry2';
-import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry2';
-const views = ['menu-view', 'flashcard-view', 'verse-details-view', 'quiz-view', 'quiz-participant-view', 'quiz-countdown-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view', 'quest-map-view', 'quest-review-view', 'quest-quiz-view', 'quest-result-view'];
+export { launchToastAlert } from '../shared/ui.js?v=1029.26-strawberry9';
+import { state } from './state.js?v=1029.26-strawberry9';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry9';
+const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-participant-view', 'quiz-countdown-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view', 'quest-map-view', 'quest-review-view', 'quest-quiz-view', 'quest-result-view'];
 export function switchView(viewId) {
   for (const id of views) document.getElementById(id).classList.toggle('hidden', id !== viewId);
 }
@@ -21,7 +20,6 @@ export function cancelPendingAnswer() {
   state.answerTimer = null;
 }
 export function exitToHome() {
-  cancelWordDetails();
   cancelPendingAnswer();
     cancelQuizAttempt();
   document.getElementById('app-title').classList.remove('dictionary-title');

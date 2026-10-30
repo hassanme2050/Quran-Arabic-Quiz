@@ -1,19 +1,18 @@
-import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry2';
+import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry9';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1030.26-strawberry2';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1030.26-strawberry2';
-import { shuffleArray } from './utils.js?v=1030.26-strawberry2';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry2';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry2';
-import {preloadScorecardRenderer} from './platform.js?v=1030.26-strawberry2';
-import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry2';
+import { state } from './state.js?v=1029.26-strawberry9';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry9';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry9';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry9';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry9';
+import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry9';
+import {tajweedChoices,tajweedContext,renderTajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry9';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
     const input = document.getElementById('quiz-code-field');
     const enteredCode = input.value.trim().toUpperCase().replace(/\s+/g, '');
     clearQuizCodeError();
-    if(activeBook==='book_d'){showQuizCodeError('Book D is available in Review mode only.');return;}
     if(activeBook==='book_c'){showQuizCodeError('Book C quiz codes are planned for a future update.');return;}
 
     if (vocabularyList.length === 0) {

@@ -602,14 +602,3 @@ button.exit-btn:hover {
 .display-card-frame .arabic-text-render,.display-card-frame .meaning-text-render { text-align:center !important; }
 [data-book="book_c"] #card-meaning-field,[data-book="book_c"] #quest-review-meaning { white-space:pre-line; }
 #card-counter,.quest-session-progress { font-size:12px; color:var(--counter-teal); text-transform:uppercase; letter-spacing:.8px; font-weight:700; text-align:left; }
-.verse-word-meaning { text-align:center; color:var(--counter-teal); font-size:18px; overflow-wrap:anywhere; }
-.verse-card { cursor:default; padding:24px 20px; margin:14px 0; }
-.verse-card .arabic-text-render { font-size:clamp(27px,6vw,38px); line-height:2; margin:0 0 20px; }
-.verse-translation { color:#263746; font-size:18px; line-height:1.8; margin:0; overflow-wrap:anywhere; text-align:center; }
-.verse-navigation { display:flex; gap:16px; margin-top:20px; }
-.verse-navigation button { flex:1; font-size:24px; }
-.verse-attribution,.verse-source { color:var(--counter-teal); font-size:12px; line-height:1.6; }
-.verse-source a { color:inherit; }
-#verse-error { color:#9b2525; line-height:1.7; }
-#verse-reference { color:var(--counter-teal); font-size:13px; font-variant-numeric:tabular-nums; }
-#card-details-btn { display:flex; justify-content:center; align-items:center; gap:8px; }

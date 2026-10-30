@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1030.26-strawberry2';
-import {parseLughatBook} from '../shared/lughat.js?v=1030.26-strawberry2';
+import {parseVocabularyRecords} from '../shared/vocabulary.js?v=1029.26-strawberry9';
+import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry9';
 const root=new URL('../',import.meta.url);
 const bookARecords=parseVocabularyRecords(fs.readFileSync(new URL('Vocabulary-File.txt',root),'utf8'));
 const bookACount=bookARecords.length;
@@ -111,7 +111,7 @@ try {
   await page.getByRole('button',{name:'Exit to Menu'}).click();
   await page.getByRole('button',{name:'Quiz Mode',exact:true}).click();
   for(let i=0;i<10;i++) {
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry2');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry9');return state.sessionWords[state.currentIndex];});
    assert(item.number<=20);assert(item.verified);
    await page.getByRole('button',{name:item.meaning,exact:true}).click();
    if(i===0)await page.screenshot({path:'artifacts/quiz-'+viewport.width+'.png',fullPage:true});

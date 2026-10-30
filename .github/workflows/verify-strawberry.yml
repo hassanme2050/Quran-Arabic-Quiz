@@ -19,13 +19,11 @@ jobs:
         with:
           node-version: '24'
       - name: Quest and Peaches regression checks
-        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs Test/tests/lughat.test.mjs Test/tests/dictionary-search.test.mjs Test/tests/editor-book.test.mjs Test/tests/quiz-attempt.test.mjs Test/tests/tajweed.test.mjs Test/tests/book-d.test.mjs
+        run: node --test Test/tests/quest.test.mjs Test/tests/flows.test.mjs Test/tests/lughat.test.mjs Test/tests/dictionary-search.test.mjs Test/tests/editor-book.test.mjs Test/tests/quiz-attempt.test.mjs Test/tests/tajweed.test.mjs
       - name: Install browser runtime
         run: |
           npm install --prefix Test --no-save --package-lock=false playwright@1.56.1
           Test/node_modules/.bin/playwright install --with-deps chromium
-      - name: Book D Review and verse details desktop/mobile and live API checks
-        run: node Test/tests/book-d.browser.mjs
       - name: Named and timed quiz-code screenshot and clipboard checks
         run: node Test/tests/quiz-code.browser.mjs
       - name: Tajweed Student and Editor desktop and mobile checks
@@ -60,7 +58,7 @@ jobs:
             const base64=fs.readFileSync(file).toString('base64');
             for(let start=0;start<base64.length;start+=48000) console.log('QUEST_IMAGE|'+name+'|'+String(start/48000).padStart(4,'0')+'|'+base64.slice(start,start+48000));
           }
-          for(const name of ['editor-open-1280.png','editor-open-390.png','editor-book-b-1280.png','editor-book-b-390.png','editor-harakat-restored-1280.png','editor-harakat-restored-390.png','editor-failure.png','coded-quiz-timer-390.png','coded-quiz-result-390.png','scorecard-clipboard-390.png','coded-quiz-failure.png','tajweed-quiz-390.png','tajweed-editor-390.png','tajweed-failure.png','book-d-card-390.png','book-d-details-390.png','book-d-live-390.png','book-d-failure.png']) {
+          for(const name of ['editor-open-1280.png','editor-open-390.png','editor-book-b-1280.png','editor-book-b-390.png','editor-harakat-restored-1280.png','editor-harakat-restored-390.png','editor-failure.png','coded-quiz-timer-390.png','coded-quiz-result-390.png','scorecard-clipboard-390.png','coded-quiz-failure.png','tajweed-quiz-390.png','tajweed-editor-390.png','tajweed-failure.png']) {
             const file=path.join('artifacts',name);
             if(!fs.existsSync(file))continue;
             const base64=fs.readFileSync(file).toString('base64');

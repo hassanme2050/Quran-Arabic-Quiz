@@ -1,14 +1,13 @@
-import { activeBook } from './vocabulary.js?v=1030.26-strawberry2';
-import { state } from './state.js?v=1030.26-strawberry2';
-import { switchView } from './ui.js?v=1030.26-strawberry2';
-import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1030.26-strawberry2';
+import { activeBook } from './vocabulary.js?v=1029.26-strawberry9';
+import { state } from './state.js?v=1029.26-strawberry9';
+import { switchView } from './ui.js?v=1029.26-strawberry9';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1029.26-strawberry9';
 
 export function showCard() {
     document.getElementById('card-counter').textContent = (activeBook==='book_c'?'Question ':'Word ') + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('card-arabic-field').textContent = state.sessionWords[state.currentIndex].word;
     const item = state.sessionWords[state.currentIndex];
-    const context=document.getElementById('card-context');renderTajweedContext(context,['book_c','book_d'].includes(activeBook)?item:null);
-    document.getElementById('card-details-btn').classList.toggle('hidden',activeBook!=='book_d'||!item.references?.length);
+    const context=document.getElementById('card-context');renderTajweedContext(context,activeBook==='book_c'?item:null);
     const meaningField = document.getElementById('card-meaning-field');
     meaningField.textContent = (activeBook==='book_c'?tajweedReviewAnswer(item.meaning):item.meaning) + (item.explanation ? ' ' + item.explanation : '');
     meaningField.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
