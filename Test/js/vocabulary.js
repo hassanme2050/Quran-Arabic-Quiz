@@ -1,8 +1,8 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry6';
-import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry6';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry6';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry6';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry6';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry7';
+import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry7';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry7';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry7';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry7';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';
@@ -54,7 +54,8 @@ export function parseVocabulary(text, bookId = 'book_a') {
     meaningSort.textContent = bookId === 'book_b' ? 'Urdu' : bookId==='book_c'?'Answer':'English';
     document.getElementById('dict-sort-arabic').textContent=bookId==='book_c'?'Question':'Arabic';
     document.getElementById('opt-all').textContent=bookId==='book_c'?'All Questions':'All Words';
-    document.getElementById('opt-last').textContent=bookId==='book_c'?'Last 10 Questions':'Last 10 Words';
+    document.getElementById('opt-last').textContent=bookId==='book_c'?'Last 10':'Last 10 Words';
+    document.querySelectorAll('[data-action="openDictionaryMode"]').forEach(button=>{button.disabled=bookId==='book_c';});
     document.getElementById('quiz-code-entry').classList.toggle('hidden',bookId==='book_c');
     document.getElementById('quiz-code-field').disabled=bookId==='book_c';
     setSessionAvailability(vocabularyList.length > 0);

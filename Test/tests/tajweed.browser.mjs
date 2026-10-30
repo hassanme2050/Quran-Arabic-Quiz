@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseTajweedBook} from '../shared/tajweed.js?v=1029.26-strawberry6';
+import {parseTajweedBook} from '../shared/tajweed.js?v=1029.26-strawberry7';
 import {replaceTajweedRecord} from '../editor/js/book.js?v=1029.26-editor8';
 import {withTajweedVerificationAt} from './book-c-fixture.mjs';
 const root=new URL('../',import.meta.url),realSource=fs.readFileSync(new URL('Tajweed-Question-Bank.txt',root),'utf8'),source=withTajweedVerificationAt(realSource,20),records=parseTajweedBook(source).records;
@@ -21,7 +21,7 @@ try{
   await selectC();assert(await page.locator('#quiz-code-entry').isHidden());assert(await page.locator('#quiz-code-btn').isDisabled());
   await page.locator('[data-action="triggerSelectedSession"][data-value="quiz"]').click();
   for(let i=0;i<10;i++){
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry6');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry7');return state.sessionWords[state.currentIndex];});
    assert(item.number<=20);assert.equal(await page.locator('#quiz-arabic-field').textContent(),item.word);assert((await page.locator('#quiz-question-context').textContent()).includes(item.subcategory.name));
    const options=await page.locator('#quiz-options-box button').allTextContents();assert.equal(options.length,4);assert.equal(new Set(options).size,4);
    assert.equal(options.filter(a=>a===item.meaning).length,1);options.filter(a=>a!==item.meaning).forEach(a=>assert(item.wrongAnswers.includes(a)));
@@ -33,13 +33,10 @@ try{
   await page.locator('#quiz-finished-view [data-action="exitToHome"]').click();
   await page.locator('[data-action="updateSegmentSelection"][data-value="last"]').click();
   await page.locator('[data-action="triggerSelectedSession"][data-value="flashcard"]').click();
-  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry6');return state.sessionWords[0];});assert(review.number>10&&review.number<=20);
+  const review=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry7');return state.sessionWords[0];});assert(review.number>10&&review.number<=20);
   assert.equal(await page.locator('#card-action-btn').textContent(),'Show Answer');await page.locator('#card-action-btn').click();assert.equal(await page.locator('#card-meaning-field').textContent(),review.meaning);
-  await page.locator('#flashcard-view [data-action="exitToHome"]').click();await page.locator('[data-action="openDictionaryMode"]').click();
-  assert.equal(await page.locator('#dictionary-count').textContent(),'680 questions');assert.equal(await page.locator('#dict-sort-arabic').textContent(),'Question');
-  await page.locator('#dictionary-search-toggle').click();await page.locator('#dictionary-search').fill('التحسين');assert(await page.locator('.dictionary-entry').count()>0);
-  assert.equal(await page.locator('.dictionary-word').first().getAttribute('dir'),'auto');
-  await page.locator('#dictionary-view [data-action="exitToHome"]').click();await page.locator('[data-action="openQuest"]').click();
+  await page.locator('#flashcard-view [data-action="exitToHome"]').click();assert(await page.locator('[data-action="openDictionaryMode"]').isDisabled());
+  await page.locator('[data-action="openQuest"]').click();
   assert.equal(await page.locator('.quest-node').count(),2);await page.locator('#quest-continue').click();
   assert.equal(await page.locator('#quest-review-number').textContent(),'Book question #1');
   for(let i=0;i<3;i++)await page.locator('#quest-review-next').click();

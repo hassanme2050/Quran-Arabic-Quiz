@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry6';
-import {encodeQuizCode, decodeTeacherQuizCode} from '../shared/quiz-codes.js?v=1029.26-strawberry6';
+import {parseLughatBook} from '../shared/lughat.js?v=1029.26-strawberry7';
+import {encodeQuizCode, decodeTeacherQuizCode} from '../shared/quiz-codes.js?v=1029.26-strawberry7';
 const source=fs.readFileSync(new URL('../Lughat-AlQuran-word-meaning.txt',import.meta.url),'utf8');
 const headings=source.split(/\r?\n/).slice(0,2).join('\n');
 const row=(n,meaning='meaning')=>String(n).padStart(4,'0')+' word'+n+' \u27F5 '+meaning;

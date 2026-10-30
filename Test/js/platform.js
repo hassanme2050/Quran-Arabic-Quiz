@@ -1,4 +1,4 @@
-import {launchToastAlert} from './ui.js?v=1029.26-strawberry6';
+import {launchToastAlert} from './ui.js?v=1029.26-strawberry7';
 let rendererPromise,lastCapture,busy=false;
 function loadScorecardRenderer() {
     if(globalThis.html2canvas)return Promise.resolve(globalThis.html2canvas);

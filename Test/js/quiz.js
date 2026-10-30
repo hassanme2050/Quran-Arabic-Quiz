@@ -1,12 +1,12 @@
-import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry6';
+import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry7';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1029.26-strawberry6';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry6';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry6';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry6';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry6';
-import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry6';
-import {tajweedChoices,tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry6';
+import { state } from './state.js?v=1029.26-strawberry7';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry7';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry7';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry7';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry7';
+import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry7';
+import {tajweedChoices,tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry7';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
