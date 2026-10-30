@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="shared/typography.css?v=1030.26-strawberry4">
-    <link rel="stylesheet" href="css/app.css?v=1030.26-strawberry4">
+    <link rel="stylesheet" href="css/app.css?v=1030.26-overlay5">
     <link rel="stylesheet" href="css/quest.css?v=1030.26-strawberry4">
 </head>
 <body>
@@ -110,15 +110,17 @@
             <div class="display-card-frame verse-card" aria-busy="false" id="verse-content">
                 <p id="verse-loading" role="status">Loading ayah…</p>
                 <p id="verse-error" class="hidden" role="alert"></p>
-                <div id="verse-arabic" class="arabic-text-render hidden" dir="rtl" lang="ar"></div>
+                <div class="verse-ayah">
+                    <div id="verse-arabic" class="arabic-text-render hidden" dir="rtl" lang="ar"></div>
+                    <div class="verse-navigation" aria-label="Browse referenced verses">
+                        <button id="verse-prev-btn" type="button" data-action="navigateWordVerse" data-value="-1" aria-label="Previous verse">←</button>
+                        <button id="verse-next-btn" type="button" data-action="navigateWordVerse" data-value="1" aria-label="Next verse">→</button>
+                    </div>
+                </div>
                 <p id="verse-english" class="verse-translation hidden" dir="ltr" lang="en"></p>
                 <button id="verse-retry-btn" class="hidden" type="button" data-action="retryWordVerse">Retry</button>
             </div>
             <p id="verse-attribution" class="verse-attribution hidden"></p>
-            <div class="verse-navigation" aria-label="Browse referenced verses">
-                <button id="verse-prev-btn" type="button" data-action="navigateWordVerse" data-value="-1" aria-label="Previous verse">←</button>
-                <button id="verse-next-btn" type="button" data-action="navigateWordVerse" data-value="1" aria-label="Next verse">→</button>
-            </div>
             <button class="exit-btn quiz-wide" id="verse-back-btn" aria-label="Close verse details" type="button" data-action="closeWordDetails">&#215;</button>
             <p class="verse-source">Arabic and English translation via <a href="https://alquran.cloud/api" target="_blank" rel="noopener noreferrer">Al Quran Cloud</a></p>
         </section>
