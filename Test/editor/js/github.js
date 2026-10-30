@@ -1,4 +1,4 @@
-import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry7';
+import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js?v=1029.26-strawberry8';
 import {replaceLughatRecord,replaceTajweedRecord,moveVerificationBoundary} from './book.js?v=1029.26-editor8';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';

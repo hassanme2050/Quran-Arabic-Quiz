@@ -1,13 +1,13 @@
-import { openQuest, initializeQuest } from './quest.js?v=1029.26-strawberry7';
-import { state } from './state.js?v=1029.26-strawberry7';
-import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1029.26-strawberry7';
-import { shuffleArray, getRandomSubset } from './utils.js?v=1029.26-strawberry7';
-import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry7';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1029.26-strawberry7';
-import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1029.26-strawberry7';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry7';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1029.26-strawberry7';
-import { copyScreenshotToClipboard } from './platform.js?v=1029.26-strawberry7';
+import { openQuest, initializeQuest } from './quest.js?v=1029.26-strawberry8';
+import { state } from './state.js?v=1029.26-strawberry8';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1029.26-strawberry8';
+import { shuffleArray, getRandomSubset } from './utils.js?v=1029.26-strawberry8';
+import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry8';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1029.26-strawberry8';
+import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1029.26-strawberry8';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry8';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1029.26-strawberry8';
+import { copyScreenshotToClipboard } from './platform.js?v=1029.26-strawberry8';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
 export function normalizeCustomRange() {

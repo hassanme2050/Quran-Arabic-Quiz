@@ -1,13 +1,13 @@
-import { state } from './state.js?v=1029.26-strawberry7';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry7';
-import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry7';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry7';
-import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry7';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry7';
+import { state } from './state.js?v=1029.26-strawberry8';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry8';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry8';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry8';
+import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry8';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry8';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry7';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry7';
-import {tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry7';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry8';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry8';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../shared/tajweed.js?v=1029.26-strawberry8';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -155,9 +155,8 @@ function renderReview() {
     byId('quest-review-word').textContent=item.word;
     byId('quest-review-word').dir=activeBook==='book_c'?'auto':'rtl';
     byId('quest-review-word').lang=activeBook==='book_c'?'en':'ar';
-    byId('quest-review-context').textContent=activeBook==='book_c'?tajweedContext(item):'';
-    byId('quest-review-context').classList.toggle('hidden',activeBook!=='book_c');
-    byId('quest-review-meaning').textContent=item.meaning;
+    renderTajweedContext(byId('quest-review-context'),activeBook==='book_c'?item:null);
+    byId('quest-review-meaning').textContent=activeBook==='book_c'?tajweedReviewAnswer(item.meaning):item.meaning;
     byId('quest-review-next').textContent=run.reviewIndex===run.order.length-1?'Start shuffled quiz →':activeBook==='book_c'?'Next question →':'Next word →';
     show('quest-review-view');
 }
@@ -174,8 +173,7 @@ function renderQuestion() {
     byId('quest-question-word').textContent=item.word;
     byId('quest-question-word').dir=activeBook==='book_c'?'auto':'rtl';
     byId('quest-question-word').lang=activeBook==='book_c'?'en':'ar';
-    byId('quest-question-context').textContent=activeBook==='book_c'?tajweedContext(item):'';
-    byId('quest-question-context').classList.toggle('hidden',activeBook!=='book_c');
+    renderTajweedContext(byId('quest-question-context'),activeBook==='book_c'?item:null);
     byId('quest-feedback').textContent='';
     const options=byId('quest-answer-options');
     options.replaceChildren();

@@ -5,8 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import {withVerificationAt} from './book-b-fixture.mjs';
-import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry7';
-import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry7';
+import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry8';
+import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1029.26-strawberry8';
 import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1029.26-editor8';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -125,10 +125,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator selection spans pages, updates one tile, stops at 20 and invalidates stale codes', async () => {
         dom('test-generator/index.html');
-        await import('../test-generator/js/app.js?v=1029.26-strawberry7');
-        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry7');
-        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js?v=1029.26-strawberry7');
-        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js?v=1029.26-strawberry7');
+        await import('../test-generator/js/app.js?v=1029.26-strawberry8');
+        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry8');
+        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js?v=1029.26-strawberry8');
+        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js?v=1029.26-strawberry8');
         state.fullVocabularyInventory = records;
         renderInventoryTilesGrid();
         assert.equal(state.totalCardsPerPageLimit,50);
@@ -158,8 +158,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator login keeps failed loads visible and resets selection after a successful load', async () => {
         dom('test-generator/index.html');
-        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry7');
-        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js?v=1029.26-strawberry7');
+        const {state} = await import('../test-generator/js/state.js?v=1029.26-strawberry8');
+        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js?v=1029.26-strawberry8');
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
         globalThis.fetch = async url => String(url).endsWith('CP.txt')
@@ -183,10 +183,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('student runs complete 20- and legacy 10-question quizzes and cancels pending answers on exit', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry7');
-        const quiz = await import('../js/quiz.js?v=1029.26-strawberry7');
-        const {state} = await import('../js/state.js?v=1029.26-strawberry7');
-        const {exitToHome} = await import('../js/ui.js?v=1029.26-strawberry7');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry8');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry8');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry8');
+        const {exitToHome} = await import('../js/ui.js?v=1029.26-strawberry8');
         vocabulary.parseVocabulary(vocabularyText);
         const beginCodeQuiz=()=>{
             quiz.startQuizWithCode();
@@ -225,8 +225,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('dictionary sorting never changes book order and reuses unchanged rows', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry7');
-        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry7');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry8');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry8');
         vocabulary.parseVocabulary(vocabularyText);
         const original = structuredClone(vocabulary.vocabularyList);
         dictionary.openDictionaryMode();
@@ -427,11 +427,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Book B sessions exclude unverified words, dictionary keeps them, and codes enforce book identity', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry7');
-        const quiz = await import('../js/quiz.js?v=1029.26-strawberry7');
-        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry7');
-        const cards = await import('../js/flashcards.js?v=1029.26-strawberry7');
-        const {state} = await import('../js/state.js?v=1029.26-strawberry7');
+        const vocabulary = await import('../js/vocabulary.js?v=1029.26-strawberry8');
+        const quiz = await import('../js/quiz.js?v=1029.26-strawberry8');
+        const dictionary = await import('../js/dictionary.js?v=1029.26-strawberry8');
+        const cards = await import('../js/flashcards.js?v=1029.26-strawberry8');
+        const {state} = await import('../js/state.js?v=1029.26-strawberry8');
         const headings = read('Lughat-AlQuran-word-meaning.txt').split(/\r?\n/).slice(0,2).join('\n');
         const rows = Array.from({length:30},(_,i)=>String(i+1).padStart(4,'0')+' word'+(i+1)+' \u27F5 meaning'+(i+1)+' (note)');
         const text = headings+'\n'+rows.slice(0,20).join('\n')+'\n-----\n'+rows.slice(20).join('\n');

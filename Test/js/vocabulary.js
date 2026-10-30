@@ -1,8 +1,8 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry7';
-import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry7';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry7';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry7';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry7';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1029.26-strawberry8';
+import { parseLughatBook } from '../shared/lughat.js?v=1029.26-strawberry8';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1029.26-strawberry8';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1029.26-strawberry8';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry8';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';

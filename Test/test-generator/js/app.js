@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1029.26-strawberry7';
-import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry7';
-import { evaluateTeacherCredentials } from './auth.js?v=1029.26-strawberry7';
-import { bindGridSelection, changeMatrixActivePage } from './grid.js?v=1029.26-strawberry7';
-import { processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard, updateStickyCounterBanner } from './selection.js?v=1029.26-strawberry7';
+import { state } from './state.js?v=1029.26-strawberry8';
+import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry8';
+import { evaluateTeacherCredentials } from './auth.js?v=1029.26-strawberry8';
+import { bindGridSelection, changeMatrixActivePage } from './grid.js?v=1029.26-strawberry8';
+import { processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard, updateStickyCounterBanner } from './selection.js?v=1029.26-strawberry8';
 // Every page represents 50 consecutive book numbers, independent of viewport/zoom.
 state.totalCardsPerPageLimit = 50;
 bindActions({ evaluateTeacherCredentials, changeMatrixActivePage, processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard });

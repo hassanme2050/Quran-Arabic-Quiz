@@ -35,6 +35,16 @@ export function parseTajweedBook(text) {
 export function tajweedContext(record) {
     return [record?.category,record?.subcategory].filter(Boolean).map(item=>item.name).join(' › ');
 }
+export function renderTajweedContext(element,record){
+    element.replaceChildren();
+    for(const [key,tag] of [['category','strong'],['subcategory','span']])if(record?.[key]){
+        const line=document.createElement(tag);line.textContent=record[key].name;element.appendChild(line);
+    }
+    element.classList.toggle('hidden',!element.textContent);
+}
+export function tajweedReviewAnswer(answer){
+    return /[\u0600-\u06ff]/.test(answer)&&/[A-Za-z]/.test(answer)?answer.replace(/[,،]\s*/, '\n'):answer;
+}
 export function tajweedChoices(record,random=Math.random) {
     validateTajweedQuestion(record);
     const shuffle=items=>{for(let i=items.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}return items;};

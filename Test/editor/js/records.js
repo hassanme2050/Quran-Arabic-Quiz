@@ -1,7 +1,7 @@
 import {state} from './state.js?v=1029.26-editor8';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry7';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry8';
 import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor8';
-import {tajweedContext} from '../../shared/tajweed.js?v=1029.26-strawberry7';
+import {tajweedContext,renderTajweedContext,tajweedReviewAnswer} from '../../shared/tajweed.js?v=1029.26-strawberry8';
 
 const byId=id=>document.getElementById(id);
 const wrongIds=Array.from({length:6},(_,index)=>'edit-wrong-answer-'+(index+1));
@@ -12,7 +12,7 @@ function writeRecord(record){
     questionField().value=record.word;byId('edit-meaning-field').value=editableMeaning(record);
     if(state.activeBook==='book_c'){
         wrongIds.forEach((id,index)=>{byId(id).value=record.wrongAnswers[index];});
-        byId('editor-question-context').textContent=tajweedContext(record);
+        renderTajweedContext(byId('editor-question-context'),record);
     }
 }
 export function refreshRecordStatus(locked=false) {

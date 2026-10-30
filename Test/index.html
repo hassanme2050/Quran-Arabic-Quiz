@@ -6,9 +6,9 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=1029.26-strawberry7">
-    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry7">
-    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry7">
+    <link rel="stylesheet" href="shared/typography.css?v=1029.26-strawberry8">
+    <link rel="stylesheet" href="css/app.css?v=1029.26-strawberry8">
+    <link rel="stylesheet" href="css/quest.css?v=1029.26-strawberry8">
 </head>
 <body>
     <div class="app-wrapper">
@@ -81,8 +81,9 @@
 
         <!-- Flashcard Session Module Display Box Container -->
         <div id="flashcard-view" class="hidden">
-            <div class="counter-label-text" id="card-counter"></div>
             <p id="card-context" class="question-context hidden"></p>
+            <div class="counter-label-text" id="card-counter"></div>
+
             <div class="display-card-frame" id="review-card-frame" data-action="handleFlashCardBodyClick">
                 <div class="card-eye-toggle-overlay" id="card-eye-toggle" data-action="handleEyeToggleIntercept" title="Show Meaning Permanently">
                     <svg xmlns="http://w3.org" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -122,13 +123,13 @@
         </section>
 
         <div id="quiz-view" class="hidden">
+            <p id="quiz-question-context" class="question-context hidden"></p>
             <div class="quiz-topline">
                 <div class="counter-label-text" id="quiz-counter"></div>
                 <div id="quiz-time-badge" class="quiz-time-badge hidden" role="timer" aria-label="Elapsed time">
                     <span id="quiz-elapsed-time">00:00</span>
                 </div>
             </div>
-            <p id="quiz-question-context" class="question-context hidden"></p>
             <div class="display-card-frame quiz-word-card" style="cursor: default; min-height: 140px; margin-bottom: 15px;">
                 <div class="arabic-text-render" id="quiz-arabic-field">-</div>
             </div>
@@ -211,8 +212,9 @@
             <div class="quest-eyebrow" id="quest-review-heading"></div>
             <h2 id="quest-review-title">Meet your next words</h2>
             <p class="quest-caption" id="quest-review-description">Read the word and meaning. The quiz starts after your final card.</p>
-            <div class="quest-session-progress" id="quest-review-counter"></div>
             <p id="quest-review-context" class="question-context hidden"></p>
+            <div class="quest-session-progress" id="quest-review-counter"></div>
+
             <div class="display-card-frame quest-review-card">
                 <span class="quest-book-number" id="quest-review-number"></span>
                 <div id="quest-review-word" class="arabic-text-render" lang="ar" dir="rtl"></div>
@@ -227,8 +229,9 @@
             <div class="quest-eyebrow" id="quest-quiz-heading"></div>
             <h2 id="quest-quiz-title">Put your words to the test</h2>
             <p class="quest-caption" id="quest-quiz-description"></p>
-            <div class="quest-session-progress" id="quest-question-counter"></div>
             <p id="quest-question-context" class="question-context hidden"></p>
+            <div class="quest-session-progress" id="quest-question-counter"></div>
+
             <div class="display-card-frame quest-question-card">
                 <span class="quest-book-number" id="quest-question-number"></span>
                 <div class="arabic-text-render" id="quest-question-word" lang="ar" dir="rtl"></div>
@@ -258,6 +261,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=1029.26-strawberry7"></script>
+    <script type="module" src="js/app.js?v=1029.26-strawberry8"></script>
 </body>
 </html>

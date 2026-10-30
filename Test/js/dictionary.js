@@ -1,6 +1,6 @@
-import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry7';
-import { switchView, launchToastAlert } from './ui.js?v=1029.26-strawberry7';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1029.26-strawberry7';
+import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry8';
+import { switchView, launchToastAlert } from './ui.js?v=1029.26-strawberry8';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1029.26-strawberry8';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
