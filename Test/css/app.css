@@ -472,10 +472,20 @@ button.exit-btn:hover {
 .quiz-wide { width:100%; margin-top:18px; }
 .quiz-countdown-number { display:flex; justify-content:center; align-items:center; width:150px; height:150px; margin:26px auto; border:4px solid var(--button-gold); border-radius:50%; color:var(--button-gold); font-size:80px; font-weight:700; }
 .quiz-word-card { padding:14px 22px 18px; }
-.quiz-topline { display:flex; align-self:stretch; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
-.quiz-topline .counter-label-text { margin:0; color:var(--primary-teal); font-size:12px; letter-spacing:.8px; }
-.quiz-time-badge { color:var(--primary-teal); font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.quiz-topline { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+.quiz-topline .counter-label-text { margin:0; font-size:12px; letter-spacing:.8px; }
+.quiz-time-badge { color:var(--counter-teal); font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.quiz-word-card { margin-top:0; }
 #quiz-arabic-field { width:100%; margin:8px 0; }
+.question-context { color:var(--counter-teal); font-size:12px; line-height:1.7; text-align:left; margin:0 0 12px; overflow-wrap:anywhere; }
+[data-book="book_c"] .arabic-text-render,
+[data-book="book_c"] .large-arabic-cell,
+[data-book="book_c"] .dictionary-word,
+[data-book="book_c"] .quest-arabic { font-family:'Segoe UI',Arial,sans-serif; font-size:20px; line-height:1.8; direction:ltr; text-align:left; font-weight:600; }
+[data-book="book_c"] .large-arabic-cell { font-size:16px; }
+[data-book="book_c"] .dictionary-word { font-size:15px; }
+[data-book="book_c"] .meaning-text-render { font-size:22px; direction:ltr; }
+[data-book="book_c"] .quiz-options button { white-space:normal; overflow-wrap:anywhere; line-height:1.7; }
 .scorecard-content { display:flex; align-items:center; justify-content:center; gap:24px; }
 .scorecard-content .summary-metric-circle { flex-shrink:0; margin:0; }
 .scorecard-participant-details { min-width:0; text-align:left; margin:0; flex:1; }

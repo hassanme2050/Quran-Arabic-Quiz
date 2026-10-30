@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {encodeQuizCode} from '../shared/quiz-codes.js?v=1029.26-strawberry1';
+import {encodeQuizCode} from '../shared/quiz-codes.js?v=1029.26-strawberry5';
 const root=new URL('../',import.meta.url);
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 let browser,page;
@@ -39,17 +39,19 @@ try {
   await page.locator('#participant-name').fill('Noor Hassan');await page.locator('#participant-name').press('Enter');
   for(const next of ['2','1']){await page.clock.fastForward(1000);assert.equal(await page.locator('#quiz-countdown-number').textContent(),next);assert(await page.locator('#quiz-view').isHidden());}
   await page.clock.fastForward(1000);await page.locator('#quiz-view:not(.hidden)').waitFor();
-  assert.equal(await page.locator('.quiz-word-card #quiz-time-badge').count(),1);
+  assert.equal(await page.locator('.quiz-word-card #quiz-time-badge').count(),0);
+  assert.equal(await page.locator('#quiz-view > .quiz-topline #quiz-time-badge').count(),1);
   assert.equal(await page.locator('.quiz-time-caption').count(),0);
   assert.equal(await page.locator('#quiz-time-badge').evaluate(el=>getComputedStyle(el).borderTopWidth),'0px');
   assert((await page.locator('#quiz-time-badge').boundingBox()).height<30);
   assert((await page.locator('#quiz-counter').boundingBox()).y<(await page.locator('#quiz-arabic-field').boundingBox()).y);
+  assert((await page.locator('.quiz-topline').boundingBox()).y+(await page.locator('.quiz-topline').boundingBox()).height<=(await page.locator('.quiz-word-card').boundingBox()).y);
   assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:00');
   await page.clock.fastForward(2500);assert.equal(await page.locator('#quiz-elapsed-time').textContent(),'00:02');
   await page.screenshot({path:'artifacts/coded-quiz-timer-'+viewport.width+'.png',fullPage:true});
   async function answerAll(count) {
    for(let i=0;i<count;i++){
-    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry4');return state.sessionWords[state.currentIndex];});
+    const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1029.26-strawberry5');return state.sessionWords[state.currentIndex];});
     const choices=await page.locator('#quiz-options-box button').allTextContents();
     const index=choices.indexOf(item.meaning);assert(index>=0);
     await page.locator('#quiz-options-box button').nth(index).click();
@@ -124,6 +126,6 @@ try {
   }
   await context.close();page=null;
  }
- console.log('PASS: centered participant name, compact in-card timer, code-to-name/countdown/timing, both books, renamed Book A across all apps, actual PNG clipboard write/read/paste, Blob compatibility retry, download fallback and simplified scorecard on desktop/mobile.');
+ console.log('PASS: centered participant name, compact timer above the card, code-to-name/countdown/timing, both books, renamed Book A across all apps, actual PNG clipboard write/read/paste, Blob compatibility retry, download fallback and simplified scorecard on desktop/mobile.');
 }catch(error){if(page)await page.screenshot({path:'artifacts/coded-quiz-failure.png',fullPage:true}).catch(()=>{});throw error;}
 finally{if(browser)await browser.close();server.kill();}

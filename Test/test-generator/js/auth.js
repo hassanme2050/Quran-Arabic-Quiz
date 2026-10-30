@@ -1,8 +1,8 @@
-import { state } from './state.js?v=1029.26-strawberry1';
-import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js?v=1029.26-strawberry1';
-import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { renderInventoryTilesGrid } from './grid.js?v=1029.26-strawberry1';
-import { resetOutputCodeState } from './selection.js?v=1029.26-strawberry1';
+import { state } from './state.js?v=1029.26-strawberry5';
+import { BOOK_FILES, fetchRootText, loadBook } from '../../shared/vocabulary.js?v=1029.26-strawberry5';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry5';
+import { renderInventoryTilesGrid } from './grid.js?v=1029.26-strawberry5';
+import { resetOutputCodeState } from './selection.js?v=1029.26-strawberry5';
 let bannerTimer;
 export async function evaluateTeacherCredentials() {
     const passwordBox = document.getElementById('admin-passcode-box');
@@ -12,7 +12,7 @@ export async function evaluateTeacherCredentials() {
     const verifyButton = document.getElementById('verify-open-btn');
     errorBox.textContent = '';
 
-    if (!selectedBook || !BOOK_FILES[selectedBook]) {
+    if (!['book_a','book_b'].includes(selectedBook)) {
         errorBox.textContent = 'Please select a valid book.';
         return;
     }

@@ -1,10 +1,12 @@
-import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1029.26-strawberry1';
-import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry1';
+import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1029.26-strawberry5';
+import {parseLughatBook} from '../../shared/lughat.js?v=1029.26-strawberry5';
+import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1029.26-strawberry5';
 
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;
 export function parseEditorBook(text,book) {
     if(book==='book_a')return {records:parseVocabularyRecords(text),availableThrough:0,availableCount:0};
+    if(book==='book_c'){const {records}=parseTajweedBook(text);return {records,availableThrough:records.at(-1)?.number||0,availableCount:records.length};}
     if(book!=='book_b')throw new Error('This book is not available in the Editor.');
     const parsed=parseLughatBook(text),occurrences=new Map();
     const records=parsed.records.map(record=>{
@@ -18,9 +20,23 @@ export function matchingRecordIndex(records,number,occurrence=1) {
     return records.findIndex((record,index)=>recordNumber(record,index)===number&&(record.occurrence??1)===occurrence);
 }
 export function validateEditorUpdate(updated,book) {
+    if(book==='book_c'){validateTajweedQuestion(updated);return;}
     if(!updated.word.trim()||!updated.meaning.trim()||/[\r\n]/.test(updated.word+updated.meaning)||
         (book==='book_b'?updated.word.includes('\u27F5'):updated.word.includes('=')))
         throw new Error('Enter a word and meaning on one source line.');
+}
+
+export function replaceTajweedRecord(text,number,expected,updated) {
+    validateEditorUpdate(updated,'book_c');
+    const record=parseTajweedBook(text).records.find(item=>item.number===number);
+    if(!record||record.word!==expected.word||record.meaning!==expected.meaning||JSON.stringify(record.wrongAnswers)!==JSON.stringify(expected.wrongAnswers))
+        throw new Error('This Tajweed question changed on GitHub. Reload the Editor before saving.');
+    const parts=text.split(/(\r\n|\n|\r)/),position=(record.sourceLine-1)*2;
+    const line=parts[position].match(/^(\uFEFF?\s*\d+\)\s*)(.*?)(\s*⟶\s*)(.*?)(\s*⟹\s*)(.*?)(\s*)$/);
+    if(!line)throw new Error('The source question format changed. Reload the Editor.');
+    const wrong=line[6].split(/(\s+-\s+)/).map((value,index)=>index%2?value:updated.wrongAnswers[index/2].trim()).join('');
+    parts[position]=line[1]+updated.word.trim()+line[3]+updated.meaning.trim()+line[5]+wrong+line[7];
+    const content=parts.join('');parseTajweedBook(content);return content;
 }
 
 export function replaceLughatRecord(text,number,expected,updated) {

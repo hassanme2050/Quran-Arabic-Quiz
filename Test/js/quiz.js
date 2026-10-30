@@ -1,17 +1,19 @@
-import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry1';
+import { decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1029.26-strawberry5';
 export { decodeTeacherQuizCode };
-import { state } from './state.js?v=1029.26-strawberry4';
-import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry4';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry4';
-import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry4';
-import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry4';
-import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry4';
+import { state } from './state.js?v=1029.26-strawberry5';
+import { vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry5';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry5';
+import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1029.26-strawberry5';
+import {cancelQuizAttempt,elapsedMilliseconds,formatDuration,finishQuizAttempt} from './quiz-attempt.js?v=1029.26-strawberry5';
+import {preloadScorecardRenderer} from './platform.js?v=1029.26-strawberry5';
+import {tajweedChoices,tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry5';
 
 // Answer generation and meaning-token handling intentionally retain the original logic.
 export function startQuizWithCode() {
     const input = document.getElementById('quiz-code-field');
     const enteredCode = input.value.trim().toUpperCase().replace(/\s+/g, '');
     clearQuizCodeError();
+    if(activeBook==='book_c'){showQuizCodeError('Book C quiz codes are planned for a future update.');return;}
 
     if (vocabularyList.length === 0) {
         showQuizCodeError('Vocabulary is not loaded yet. Please wait and try again.');
@@ -91,6 +93,7 @@ function updateQuizClock() {
 }
 
 export function generateQuizChoices(correctItem) {
+    if(activeBook==='book_c')return tajweedChoices(correctItem);
     let choices = [correctItem];
     const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
 
@@ -140,6 +143,9 @@ export function showQuizQuestion() {
     const currentItem = state.sessionWords[state.currentIndex];
     document.getElementById('quiz-counter').textContent = "Question " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('quiz-arabic-field').textContent = currentItem.word;
+    const context=document.getElementById('quiz-question-context');
+    context.textContent=activeBook==='book_c'?tajweedContext(currentItem):'';
+    context.classList.toggle('hidden',!context.textContent);
 
     const optionsBox = document.getElementById('quiz-options-box');
     optionsBox.innerHTML = '';
@@ -228,7 +234,7 @@ export function displayQuizSummary() {
     const table = document.createElement('table');
     table.className = 'summary-table';
     const head = table.createTHead().insertRow();
-    ['#', 'Result', 'Word', 'Correct Meaning', 'Your Choice'].forEach(label => {
+    ['#', 'Result', activeBook==='book_c'?'Question':'Word', activeBook==='book_c'?'Correct Answer':'Correct Meaning', 'Your Choice'].forEach(label => {
         const cell = document.createElement('th');
         cell.textContent = label;
         head.appendChild(cell);

@@ -1,10 +1,10 @@
-import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry1';
-import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor6';
-import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor6';
-import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor6';
+import { bindActions } from '../../shared/ui.js?v=1029.26-strawberry5';
+import { evaluateAdministrativeCredentials } from './auth.js?v=1029.26-editor7';
+import { loadTargetInventoryRecord, navigateWord } from './records.js?v=1029.26-editor7';
+import { saveWordUpdateToGitHub, makeWordsAvailable } from './save.js?v=1029.26-editor7';
 bindActions({ loadTargetInventoryRecord, navigateWord: direction => navigateWord(Number(direction)), saveWordUpdateToGitHub, makeWordsAvailable });
 const requestedBook=new URLSearchParams(window.location?.search||'').get('book');
-if(['book_a','book_b'].includes(requestedBook))document.getElementById('login-book-selector').value=requestedBook;
+if(['book_a','book_b','book_c'].includes(requestedBook))document.getElementById('login-book-selector').value=requestedBook;
 document.getElementById('editor-login-form').addEventListener('submit', event => {
     event.preventDefault();
     evaluateAdministrativeCredentials();

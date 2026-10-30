@@ -1,11 +1,13 @@
-import { activeBook } from './vocabulary.js?v=1029.26-strawberry4';
-import { state } from './state.js?v=1029.26-strawberry4';
-import { switchView } from './ui.js?v=1029.26-strawberry4';
+import { activeBook } from './vocabulary.js?v=1029.26-strawberry5';
+import { state } from './state.js?v=1029.26-strawberry5';
+import { switchView } from './ui.js?v=1029.26-strawberry5';
+import {tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry5';
 
 export function showCard() {
-    document.getElementById('card-counter').textContent = "Word " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
+    document.getElementById('card-counter').textContent = (activeBook==='book_c'?'Question ':'Word ') + (state.currentIndex + 1) + " of " + state.sessionWords.length;
     document.getElementById('card-arabic-field').textContent = state.sessionWords[state.currentIndex].word;
     const item = state.sessionWords[state.currentIndex];
+    const context=document.getElementById('card-context');context.textContent=activeBook==='book_c'?tajweedContext(item):'';context.classList.toggle('hidden',!context.textContent);
     const meaningField = document.getElementById('card-meaning-field');
     meaningField.textContent = item.meaning + (item.explanation ? ' ' + item.explanation : '');
     meaningField.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
@@ -14,11 +16,11 @@ export function showCard() {
     if (state.globalPersistentEyeToggleStatus) {
         state.isMeaningVisible = true;
         document.getElementById('card-meaning-field').classList.remove('hidden');
-        document.getElementById('card-action-btn').textContent = "Next Word";
+        document.getElementById('card-action-btn').textContent = (activeBook==='book_c'?'Next Question':'Next Word');
     } else {
         state.isMeaningVisible = false;
         document.getElementById('card-meaning-field').classList.add('hidden');
-        document.getElementById('card-action-btn').textContent = "Show Meaning";
+        document.getElementById('card-action-btn').textContent = (activeBook==='book_c'?'Show Answer':'Show Meaning');
     }
 }
 
@@ -35,13 +37,13 @@ export function handleEyeToggleIntercept(event) {
         eyeNode.setAttribute('title', 'Hide Meaning Permanently');
         state.isMeaningVisible = true;
         meaningField.classList.remove('hidden');
-        actBtn.textContent = "Next Word";
+        actBtn.textContent = (activeBook==='book_c'?'Next Question':'Next Word');
     } else {
         eyeNode.classList.remove('visible-state');
         eyeNode.setAttribute('title', 'Show Meaning Permanently');
         state.isMeaningVisible = false;
         meaningField.classList.add('hidden');
-        actBtn.textContent = "Show Meaning";
+        actBtn.textContent = (activeBook==='book_c'?'Show Answer':'Show Meaning');
     }
 }
 
@@ -54,10 +56,10 @@ export function handleFlashCardBodyClick() {
     
     if (state.isMeaningVisible) {
         meaningField.classList.remove('hidden');
-        actBtn.textContent = "Next Word";
+        actBtn.textContent = (activeBook==='book_c'?'Next Question':'Next Word');
     } else {
         meaningField.classList.add('hidden');
-        actBtn.textContent = "Show Meaning";
+        actBtn.textContent = (activeBook==='book_c'?'Show Answer':'Show Meaning');
     }
 }
 
@@ -65,7 +67,7 @@ export function handleCardProgression() {
     if (!state.isMeaningVisible) {
         state.isMeaningVisible = true;
         document.getElementById('card-meaning-field').classList.remove('hidden');
-        document.getElementById('card-action-btn').textContent = "Next Word";
+        document.getElementById('card-action-btn').textContent = (activeBook==='book_c'?'Next Question':'Next Word');
     } else {
         state.currentIndex++;
         if (state.currentIndex < state.sessionWords.length) {

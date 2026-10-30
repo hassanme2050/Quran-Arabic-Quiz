@@ -3,3 +3,7 @@ Base: QuranAQ-v1026.26 Peaches.
 Includes Strawberry Quest and the requested horizontal layout, shared buttons, score-detail weak words and bottom progress bar.
 Original QuranAQ-v1025.26 Strawberry preserved separately.
 Preview destination: GitHub Test/.
+Book C - Quran Tajweed: Tajweed-Question-Bank.txt; Student modes and Editor enabled; Test Generator/quiz codes deferred.
+Deploy code files separately from live data. Never overwrite GitHub Vocabulary-File.txt with the local copy. If local Book A has more entries than GitHub, ask the user before any data replacement. Book B data and CP.txt must also be excluded from code deployments.
+October 29 library check: GitHub Book A had 98 entries; local had 88. Downloaded the newer GitHub copy locally and preserved the old file in History Archive.
+Android image clipboard support is deferred; saving the PNG is accepted for now. See the parent Future-Notes file.

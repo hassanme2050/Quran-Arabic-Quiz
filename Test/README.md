@@ -1,4 +1,10 @@
-# Quran Arabic Quiz — Peaches
+# Quran Arabic Quiz — Strawberry v1029.26
+
+Development preview: GitHub `Test/`. Production at the repository root remains Peaches.
+
+Book C - Quran Tajweed reads `Tajweed-Question-Bank.txt` through the shared online loader. Student Quiz, Review, Dictionary and Quest support its category/subcategory metadata, questions and answers. Quiz choices contain one correct answer and three distinct wrong answers sampled from that question's six, in shuffled order. Editor exposes the question, correct answer and six wrong answers and saves just the selected source row with conflict detection. All Book C questions are available to students; its Test Generator/teacher codes are deferred. Quest backups include all three books and accept older one/two-book backups.
+
+Deployment must exclude `Vocabulary-File.txt`, `Lughat-AlQuran-word-meaning.txt` and `CP.txt`. GitHub Book A is authoritative; never overwrite it from a local code upload. If a local Book A copy has more entries than GitHub, confirm with the user before any data replacement. Add a new book file only when authorized and absent remotely; subsequent code deployments must preserve it too.
 
 Peaches (QuranAQ-v1026.26) starts as a clone of production Pineapple. Copied Android files and APKs remain Pineapple artifacts; no Peaches Android build has been created.
 
@@ -26,7 +32,7 @@ Then open http://127.0.0.1:8124. Stop with Ctrl+C.
 
 Update Vocabulary-File.txt in place. Existing book numbers, words and meanings must remain fixed. Teacher codes continue to reference the original one-based book order, independent of dictionary display sorting. Vocabulary is fetched without persistent caching each page visit; dictionary caches last only for the current visit.
 
-Scorecard export loads html2canvas 1.4.1 from jsDelivr only when requested and needs network access. Bundle this dependency when preparing an offline Android/iOS package. No mobile package is included yet.
+Scorecard export loads the bundled html2canvas 1.4.1 when requested. Desktop image clipboard support is available; Android clipboard support is deferred and PNG downloading is accepted for now. No new mobile package is included yet.
 
 Arabic typography is shared in shared/typography.css and uses Alexandria from Google Fonts (weights 400, 600 and 700). Arabic words, result rows, dictionary letters, Generator tiles and Editor input use this family; English interface text retains its existing font. Google Fonts requires a network connection on first load; bundle the font when preparing offline mobile packages.
 

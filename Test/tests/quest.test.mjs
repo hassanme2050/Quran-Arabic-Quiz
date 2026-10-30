@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildQuestPlan,emptyQuestProgress,isNodeUnlocked,nextQuestNode,beginQuestNode,advanceQuestReview,
-    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1029.26-strawberry4';
-import {createQuestStorage,parseQuestImport,createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1029.26-strawberry4';
+    answerQuestQuestion,retryQuestNode,starsForScore,rankQuestWords,reconcileQuestProgress,resultForRun} from '../js/quest-model.js?v=1029.26-strawberry5';
+import {createQuestStorage,parseQuestImport,createQuestLibraryStorage,parseQuestBackup} from '../js/quest-storage.js?v=1029.26-strawberry5';
 const shuffle=array=>array.reverse();
 function finish(plan,progress,id,correctCount=10) {
     const run=beginQuestNode(plan,progress,id,shuffle);
@@ -138,7 +138,7 @@ test('a single backup moves both books including inactive runs into a fresh libr
     finish(buildQuestPlan(88),a,'stage-1',10);library.save(a);
     finish(buildQuestPlan(20),b,'stage-1',8);
     beginQuestNode(buildQuestPlan(20),b,'stage-2',shuffle);advanceQuestReview(b,'stage-2',shuffle);library.save(b);
-    const serialized=JSON.stringify(library.backup()),parsed=parseQuestBackup(serialized,{book_a:88,book_b:20});
+    const serialized=JSON.stringify(library.backup()),parsed=parseQuestBackup(serialized,{book_a:88,book_b:20,book_c:680});
     let writes=0;const target=new Map(),newStorage={getItem:key=>target.get(key),setItem:(key,value)=>{writes++;target.set(key,value);}};
     const moved=createQuestLibraryStorage(newStorage,'library','legacy');moved.importBooks(parsed);
     assert.equal(writes,1,'combined import must persist as a single operation');
@@ -165,8 +165,8 @@ test('combined imports reject mismatched books and blocked storage retains both 
     assert.equal(library.save(b),false);
     library.loadBook('book_a',88);
     assert.equal(library.backup().books.book_b.records['stage-1'].bestStars,3);
-    const counts={book_a:88,book_b:20};
-    for(const input of ['bad','{"schema":2,"type":"other","books":{}}',JSON.stringify({schema:2,type:'quranaq-quest',books:{book_b:emptyQuestProgress()}}),JSON.stringify({schema:2,type:'quranaq-quest',books:{book_c:emptyQuestProgress('book_c')}})])
+    const counts={book_a:88,book_b:20,book_c:680};
+    for(const input of ['bad','{"schema":2,"type":"other","books":{}}',JSON.stringify({schema:2,type:'quranaq-quest',books:{book_b:emptyQuestProgress()}}),JSON.stringify({schema:2,type:'quranaq-quest',books:{book_d:emptyQuestProgress('book_d')}})])
         assert.throws(()=>parseQuestBackup(input,counts));
     assert.throws(()=>parseQuestBackup(JSON.stringify(library.backup()),{book_a:88}));
     assert.equal(parseQuestBackup(JSON.stringify(library.backup()),counts).book_b.records['stage-1'].bestStars,3);

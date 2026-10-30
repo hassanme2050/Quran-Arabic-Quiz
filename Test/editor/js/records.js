@@ -1,12 +1,23 @@
-import {state} from './state.js?v=1029.26-editor6';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry1';
-import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor6';
+import {state} from './state.js?v=1029.26-editor7';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry5';
+import {editableMeaning,recordNumber,parseEditorBook,matchingRecordIndex} from './book.js?v=1029.26-editor7';
+import {tajweedContext} from '../../shared/tajweed.js?v=1029.26-strawberry5';
 
 const byId=id=>document.getElementById(id);
-const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-meaning-field','commit-save-btn','publish-words-btn'];
+const wrongIds=Array.from({length:6},(_,index)=>'edit-wrong-answer-'+(index+1));
+const controls=['word-target-index','lookup-go-btn','lookup-prev-btn','lookup-next-btn','edit-arabic-field','edit-question-field','edit-meaning-field','commit-save-btn','publish-words-btn',...wrongIds];
+export const questionField=()=>byId(state.activeBook==='book_c'?'edit-question-field':'edit-arabic-field');
+export const wrongAnswerValues=()=>wrongIds.map(id=>byId(id).value);
+function writeRecord(record){
+    questionField().value=record.word;byId('edit-meaning-field').value=editableMeaning(record);
+    if(state.activeBook==='book_c'){
+        wrongIds.forEach((id,index)=>{byId(id).value=record.wrongAnswers[index];});
+        byId('editor-question-context').textContent=tajweedContext(record);
+    }
+}
 export function refreshRecordStatus(locked=false) {
     const bookB=state.activeBook==='book_b',index=state.loadedIndex,record=state.records[index];
-    byId('editor-availability-status').textContent=!bookB?'Select Book B at login to manage its ----- marker.':state.availableCount
+    byId('editor-availability-status').textContent=state.activeBook==='book_c'?'All '+state.records.length+' Tajweed questions are available to students.':!bookB?'Select Book B at login to manage its ----- marker.':state.availableCount
         ?'----- is after word '+state.availableThrough+' ('+state.availableCount+' entries available to students).':'No words are available to students yet.';
     byId('publish-words-btn').textContent='Make available';
     byId('publish-words-btn').disabled=locked||state.saving||!bookB||!record;
@@ -22,7 +33,8 @@ export function setEditorLocked(locked) {
 export function disableEditorControls(){setEditorLocked(true);}
 export function hasUnsavedEdits() {
     const record=state.records[state.loadedIndex];
-    return !!record&&(byId('edit-arabic-field').value!==record.word||byId('edit-meaning-field').value!==editableMeaning(record));
+    return !!record&&(questionField().value!==record.word||byId('edit-meaning-field').value!==editableMeaning(record)||
+        (state.activeBook==='book_c'&&JSON.stringify(wrongAnswerValues())!==JSON.stringify(record.wrongAnswers)));
 }
 function showRecord(index,checkEdits=true) {
     if(state.saving)return;
@@ -32,8 +44,7 @@ function showRecord(index,checkEdits=true) {
     }
     state.loadedIndex=index;state.loadedNumber=recordNumber(record,index);
     byId('word-target-index').value=state.loadedNumber;
-    byId('edit-arabic-field').value=record.word;
-    byId('edit-meaning-field').value=editableMeaning(record);
+    writeRecord(record);
     setEditorLocked(false);
 }
 export function loadTargetInventoryRecord() {
@@ -59,6 +70,5 @@ export function applySavedText(text,number,occurrence=1) {
     const record=state.records[state.loadedIndex];
     state.loadedNumber=recordNumber(record,state.loadedIndex);
     byId('word-target-index').value=state.loadedNumber;
-    byId('edit-arabic-field').value=record.word;
-    byId('edit-meaning-field').value=editableMeaning(record);
+    writeRecord(record);
 }

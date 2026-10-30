@@ -1,6 +1,6 @@
-import { state } from './state.js?v=1029.26-strawberry1';
-import { GENERATOR_QUESTION_COUNT as count, encodeQuizCode } from '../../shared/quiz-codes.js?v=1029.26-strawberry1';
-import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry1';
+import { state } from './state.js?v=1029.26-strawberry5';
+import { GENERATOR_QUESTION_COUNT as count, encodeQuizCode } from '../../shared/quiz-codes.js?v=1029.26-strawberry5';
+import { launchToastAlert } from '../../shared/ui.js?v=1029.26-strawberry5';
 export function resetOutputCodeState() {
     document.getElementById('quiz-code-output').value = '';
     document.getElementById('copy-code-btn').disabled = true;

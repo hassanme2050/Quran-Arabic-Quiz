@@ -1,8 +1,8 @@
-import {state} from './state.js?v=1029.26-editor6';
-import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry1';
-import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1029.26-editor6';
-import {setEditorLocked,hasUnsavedEdits,applySavedText} from './records.js?v=1029.26-editor6';
-import {validateEditorUpdate} from './book.js?v=1029.26-editor6';
+import {state} from './state.js?v=1029.26-editor7';
+import {launchToastAlert} from '../../shared/ui.js?v=1029.26-strawberry5';
+import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1029.26-editor7';
+import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1029.26-editor7';
+import {validateEditorUpdate} from './book.js?v=1029.26-editor7';
 
 function selectedRecord() {
     const record=state.records[state.loadedIndex];
@@ -16,7 +16,8 @@ export async function saveWordUpdateToGitHub() {
     if(state.saving)return;
     const expected=selectedRecord();if(!expected)return;
     const number=state.loadedNumber;
-    const updated={word:document.getElementById('edit-arabic-field').value.trim(),meaning:document.getElementById('edit-meaning-field').value.trim()};
+    const updated={word:questionField().value.trim(),meaning:document.getElementById('edit-meaning-field').value.trim()};
+    if(state.activeBook==='book_c')updated.wrongAnswers=wrongAnswerValues().map(answer=>answer.trim());
     try {validateEditorUpdate(updated,state.activeBook);}catch(error){launchToastAlert(error.message);return;}
     state.saving=true;setEditorLocked(true);launchToastAlert('Saving changes to GitHub...');
     try {

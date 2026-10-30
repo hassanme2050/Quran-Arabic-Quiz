@@ -1,12 +1,13 @@
-import { state } from './state.js?v=1029.26-strawberry4';
-import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry4';
-import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry1';
-import { shuffleArray } from './utils.js?v=1029.26-strawberry4';
-import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry4';
-import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry4';
+import { state } from './state.js?v=1029.26-strawberry5';
+import { vocabularyList, activeBook, loadVocabulary } from './vocabulary.js?v=1029.26-strawberry5';
+import { loadBook as loadBookRecords } from '../shared/vocabulary.js?v=1029.26-strawberry5';
+import { shuffleArray } from './utils.js?v=1029.26-strawberry5';
+import { generateQuizChoices } from './quiz.js?v=1029.26-strawberry5';
+import { switchView, exitToHome, cancelPendingAnswer, launchToastAlert } from './ui.js?v=1029.26-strawberry5';
 import { buildQuestPlan, isNodeUnlocked, nextQuestNode, beginQuestNode, advanceQuestReview,
-    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry4';
-import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry4';
+    answerQuestQuestion, retryQuestNode, resultForRun, rankQuestWords } from './quest-model.js?v=1029.26-strawberry5';
+import { createQuestLibraryStorage, parseQuestBackup, QUEST_BOOKS } from './quest-storage.js?v=1029.26-strawberry5';
+import {tajweedContext} from '../shared/tajweed.js?v=1029.26-strawberry5';
 
 let progress,plan=[],store,loadedVocabulary,currentId=null,answerLocked=false,nextId=null;
 const byId=id=>document.getElementById(id);
@@ -30,7 +31,7 @@ function persist() {
     updateSaveNotes();
 }
 function updateSaveNotes() {
-    const note=store.issue||'Both books are saved in this browser. Export progress to back up all books.';
+    const note=store.issue||'Each book is saved in this browser. Export progress to back up all books.';
     byId('quest-save-note').textContent=note;
     byId('quest-save-note').classList.toggle('quest-save-warning',Boolean(store.issue));
     document.querySelectorAll('.quest-session-save').forEach(element=>{element.textContent=store.issue||'Your place is saved automatically.';});
@@ -62,6 +63,7 @@ export async function openQuest() {
 }
 export function renderQuestMap() {
     answerLocked=false;
+    byId('quest-trouble-summary').textContent=activeBook==='book_c'?'Questions to strengthen':'Words to strengthen';
     byId('quest-book-selector').value=activeBook;
     const stages=plan.filter(node=>node.kind==='stage'),dragons=plan.filter(node=>node.kind==='dragon');
     const cleared=nodes=>nodes.filter(node=>(progress.records[node.id]?.bestStars||0)>=1).length;
@@ -121,7 +123,7 @@ function renderWeakWords() {
     const weak=rankQuestWords(progress,lastLearned).filter(number=>progress.words[number]?.wrong>0).slice(0,10);
     if(!weak.length){list.appendChild(make('p','quest-empty','No trouble words yet. Your challenges adapt as you play.'));return;}
     const table=make('table','summary-table'),head=make('thead'),hr=make('tr');
-    for(const label of ['Word #','Arabic','Meaning','Misses','Correct'])hr.appendChild(make('th','',label));
+    for(const label of [activeBook==='book_c'?'Question #':'Word #',activeBook==='book_c'?'Question':'Arabic',activeBook==='book_c'?'Answer':'Meaning','Misses','Correct'])hr.appendChild(make('th','',label));
     head.appendChild(hr);table.appendChild(head);const body=make('tbody');
     for(const number of weak){
         const item=vocabularyList[number-1],stats=progress.words[number],row=make('tr');
@@ -145,24 +147,35 @@ function renderRun() {
 }
 function renderReview() {
     const node=currentNode(),run=currentRun(),number=run.order[run.reviewIndex],item=vocabularyList[number-1];
-    byId('quest-review-heading').textContent=node.title+' · WORDS '+(vocabularyList[node.firstWord-1].number??node.firstWord)+'–'+(vocabularyList[node.lastWord-1].number??node.lastWord);
+    byId('quest-review-heading').textContent=node.title+(activeBook==='book_c'?' · QUESTIONS ':' · WORDS ')+(vocabularyList[node.firstWord-1].number??node.firstWord)+'–'+(vocabularyList[node.lastWord-1].number??node.lastWord);
+    byId('quest-review-title').textContent=activeBook==='book_c'?'Meet your next questions':'Meet your next words';
+    byId('quest-review-description').textContent=activeBook==='book_c'?'Read the question and correct answer. The quiz starts after your final card.':'Read the word and meaning. The quiz starts after your final card.';
     byId('quest-review-counter').textContent='Review '+(run.reviewIndex+1)+' of '+run.order.length;
-    byId('quest-review-number').textContent='Book word #'+(item.number??number);
+    byId('quest-review-number').textContent=(activeBook==='book_c'?'Book question #':'Book word #')+(item.number??number);
     byId('quest-review-word').textContent=item.word;
+    byId('quest-review-word').dir=activeBook==='book_c'?'auto':'rtl';
+    byId('quest-review-word').lang=activeBook==='book_c'?'en':'ar';
+    byId('quest-review-context').textContent=activeBook==='book_c'?tajweedContext(item):'';
+    byId('quest-review-context').classList.toggle('hidden',activeBook!=='book_c');
     byId('quest-review-meaning').textContent=item.meaning;
-    byId('quest-review-next').textContent=run.reviewIndex===run.order.length-1?'Start shuffled quiz →':'Next word →';
+    byId('quest-review-next').textContent=run.reviewIndex===run.order.length-1?'Start shuffled quiz →':activeBook==='book_c'?'Next question →':'Next word →';
     show('quest-review-view');
 }
 function renderQuestion() {
     const node=currentNode(),run=currentRun(),number=run.order[run.answers.length],item=vocabularyList[number-1];
     const dragon=node.kind==='dragon';
     byId('quest-quiz-heading').textContent=node.title+(dragon?' · DRAGON CHECKPOINT':' · SHUFFLED QUIZ');
-    byId('quest-quiz-title').textContent=dragon?'Face your dragon':'Put your words to the test';
-    byId('quest-quiz-description').textContent=dragon?'These '+run.order.length+' learned words prioritize your recent and repeated mistakes.':
-        'The same words you just reviewed, in a new order.';
+    byId('quest-quiz-title').textContent=dragon?'Face your dragon':activeBook==='book_c'?'Test your Tajweed knowledge':'Put your words to the test';
+    const subject=activeBook==='book_c'?'questions':'words';
+    byId('quest-quiz-description').textContent=dragon?'These '+run.order.length+' learned '+subject+' prioritize your recent and repeated mistakes.':
+        'The same '+subject+' you just reviewed, in a new order.';
     byId('quest-question-counter').textContent='Question '+(run.answers.length+1)+' of '+run.order.length;
-    byId('quest-question-number').textContent='Book word #'+(item.number??number);
+    byId('quest-question-number').textContent=(activeBook==='book_c'?'Book question #':'Book word #')+(item.number??number);
     byId('quest-question-word').textContent=item.word;
+    byId('quest-question-word').dir=activeBook==='book_c'?'auto':'rtl';
+    byId('quest-question-word').lang=activeBook==='book_c'?'en':'ar';
+    byId('quest-question-context').textContent=activeBook==='book_c'?tajweedContext(item):'';
+    byId('quest-question-context').classList.toggle('hidden',activeBook!=='book_c');
     byId('quest-feedback').textContent='';
     const options=byId('quest-answer-options');
     options.replaceChildren();
@@ -188,7 +201,7 @@ function submitAnswer(button,choice,item) {
     if(!correct)button.classList.add('wrong-choice');
     answerQuestQuestion(plan,progress,currentId,choice.meaning,correct);
     persist();
-    byId('quest-feedback').textContent=correct?'✓ Correct!':'Correct meaning: '+item.meaning;
+    byId('quest-feedback').textContent=correct?'✓ Correct!':(activeBook==='book_c'?'Correct answer: ':'Correct meaning: ')+item.meaning;
     byId('quest-feedback').classList.toggle('quest-feedback-wrong',!correct);
     const answeredId=currentId;
     cancelPendingAnswer();
@@ -240,7 +253,7 @@ async function importProgress(event) {
         const counts=Object.fromEntries(await Promise.all(QUEST_BOOKS.map(async book=>[book,
             book===activeBook?vocabularyList.length:(await loadBookRecords(book)).filter(item=>item.verified!==false).length])));
         const imported=parseQuestBackup(await file.text(),counts);
-        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A - 500 Arabic Word (Arabic to English)':'Book B').join(' and ');
+        const names=Object.keys(imported).map(book=>book==='book_a'?'Book A - 500 Arabic Word (Arabic to English)':book==='book_c'?'Book C - Quran Tajweed':'Book B').join(' and ');
         if(!window.confirm('Replace Quest progress for '+names+' in this browser with this backup?'))return;
         store.importBooks(imported);
         progress=store.loadBook(activeBook,vocabularyList.length);currentId=null;renderQuestMap();

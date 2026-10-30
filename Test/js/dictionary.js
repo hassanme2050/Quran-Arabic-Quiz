@@ -1,6 +1,6 @@
-import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry4';
-import { switchView, launchToastAlert } from './ui.js?v=1029.26-strawberry4';
-import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1029.26-strawberry4';
+import { dictionaryVocabularyList as vocabularyList, activeBook } from './vocabulary.js?v=1029.26-strawberry5';
+import { switchView, launchToastAlert } from './ui.js?v=1029.26-strawberry5';
+import { searchDictionary, configureSearchKeyboard } from './dictionary-search.js?v=1029.26-strawberry5';
 let dictionarySortMode = 'arabic';
 let dictionarySortedItems = [];
 let dictionaryJumpItems = [];
@@ -15,7 +15,7 @@ let searchQuery = '';
 
 function configureKeyboard() {
     const input = document.getElementById('dictionary-search');
-    const language = dictionarySortMode === 'number' ? 'number' : dictionarySortMode === 'arabic' ? 'ar' : activeBook === 'book_b' ? 'ur' : 'en';
+    const language = dictionarySortMode === 'number' ? 'number' : activeBook==='book_c'?'en': dictionarySortMode === 'arabic' ? 'ar' : activeBook === 'book_b' ? 'ur' : 'en';
     configureSearchKeyboard(input, language);
 }
 
@@ -87,7 +87,7 @@ export function setDictionarySort(mode) {
         if (button) button.classList.toggle('active', key === mode);
         if (button) button.setAttribute('aria-pressed', String(key === mode));
     });
-    const captions = { number: 'Original word order', english: activeBook === 'book_b' ? 'Sorted by Urdu Alphabet' : 'Sorted by English Alphabet', arabic: 'Sorted by Arabic Alphabet' };
+    const captions = { number: activeBook==='book_c'?'Original question order':'Original word order', english: activeBook === 'book_b' ? 'Sorted by Urdu Alphabet' : activeBook==='book_c'?'Sorted by answer':'Sorted by English Alphabet', arabic: activeBook==='book_c'?'Sorted by question':'Sorted by Arabic Alphabet' };
     const pill = document.getElementById('dictionary-sort-pill');
     if (pill) pill.style.transform = 'translateX(' + ({number:0, english:100, arabic:200}[mode]) + '%)';
     const caption = document.getElementById('dictionary-sort-caption');
@@ -104,6 +104,7 @@ function numericJumpStep() { return Math.max(25, Math.ceil(vocabularyList.length
 export function getDictionaryJumpKey(item, index) {
     if (dictionarySortMode === 'number') return String(Math.ceil((index + 1) / numericJumpStep()) * numericJumpStep());
     if (dictionarySortMode === 'arabic') {
+        if(activeBook==='book_c')return String(item.word).trim().charAt(0).toUpperCase()||'#';
         const letters = ['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
         const first = getArabicSortKey(item.word).charAt(0);
         return letters.includes(first) ? first : 'ا';
@@ -129,7 +130,7 @@ export function renderDictionary() {
     if (dictionarySortMode === 'english') {
         dictionarySortedItems.sort((a,b) => a.meaning.localeCompare(b.meaning, activeBook === 'book_b' ? 'ur' : 'en', {sensitivity:'base'}) || a.originalIndex-b.originalIndex);
     } else if (dictionarySortMode === 'arabic') {
-        dictionarySortedItems.sort((a,b) => getArabicSortKey(a.word).localeCompare(getArabicSortKey(b.word), 'ar') || a.originalIndex-b.originalIndex);
+        dictionarySortedItems.sort((a,b) => getArabicSortKey(a.word).localeCompare(getArabicSortKey(b.word), activeBook==='book_c'?'en':'ar') || a.originalIndex-b.originalIndex);
     } else {
         dictionarySortedItems.sort((a,b) => a.originalIndex-b.originalIndex);
     }
@@ -158,7 +159,7 @@ export function renderDictionary() {
         if (activeBook === 'book_b') { meaning.dir = 'rtl'; meaning.lang = 'ur'; }
         const word = document.createElement('div');
         word.className = 'dictionary-word';
-        word.dir = 'rtl';
+        word.dir = activeBook==='book_c'?'auto':'rtl';
         word.textContent = item.word;
         const diamond = document.createElement('span');
         diamond.className = 'dictionary-diamond';
@@ -175,7 +176,7 @@ export function renderDictionary() {
         fragment.appendChild(empty);
     }
     list.appendChild(fragment);
-    document.getElementById('dictionary-count').textContent = dictionarySortedItems.length + (dictionarySortedItems.length === 1 ? ' word' : ' words');
+    document.getElementById('dictionary-count').textContent = dictionarySortedItems.length + (activeBook==='book_c'?(dictionarySortedItems.length===1?' question':' questions'):(dictionarySortedItems.length === 1 ? ' word' : ' words'));
     dictionaryRows = Array.from(list.querySelectorAll('.dictionary-entry'));
     jumpTargets = new Map();
     for (const row of dictionaryRows) {
