@@ -1,0 +1,11 @@
+QuranAQ-v1031.26 Dates - October 30, 2026
+Purpose: local-only portable fork. Do not upload Dates to GitHub.
+Future feature development continues in QuranAQ-v1030.26 Strawberry and Test2/.
+Run the three standalone HTML files at the top of this folder. Source edits require node build-portable.cjs before the standalone files change.
+All four runtime TXT files and CP.txt remain on GitHub main/Test2. Reads and Editor saves use one shared fixed configuration; deployment/file location cannot redirect writes.
+No automatic fallback to local TXT copies. Do not overwrite the live GitHub libraries from a code deployment.
+70 automated checks passed. Real browser/UI verification was stopped by the computer-use URL check.
+
+Quran ayah text uses the supplied KFGQPC Hafs v30 font, embedded in the standalone Student HTML so moving it needs no font folder.
+
+October 31: Refreshed from approved Strawberry, preserved Book D Quest ayah details and portability, then added Dates-only Admin availability controls backed by shared Test2/dbs.json, paired Review/Quiz buttons, and a seven-Go-click session override. Save/Cancel, write failures, conflicts, hidden books and recovery are covered by 79 automated checks. Separated Admin into admin/index.html, removed all Admin UI/code from the Student bundle, fixed emoji encoding and grouped study settings with Review/Quiz. Hiding removes book options from both pickers and the whole Quiz Code row; home settings refresh automatically. Save keeps the session, Cancel reloads saved settings, and Sign out discards drafts. Admin uses a near-black background; the Student group has no surrounding box. Dates code stays local; existing APKs predate the dashboard.

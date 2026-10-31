@@ -1,0 +1,390 @@
+<!-- QuranAQ-v1030.26 Dates: standalone HTML; books remain on GitHub.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Arabic Quiz - Test Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700&display=swap');
+
+:root {
+    --arabic-font: 'Alexandria', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Shared by student screens and both teacher tools. */
+.arabic-text-render,
+.large-arabic-cell,
+.dictionary-word,
+.tile-arabic-text,
+.large-arabic-input {
+    font-family: var(--arabic-font);
+    font-weight: 600;
+    letter-spacing: normal;
+}
+
+.dictionary-jump[data-script="arabic"] button {
+    font-family: var(--arabic-font);
+    font-weight: 600;
+}
+
+</style>
+    <style>
+:root {
+    --primary-gray: #2d3748;
+    --button-gold: #d49a3b;
+    --button-gold-hover: #e5ab4f;
+    --button-gold-active: #b5802e;
+    --exit-btn-color: rgba(255, 255, 255, 0.12);
+    --exit-btn-hover: rgba(255, 255, 255, 0.2);
+    --counter-gray: #a0aec0;
+    --white: #ffffff;
+    --gold-glow: 0 0 15px rgba(212, 154, 59, 0.6);
+    --disabled-gray: rgba(255, 255, 255, 0.1);
+    --disabled-text: rgba(255, 255, 255, 0.25);
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #1a202c 100%);
+    color: var(--white);
+    margin: 0;
+    padding: clamp(8px, 1.5vh, 16px);
+    height: 100vh;
+    height: 100dvh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+.generator-wrapper {
+    width: 100%;
+    max-width: 1400px;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    text-align: center;
+    gap: 8px;
+}
+
+h1 {
+    color: var(--button-gold);
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: clamp(20px, 3.6vh, 28px);
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.status-banner {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #cbd5e0;
+    margin-bottom: 0;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+    font-weight: 500;
+    transition: opacity 0.5s ease;
+}
+
+.words-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: clamp(4px, 0.7vw, 8px);
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.compact-word-tile {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: clamp(3px, 0.8vh, 8px);
+    color: #1a202c;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    text-align: center;
+    justify-content: space-between;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.compact-word-tile:hover { transform: translateY(-1px); border-color: #cbd5e0; }
+.compact-word-tile.selected-state { border-color: var(--button-gold); background: #fdfbf7; }
+.tile-header-index { font-size: 10px; font-weight: 800; color: #718096; text-align: left; }
+.tile-arabic-text {
+    font-size: clamp(16px, 2.8vh, 22px);
+    font-family: var(--arabic-font);
+    font-weight: 600;
+    color: #2d3748;
+    margin: 2px 0;
+    line-height: 1.65;
+    padding: 0.1em 0;
+    direction: rtl;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tile-meaning-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4a5568;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 2px;
+    border-top: 1px dashed #edf2f7;
+}
+.tile-checkbox-anchor {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #cbd5e0;
+    border-radius: 3px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.compact-word-tile.selected-state .tile-checkbox-anchor { background-color: var(--button-gold); border-color: var(--button-gold); }
+.compact-word-tile.selected-state .tile-checkbox-anchor::after {
+    content: "✓";
+    color: #1a1002;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.bottom-control-dashboard {
+    background: rgba(45, 55, 72, 0.95);
+    border: 2px solid var(--button-gold);
+    padding: 10px 12px;
+    border-radius: 12px;
+    box-shadow: var(--gold-glow), 0 -4px 20px rgba(0,0,0,0.3);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    box-sizing: border-box;
+    width: 100%;
+    flex: 0 0 auto;
+}
+.counter-status-text { grid-column:1 / -1; font-size:14px; font-weight:bold; color:var(--white); text-align:left; min-width:0; }
+.counter-status-text span { color: var(--button-gold); }
+.output-code-container { display:flex; gap:8px; min-width:0; }
+.hex-output-field {
+    flex: 1;
+    min-width: 0;
+    width: 0;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 10px;
+    color: var(--button-gold);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+    font-weight: bold;
+    outline: none;
+    text-align: center;
+}
+.pagination-bar-wrapper { display: flex; align-items: center; gap: 10px; }
+.page-indicator-text { font-size: 13px; font-weight: 600; color: var(--counter-gray); white-space: nowrap; }
+button {
+    background-color: var(--button-gold);
+    color: #1a1002;
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, transform 0.1s;
+    white-space: nowrap;
+}
+button:hover:not(:disabled) { background-color: var(--button-gold-hover); }
+button:disabled { background-color: var(--disabled-gray); color: var(--disabled-text); cursor: not-allowed; }
+.toast-popup {
+    position: fixed;
+    bottom: 100px;
+    background: var(--button-gold);
+    color: #1a1002;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 2500;
+}
+.toast-popup.show { opacity: 1; }
+
+/* Teacher verification uses the same dark-gray and gold palette as the generator. */
+.auth-gate-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #1a202c 100%);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+}
+.auth-card {
+    background: rgba(45, 55, 72, 0.98);
+    border: 2px solid var(--button-gold);
+    border-radius: 12px;
+    padding: 34px 28px;
+    max-width: 440px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: var(--gold-glow), 0 10px 25px rgba(0,0,0,0.3);
+    color: var(--white);
+}
+.auth-card h2 { margin: 0 0 10px; font-size: 22px; color: var(--button-gold); }
+.auth-card p { color: #cbd5e0; font-size: 14px; line-height: 1.5; margin: 0 0 22px; }
+.password-input-wrapper { display: flex; flex-direction: column; gap: 13px; width: 100%; }
+.admin-text-field {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 13px 14px;
+    color: var(--white);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.admin-text-field::placeholder { color: #a0aec0; }
+.admin-text-field:focus { border-color: var(--button-gold); }
+.custom-select-menu {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+.custom-select-menu:focus { border-color: var(--button-gold); }
+.custom-select-menu option { color: #1a202c; background: #ffffff; }
+.custom-select-menu option:disabled { color: #718096; background: #e2e8f0; }
+#verify-open-btn { display: block; width: 100%; box-sizing: border-box; }
+.auth-error { min-height: 18px; color: #feb2b2; font-size: 13px; text-align: left; }
+.is-hidden { display: none !important; }
+@media (min-width: 701px) and (max-height: 560px) {
+    .generator-wrapper { gap:4px; }
+    .compact-word-tile { padding:2px 4px; }
+    .tile-arabic-text { font-size:17px; margin:0; }
+    .tile-meaning-text { font-size:10px; padding-top:1px; }
+    .bottom-control-dashboard { padding:6px 8px; gap:4px 8px; }
+    button { padding:8px 12px; }
+}
+@media (max-width: 700px) {
+    body { height:auto; min-height:100dvh; overflow:auto; }
+    .generator-wrapper { height:auto; }
+    .words-selection-grid { flex:none; grid-template-columns:repeat(5,minmax(0,1fr)); grid-template-rows:none; grid-auto-rows:minmax(84px,auto); }
+    .bottom-control-dashboard { grid-template-columns:minmax(0,1fr); }
+    .counter-status-text { text-align:center; }
+    .output-code-container { width:100%; flex-wrap:wrap; }
+    .hex-output-field { min-width:100px; }
+    .pagination-bar-wrapper { justify-content:center; }
+    .output-code-container button { padding:10px; font-size:12px; }
+}
+
+</style>
+</head>
+<body>
+    <!-- Teacher authentication: same book list and file mapping as Editor, without the token field. -->
+    <div class="auth-gate-overlay" id="login-shield-gate">
+        <div class="auth-card">
+            <h2>Teacher Verification</h2>
+            <p>Select the vocabulary book, then enter your system password to access the Test Generator.</p>
+            <div class="password-input-wrapper">
+                <select class="custom-select-menu" id="login-book-selector" aria-label="Select book">
+                    <option value="book_a" selected>Book A - 500 Arabic Word (Arabic to English)</option>
+                    <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
+                    <option value="book_c" disabled>Book C - Quran Tajweed (Coming later)</option>
+                <option value="book_d">Book D - Quran Vocabulary (Arabic to English)</option>
+                </select>
+                <input type="password" class="admin-text-field" id="admin-passcode-box" placeholder="Enter System Password" autocomplete="current-password">
+                <div class="auth-error" id="login-error" role="status" aria-live="polite"></div>
+                <button id="verify-open-btn" type="button" data-action="evaluateTeacherCredentials">Verify &amp; Open Test Generator</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="generator-wrapper">
+        <h1>Quran Arabic Quiz - Test Generator</h1>
+        <div class="status-banner" id="status-message">Please sign in to load vocabulary records.</div>
+        <div class="words-selection-grid" id="tiles-matrix-box"></div>
+        <div class="bottom-control-dashboard">
+            <div class="counter-status-text" id="selection-counter-banner">Please select exactly 20 words (20 remaining)</div>
+            <div class="output-code-container">
+                <button id="generate-code-btn" data-action="processSelectedHexadecimalQuizCode" disabled>Generate Quiz Code</button>
+                <input type="text" class="hex-output-field" id="quiz-code-output" placeholder="[ Quiz Code Output ]" readonly>
+                <button id="copy-code-btn" data-action="copyGeneratedCodeToClipboard" style="background-color: rgba(255,255,255,0.08); color:#ffffff; border:1px solid rgba(255,255,255,0.15);" disabled>Copy Code</button>
+            </div>
+            <div class="pagination-bar-wrapper">
+                <button id="prev-page-btn" style="padding: 8px 12px;" data-action="changeMatrixActivePage" data-value="-1" disabled>◀</button>
+                <span class="page-indicator-text" id="page-number-text">Page 1 of 1</span>
+                <button id="next-page-btn" style="padding: 8px 12px;" data-action="changeMatrixActivePage" data-value="1" disabled>▶</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-popup" id="toast-alert">Notification Popup</div>
+    <script id="dates-app-bundle">(function(){const definitions={"test-generator/js/app.js":{imports:[["state","test-generator/js/state.js","state"],["bindActions","shared/ui.js","bindActions"],["evaluateTeacherCredentials","test-generator/js/auth.js","evaluateTeacherCredentials"],["bindGridSelection","test-generator/js/grid.js","bindGridSelection"],["changeMatrixActivePage","test-generator/js/grid.js","changeMatrixActivePage"],["processSelectedHexadecimalQuizCode","test-generator/js/selection.js","processSelectedHexadecimalQuizCode"],["copyGeneratedCodeToClipboard","test-generator/js/selection.js","copyGeneratedCodeToClipboard"],["updateStickyCounterBanner","test-generator/js/selection.js","updateStickyCounterBanner"]],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{});__datesRequire(\"test-generator/js/state.js\");__datesRequire(\"shared/ui.js\");__datesRequire(\"test-generator/js/auth.js\");__datesRequire(\"test-generator/js/grid.js\");__datesRequire(\"test-generator/js/selection.js\");\n\n\n\n\n\n// Every page represents 50 consecutive book numbers, independent of viewport/zoom.\nstate.totalCardsPerPageLimit = 50;\nbindActions({ evaluateTeacherCredentials, changeMatrixActivePage, processSelectedHexadecimalQuizCode, copyGeneratedCodeToClipboard });\nbindGridSelection();\nupdateStickyCounterBanner();\nconst password = document.getElementById('admin-passcode-box');\npassword.addEventListener('keydown', event => { if (event.key === 'Enter') evaluateTeacherCredentials(); });\npassword.focus();\n\n}")},
+"test-generator/js/state.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"state\":{enumerable:true,get:()=>state}});\nconst state = {\n    fullVocabularyInventory: [], selected: new Set(), activeMatrixPage: 1,\n    totalCardsPerPageLimit: 50, activeBook: 'book_a', activeFile: 'Vocabulary-File.txt'\n};\n\n}")},
+"shared/ui.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"launchToastAlert\":{enumerable:true,get:()=>launchToastAlert},\"bindActions\":{enumerable:true,get:()=>bindActions}});\nlet toastTimer;\nfunction launchToastAlert(message) {\n    const toast = document.getElementById('toast-alert');\n    toast.textContent = message;\n    toast.classList.add('show');\n    clearTimeout(toastTimer);\n    toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);\n}\nfunction bindActions(actions) {\n    document.querySelectorAll('[data-action]').forEach(element => {\n        const action = actions[element.dataset.action];\n        if (!action) throw new Error('Unknown action: ' + element.dataset.action);\n        element.addEventListener('click', () => action(element.dataset.value));\n    });\n}\n\n}")},
+"test-generator/js/auth.js":{imports:[["state","test-generator/js/state.js","state"],["BOOK_FILES","shared/vocabulary.js","BOOK_FILES"],["fetchRootText","shared/vocabulary.js","fetchRootText"],["loadBook","shared/vocabulary.js","loadBook"],["launchToastAlert","shared/ui.js","launchToastAlert"],["renderInventoryTilesGrid","test-generator/js/grid.js","renderInventoryTilesGrid"],["resetOutputCodeState","test-generator/js/selection.js","resetOutputCodeState"]],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"evaluateTeacherCredentials\":{enumerable:true,get:()=>evaluateTeacherCredentials},\"loadSelectedVocabularyFile\":{enumerable:true,get:()=>loadSelectedVocabularyFile}});__datesRequire(\"test-generator/js/state.js\");__datesRequire(\"shared/vocabulary.js\");__datesRequire(\"shared/ui.js\");__datesRequire(\"test-generator/js/grid.js\");__datesRequire(\"test-generator/js/selection.js\");\n\n\n\n\n\nlet bannerTimer;\nasync function evaluateTeacherCredentials() {\n    const passwordBox = document.getElementById('admin-passcode-box');\n    const selectedBook = document.getElementById('login-book-selector').value;\n    const plaintextPassword = passwordBox.value.trim();\n    const errorBox = document.getElementById('login-error');\n    const verifyButton = document.getElementById('verify-open-btn');\n    errorBox.textContent = '';\n\n    if (!['book_a','book_b','book_d'].includes(selectedBook)) {\n        errorBox.textContent = 'Please select a valid book.';\n        return;\n    }\n    if (!plaintextPassword) {\n        errorBox.textContent = 'Please enter the system password.';\n        passwordBox.focus();\n        return;\n    }\n\n    verifyButton.disabled = true;\n    verifyButton.textContent = 'Verifying…';\n    try {\n        const cpText = await fetchRootText('CP.txt');\n        const allowedEncodedPasswords = cpText.split(/\\r?\\n/).map(line => line.trim()).filter(Boolean);\n        const encodedInput = btoa(unescape(encodeURIComponent(plaintextPassword)));\n\n        if (!allowedEncodedPasswords.includes(encodedInput)) {\n            errorBox.textContent = 'Invalid password. Access denied.';\n            passwordBox.value = '';\n            passwordBox.focus();\n            return;\n        }\n\n        state.activeBook = selectedBook;\n        state.activeFile = BOOK_FILES[state.activeBook];\n        const gate = document.getElementById('login-shield-gate');\n        if (await loadSelectedVocabularyFile()) {\n            gate.style.opacity = '0';\n            setTimeout(() => { gate.classList.add('is-hidden'); }, 300);\n        }\n    } catch (error) {\n        console.error(error);\n        errorBox.textContent = 'Unable to verify password. Check that CP.txt is available in the project root.';\n    } finally {\n        verifyButton.disabled = false;\n        verifyButton.textContent = 'Verify & Open Test Generator';\n    }\n}\nasync function loadSelectedVocabularyFile() {\n    const banner = document.getElementById('status-message');\n    clearTimeout(bannerTimer);\n    banner.style.opacity = '1';\n    banner.classList.remove('is-hidden');\n    banner.textContent = 'Connecting to Vocabulary Records...';\n    try {\n        const records = await loadBook(state.activeBook);\n        state.fullVocabularyInventory = records.filter(item => item.verified !== false && (state.activeBook !== 'book_b' || records.filter(other => other.number === item.number).length === 1));\n        state.selected.clear();\n        state.activeMatrixPage = 1;\n        resetOutputCodeState();\n        renderInventoryTilesGrid();\n        banner.textContent = state.activeBook === 'book_b' ? state.fullVocabularyInventory.length + ' verified words available for Book B quizzes.' : records.length ? '✅ Success: Parsed ' + records.length + ' library records.' : '⚠️ No matching vocabulary format found.';\n        if (state.activeBook === 'book_a' && records.length > 999) launchToastAlert('Quiz codes support book numbers 1–999. Later words are shown for reference.');\n        if (records.length) {\n            bannerTimer = setTimeout(() => {\n                banner.style.opacity = '0';\n                bannerTimer = setTimeout(() => banner.classList.add('is-hidden'), 500);\n            }, 2500);\n        }\n        return true;\n    } catch (error) {\n        console.error(error);\n        banner.textContent = '⚠️ Failed to read ' + state.activeFile + ' from the project root.';\n        const gate = document.getElementById('login-shield-gate');\n        gate.classList.remove('is-hidden');\n        gate.style.opacity = '1';\n        document.getElementById('login-error').textContent = 'Vocabulary file could not be loaded. Please try again.';\n        return false;\n    }\n}\n\n}")},
+"shared/vocabulary.js":{imports:[["parseLughatBook","shared/lughat.js","parseLughatBook"],["parseTajweedBook","shared/tajweed.js","parseTajweedBook"],["parseQuranVocabulary","shared/quran-vocabulary.js","parseQuranVocabulary"],["BOOK_FILES","shared/library-config.js","BOOK_FILES"],["libraryUrl","shared/library-config.js","libraryUrl"]],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"rootFileUrl\":{enumerable:true,get:()=>rootFileUrl},\"fetchRootText\":{enumerable:true,get:()=>fetchRootText},\"parseVocabularyRecords\":{enumerable:true,get:()=>parseVocabularyRecords},\"loadBook\":{enumerable:true,get:()=>loadBook},\"BOOK_FILES\":{enumerable:true,get:()=>BOOK_FILES}});__datesRequire(\"shared/lughat.js\");__datesRequire(\"shared/tajweed.js\");__datesRequire(\"shared/quran-vocabulary.js\");__datesRequire(\"shared/library-config.js\");\n\n\n\n\n\nfunction rootFileUrl(filename) {\n    return libraryUrl(filename);\n}\nasync function fetchRootText(filename) {\n    const response = await fetch(rootFileUrl(filename), { cache: 'no-store' });\n    if (!response.ok) throw new Error('Could not read ' + filename + ' (' + response.status + ').');\n    return response.text();\n}\nfunction parseVocabularyRecords(text) {\n    // Book number is the one-based position of valid entries; never sort this array.\n    return String(text).split(/\\r?\\n/).flatMap(line => {\n        const separator = line.indexOf('=');\n        if (separator < 0) return [];\n        const word = line.slice(0, separator).trim();\n        const meaning = line.slice(separator + 1).trim();\n        return word && meaning ? [{ word, meaning }] : [];\n    });\n}\nasync function loadBook(bookId) {\n    const filename = BOOK_FILES[bookId];\n    if (!filename) throw new Error('Unknown vocabulary book.');\n    const text = await fetchRootText(filename);\n    return bookId === 'book_b' ? parseLughatBook(text).records : bookId === 'book_c' ? parseTajweedBook(text).records : bookId==='book_d'?parseQuranVocabulary(text).records:parseVocabularyRecords(text);\n}\n\n}")},
+"shared/lughat.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"parseLughatBook\":{enumerable:true,get:()=>parseLughatBook}});\n// Parse the source as written; never rewrite or normalize its Unicode text.\nfunction parseLughatBook(text) {\n    const lines = String(text).replace(/^\\uFEFF/, '').split(/\\r\\n|\\n|\\r/);\n    const hasBoundary = lines.some(line => /^\\s*-{5,}(?:\\s.*)?$/.test(line));\n    const records = [], warnings = [], seen = new Set();\n    let verified = hasBoundary, boundaryCount = 0, juzz = null, surah = null;\n    lines.forEach((line, index) => {\n        const trimmed = line.trim();\n        if (!trimmed) return;\n        if (/^-{5,}(?:\\s.*)?$/.test(trimmed)) { verified = false; boundaryCount++; return; }\n        const heading = trimmed.match(/\\u0F3B\\s*(\\d+)\\s+(.+?)\\s*\\u0F3A/);\n        if (heading) {\n            const value = {number:Number(heading[1]), name:heading[2].trim()};\n            if (/\\u062C\\u0632\\u0621|\\u067E\\u0627\\u0631\\u06C1/.test(value.name)) juzz = value;\n            else if (/\\u0633\\u0648\\u0631/.test(value.name)) surah = value;\n            else warnings.push('Unknown heading on line ' + (index + 1));\n            return;\n        }\n        const match = trimmed.match(/^(\\d{4})\\s+(.+?)\\s*\\u27F5\\s*(.+)$/);\n        if (!match) { warnings.push('Unrecognized line ' + (index + 1)); return; }\n        const number = Number(match[1]);\n        if (!number) throw new Error('Invalid Book B word number: ' + match[1]);\n        if (seen.has(number)) warnings.push('Duplicate Book B word number ' + match[1] + ' on line ' + (index + 1));\n        seen.add(number);\n        const rawMeaning = match[3].trim();\n        const note = rawMeaning.match(/\\s*(\\([^()]*\\)(?:\\s*\\([^()]*\\))*)\\s*$/);\n        const meaning = note ? rawMeaning.slice(0, note.index).trim() : rawMeaning;\n        if (!meaning) throw new Error('Missing Urdu meaning at word ' + match[1]);\n        records.push({number, word:match[2].trim(), meaning, explanation:note ? note[1] : '', rawMeaning,\n            juzz, surah, verified, language:'ur', sourceLine:index + 1});\n    });\n    if (!hasBoundary) warnings.push('No verification boundary found; all Book B words are dictionary-only.');\n    if (boundaryCount > 1) warnings.push('Multiple verification boundaries found; words after the first remain unverified.');\n    return {records, warnings, hasBoundary};\n}\n\n}")},
+"shared/tajweed.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"validateTajweedQuestion\":{enumerable:true,get:()=>validateTajweedQuestion},\"parseTajweedBook\":{enumerable:true,get:()=>parseTajweedBook},\"tajweedContext\":{enumerable:true,get:()=>tajweedContext},\"renderTajweedContext\":{enumerable:true,get:()=>renderTajweedContext},\"tajweedReviewAnswer\":{enumerable:true,get:()=>tajweedReviewAnswer},\"tajweedChoices\":{enumerable:true,get:()=>tajweedChoices}});\n// Keep question text, bilingual answer text and heading metadata exactly as authored.\nconst answerKey=value=>value.trim().replace(/\\s+/g,' ').toLocaleLowerCase('en');\nfunction validateTajweedQuestion(record) {\n    const values=[record.word,record.meaning,...(record.wrongAnswers||[])];\n    if(record.wrongAnswers?.length!==6||values.some(value=>typeof value!=='string'||!value.trim()||/[\\r\\n\\u27F6\\u27F9]/.test(value))||record.wrongAnswers.some(value=>/\\s+-\\s+/.test(value)))\n        throw new Error('Enter a question, one correct answer and exactly six wrong answers, each on one line without source separators.');\n    if(new Set([record.meaning,...record.wrongAnswers].map(answerKey)).size!==7)\n        throw new Error('The correct answer and six wrong answers must all be different.');\n}\nfunction parseTajweedBook(text) {\n    const records=[],warnings=[],seen=new Set();let category=null,subcategory=null,boundaryCount=0;\n    const lines=String(text).replace(/^\\uFEFF/,'').split(/\\r\\n|\\n|\\r/),marker=line=>/^\\s*-{5,}(?:\\s.*)?$/.test(line);\n    const hasBoundary=lines.some(marker);let verified=hasBoundary;\n    lines.forEach((line,index)=>{\n        const value=line.trim();if(!value)return;\n        if(marker(value)){verified=false;boundaryCount++;return;}\n        const heading=value.match(/^[═─]+\\s*༻\\s*(\\d+)\\s+(.+?)\\s*༺/);\n        if(heading){\n            const item={number:Number(heading[1]),name:heading[2].trim()};\n            if(value.startsWith('═')){category=item;subcategory=null;}else subcategory=item;\n            return;\n        }\n        const match=value.match(/^(\\d+)\\)\\s*(.*?)\\s*⟶\\s*(.*?)\\s*⟹\\s*(.*?)\\s*$/);\n        if(!match){if(/^\\d+\\)/.test(value))throw new Error('Invalid Tajweed question on line '+(index+1));warnings.push('Unrecognized Tajweed line '+(index+1));return;}\n        const number=Number(match[1]);\n        if(!Number.isSafeInteger(number)||number<1||seen.has(number))throw new Error('Invalid or duplicate Tajweed question number '+match[1]);\n        const record={number,word:match[2].trim(),meaning:match[3].trim(),wrongAnswers:match[4].split(/\\s+-\\s+/).map(answer=>answer.trim()),category,subcategory,sourceLine:index+1,language:'en',verified};\n        try{validateTajweedQuestion(record);}catch(error){throw new Error('Tajweed question '+number+': '+error.message);}\n        records.push(record);seen.add(number);\n    });\n    if(!hasBoundary)warnings.push('No verification boundary found; all Tajweed questions are dictionary-only.');\n    if(boundaryCount>1)warnings.push('Multiple verification boundaries found; questions after the first remain unverified.');\n    return {records,warnings,hasBoundary};\n}\nfunction tajweedContext(record) {\n    return [record?.category,record?.subcategory].filter(Boolean).map(item=>item.name).join(' › ');\n}\nfunction renderTajweedContext(element,record){\n    element.replaceChildren();\n    for(const [key,tag] of [['category','strong'],['subcategory','span']])if(record?.[key]){\n        const line=document.createElement(tag);line.textContent=record[key].name;element.appendChild(line);\n    }\n    element.classList.toggle('hidden',!element.textContent);\n}\nfunction tajweedReviewAnswer(answer){\n    return /[\\u0600-\\u06ff]/.test(answer)&&/[A-Za-z]/.test(answer)?answer.replace(/[,،]\\s*/, '\\n'):answer;\n}\nfunction tajweedChoices(record,random=Math.random) {\n    validateTajweedQuestion(record);\n    const shuffle=items=>{for(let i=items.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}return items;};\n    const answers=[record.meaning,...shuffle([...record.wrongAnswers]).slice(0,3)];\n    return shuffle(answers).map(meaning=>({word:record.word,meaning}));\n}\n\n}")},
+"shared/quran-vocabulary.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"parseQuranVocabulary\":{enumerable:true,get:()=>parseQuranVocabulary}});\n// A reference's meaning label belongs to that reference, not to the next word.\nfunction parseQuranVocabulary(text){\n    const records=[],warnings=[];let category=null,subcategory=null;\n    String(text).replace(/^\\uFEFF/,'').split(/\\r\\n|\\n|\\r/).forEach((line,index)=>{\n        const value=line.trim();if(!value)return;\n        const heading=value.match(/^[═─]+\\s*༻\\s*(.+?)\\s*༺/);\n        if(heading){const item={name:heading[1].trim()};if(value.startsWith('═')){category=item;subcategory=null;}else subcategory=item;return;}\n        const split=value.indexOf('=');\n        if(split<1){warnings.push('Unrecognized Book D line '+(index+1));return;}\n        const word=value.slice(0,split).trim(),remaining=value.slice(split+1),arrow=remaining.indexOf('=>');\n        const meaning=(arrow<0?remaining:remaining.slice(0,arrow)).trim();\n        if(!word||!meaning)throw new Error('Missing word or meaning on Book D line '+(index+1));\n        const references=arrow<0?[]:remaining.slice(arrow+2).split(',').map(part=>{\n            const match=part.trim().match(/^(.+?)\\s+(\\d+)\\s*:\\s*(\\d+)$/);\n            if(!match)throw new Error('Invalid verse reference on Book D line '+(index+1)+': '+part.trim());\n            const surah=Number(match[2]),ayah=Number(match[3]);\n            if(!Number.isSafeInteger(surah)||surah<1||surah>114||!Number.isSafeInteger(ayah)||ayah<1)\n                throw new Error('Invalid chapter/verse on Book D line '+(index+1));\n            return {meaning:match[1].trim(),surah,ayah,key:surah+':'+ayah};\n        });\n        records.push({rawReferences:arrow<0?'':remaining.slice(arrow+2).trim(),number:records.length+1,word,meaning,references,category,subcategory,sourceLine:index+1,language:'en',verified:true});\n    });\n    return {records,warnings};\n}\n\n}")},
+"shared/library-config.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"LIBRARY\":{enumerable:true,get:()=>LIBRARY},\"BOOK_FILES\":{enumerable:true,get:()=>BOOK_FILES},\"libraryPath\":{enumerable:true,get:()=>libraryPath},\"libraryUrl\":{enumerable:true,get:()=>libraryUrl}});\n// Dates is portable; this is the library's location, not the app's location.\nconst LIBRARY=Object.freeze({owner:'hassanme2050',repository:'Quran-Arabic-Quiz',branch:'main',folder:''});\nconst BOOK_FILES=Object.freeze({book_a:'Vocabulary-File.txt',book_b:'Lughat-AlQuran-word-meaning.txt',book_c:'Tajweed-Question-Bank.txt',book_d:'Quran-Vocabulary-Meaning-Arabic-English.txt'});\nfunction libraryPath(filename){\n    if(!Object.values(BOOK_FILES).includes(filename)&&filename!=='CP.txt'&&filename!=='dbs.json')throw new Error('Unknown library file.');\n    return (LIBRARY.folder?LIBRARY.folder+'/':'')+filename;\n}\nfunction libraryUrl(filename){\n    return new URL('https://raw.githubusercontent.com/'+LIBRARY.owner+'/'+LIBRARY.repository+'/'+encodeURIComponent(LIBRARY.branch)+'/'+libraryPath(filename).split('/').map(encodeURIComponent).join('/'));\n}\n\n}")},
+"test-generator/js/grid.js":{imports:[["state","test-generator/js/state.js","state"],["toggleWordSelection","test-generator/js/selection.js","toggleWordSelection"],["updateStickyCounterBanner","test-generator/js/selection.js","updateStickyCounterBanner"]],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"renderInventoryTilesGrid\":{enumerable:true,get:()=>renderInventoryTilesGrid},\"changeMatrixActivePage\":{enumerable:true,get:()=>changeMatrixActivePage},\"bindGridSelection\":{enumerable:true,get:()=>bindGridSelection}});__datesRequire(\"test-generator/js/state.js\");__datesRequire(\"test-generator/js/selection.js\");\n\n\nfunction renderInventoryTilesGrid() {\n    const gridBox = document.getElementById('tiles-matrix-box');\n    gridBox.replaceChildren();\n    const fragment = document.createDocumentFragment();\n    const totalRequiredPages = Math.ceil(state.fullVocabularyInventory.length / state.totalCardsPerPageLimit) || 1;\n    if (state.activeMatrixPage < 1) state.activeMatrixPage = 1;\n    if (state.activeMatrixPage > totalRequiredPages) state.activeMatrixPage = totalRequiredPages;\n    const startIdx = (state.activeMatrixPage - 1) * state.totalCardsPerPageLimit;\n    const endIdx = Math.min(startIdx + state.totalCardsPerPageLimit, state.fullVocabularyInventory.length);\n\n    for (let i = startIdx; i < endIdx; i++) {\n        const item = state.fullVocabularyInventory[i];\n        const absoluteIndex = item.number || i + 1;\n        const isSelected = state.selected.has(absoluteIndex);\n        const tile = document.createElement('div');\n        tile.className = 'compact-word-tile' + (isSelected ? ' selected-state' : '');\n        tile.dataset.number = String(absoluteIndex);\n        tile.setAttribute('role', 'button');\n        tile.setAttribute('aria-pressed', String(isSelected));\n        tile.tabIndex = 0;\n        if (absoluteIndex > (state.activeBook === 'book_b' ? 9999 : 999)) {\n            tile.setAttribute('aria-disabled', 'true');\n            tile.tabIndex = -1;\n        }\n        const indexNode = document.createElement('div');\n        indexNode.className = 'tile-header-index';\n        indexNode.textContent = '#' + String(absoluteIndex).padStart(3, '0');\n        const checkboxNode = document.createElement('div');\n        checkboxNode.className = 'tile-checkbox-anchor';\n        const arabicNode = document.createElement('div');\n        arabicNode.className = 'tile-arabic-text';\n        arabicNode.textContent = item.word;\n        const meaningNode = document.createElement('div');\n        meaningNode.className = 'tile-meaning-text';\n        meaningNode.title = item.meaning;\n        meaningNode.textContent = item.meaning;\n        meaningNode.dir = state.activeBook === 'book_b' ? 'rtl' : 'auto';\n        meaningNode.lang = state.activeBook === 'book_b' ? 'ur' : 'en';\n        tile.append(indexNode, checkboxNode, arabicNode, meaningNode);\n        fragment.appendChild(tile);\n    }\n    gridBox.appendChild(fragment);\n    document.getElementById('page-number-text').textContent = 'Page ' + state.activeMatrixPage + ' of ' + totalRequiredPages;\n    document.getElementById('prev-page-btn').disabled = (state.activeMatrixPage === 1);\n    document.getElementById('next-page-btn').disabled = (state.activeMatrixPage === totalRequiredPages);\n    updateStickyCounterBanner();\n}\nfunction changeMatrixActivePage(offset) {\n    state.activeMatrixPage += Number(offset);\n    renderInventoryTilesGrid();\n}\nfunction bindGridSelection() {\n    const grid = document.getElementById('tiles-matrix-box');\n    function select(event) {\n        const tile = event.target.closest('[data-number]');\n        if (tile && grid.contains(tile)) toggleWordSelection(Number(tile.dataset.number), tile);\n    }\n    grid.addEventListener('click', select);\n    grid.addEventListener('keydown', event => {\n        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(event); }\n    });\n}\n\n}")},
+"test-generator/js/selection.js":{imports:[["state","test-generator/js/state.js","state"],["count","shared/quiz-codes.js","GENERATOR_QUESTION_COUNT"],["encodeQuizCode","shared/quiz-codes.js","encodeQuizCode"],["launchToastAlert","shared/ui.js","launchToastAlert"]],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"resetOutputCodeState\":{enumerable:true,get:()=>resetOutputCodeState},\"updateStickyCounterBanner\":{enumerable:true,get:()=>updateStickyCounterBanner},\"toggleWordSelection\":{enumerable:true,get:()=>toggleWordSelection},\"processSelectedHexadecimalQuizCode\":{enumerable:true,get:()=>processSelectedHexadecimalQuizCode},\"copyGeneratedCodeToClipboard\":{enumerable:true,get:()=>copyGeneratedCodeToClipboard}});__datesRequire(\"test-generator/js/state.js\");__datesRequire(\"shared/quiz-codes.js\");__datesRequire(\"shared/ui.js\");\n\n\n\nfunction resetOutputCodeState() {\n    document.getElementById('quiz-code-output').value = '';\n    document.getElementById('copy-code-btn').disabled = true;\n}\nfunction updateStickyCounterBanner() {\n    const picked = state.selected.size;\n    const remaining = count - picked;\n    const banner = document.getElementById('selection-counter-banner');\n    banner.textContent = remaining > 0\n        ? 'Please select exactly ' + count + ' words (' + remaining + ' remaining)'\n        : '✅ ' + count + ' questions selected successfully!';\n    document.getElementById('generate-code-btn').disabled = picked !== count;\n}\nfunction toggleWordSelection(number, tile) {\n    if (!Number.isInteger(number) || number < 1 || !(state.activeBook === 'book_b' ? state.fullVocabularyInventory.some(item => item.number === number && item.verified !== false) : number <= Math.min(999, state.fullVocabularyInventory.length))) return;\n    if (state.selected.has(number)) state.selected.delete(number);\n    else {\n        if (state.selected.size >= count) {\n            launchToastAlert('⚠️ Selection filled! You have already picked ' + count + ' questions.');\n            return;\n        }\n        state.selected.add(number);\n    }\n    resetOutputCodeState();\n    if (tile) {\n        tile.classList.toggle('selected-state', state.selected.has(number));\n        tile.setAttribute('aria-pressed', String(state.selected.has(number)));\n    }\n    updateStickyCounterBanner();\n}\nfunction processSelectedHexadecimalQuizCode() {\n    if (state.selected.size !== count) return;\n    try {\n        document.getElementById('quiz-code-output').value = encodeQuizCode([...state.selected], state.activeBook || 'book_a');\n        document.getElementById('copy-code-btn').disabled = false;\n        launchToastAlert('🎉 ' + count + '-question quiz code compiled successfully!');\n    } catch (error) { launchToastAlert('⚠️ ' + error.message); }\n}\nasync function copyGeneratedCodeToClipboard() {\n    const output = document.getElementById('quiz-code-output');\n    if (!output.value) return;\n    try {\n        await navigator.clipboard.writeText(output.value);\n        launchToastAlert('📋 Code copied to clipboard!');\n    } catch {\n        output.focus();\n        output.select();\n        launchToastAlert('⚠️ Clipboard unavailable. Copy the selected code manually.');\n    }\n}\n\n}")},
+"shared/quiz-codes.js":{imports:[],run:new Function("__datesScope","__datesExports","__datesRequire","with(__datesScope){Object.defineProperties(__datesExports,{\"GENERATOR_QUESTION_COUNT\":{enumerable:true,get:()=>GENERATOR_QUESTION_COUNT},\"SUPPORTED_QUESTION_COUNTS\":{enumerable:true,get:()=>SUPPORTED_QUESTION_COUNTS},\"encodeQuizCode\":{enumerable:true,get:()=>encodeQuizCode},\"decodeTeacherQuizCode\":{enumerable:true,get:()=>decodeTeacherQuizCode}});\n// Keep the original HEX encoding: sorted book numbers, each padded to 3 decimal digits.\nconst GENERATOR_QUESTION_COUNT = 20;\nconst SUPPORTED_QUESTION_COUNTS = Object.freeze([10, 20]);\nconst MAX_BOOK_NUMBER = 999;\nfunction encodeQuizCode(numbers, bookId = 'book_a') {\n    if (['book_b','book_c','book_d'].includes(bookId)) {\n        if (!Array.isArray(numbers) || !SUPPORTED_QUESTION_COUNTS.includes(numbers.length) || new Set(numbers).size !== numbers.length || numbers.some(n => !Number.isInteger(n) || n < 1 || n > 9999)) throw new Error('Select 10 or 20 distinct Book B word numbers.');\n        return (bookId==='book_d'?'D4:':bookId==='book_c'?'C3:':'B2:') + [...numbers].sort((a,b)=>a-b).map(n=>String(n).padStart(4,'0')).join('.');\n    }\n    if (bookId !== 'book_a') throw new Error('Unknown book.');\n    if (!Array.isArray(numbers) || !SUPPORTED_QUESTION_COUNTS.includes(numbers.length) ||\n        new Set(numbers).size !== numbers.length ||\n        numbers.some(number => !Number.isInteger(number) || number < 1 || number > MAX_BOOK_NUMBER)) {\n        throw new Error('Select 10 or 20 distinct book numbers between 1 and 999.');\n    }\n    const sequence = [...numbers].sort((a,b) => a-b).map(number => String(number).padStart(3,'0')).join('');\n    return BigInt(sequence).toString(16).toUpperCase();\n}\nfunction decodeTeacherQuizCode(code) {\n    if (typeof code === 'string' && /^(B2|C3|D4):/i.test(code)) {\n        if (!/^(B2|C3|D4):\\d{4}(?:\\.\\d{4}){9}(?:(?:\\.\\d{4}){10})?$/i.test(code)) return null;\n        const numbers = code.slice(3).split('.').map(Number);\n        return numbers.every(n=>n > 0) && new Set(numbers).size === numbers.length ? numbers : null;\n    }\n    if (typeof code !== 'string' || !/^[0-9A-F]+$/i.test(code) || code.length > 50) return null;\n    try {\n        const decimal = BigInt('0x' + code).toString(10);\n        // A positive first 3-digit book number loses at most 2 leading zeros.\n        const count = decimal.length <= 30 ? 10 : 20;\n        if (decimal.length > count * 3) return null;\n        const sequence = decimal.padStart(count * 3, '0');\n        const numbers = [];\n        for (let index = 0; index < sequence.length; index += 3) {\n            const number = Number(sequence.slice(index, index + 3));\n            if (number < 1 || number > MAX_BOOK_NUMBER) return null;\n            numbers.push(number);\n        }\n        if (new Set(numbers).size !== count) return null;\n        return numbers;\n    } catch { return null; }\n}\n\n}")}};const cache=Object.create(null);function load(id){if(cache[id])return cache[id];const record=definitions[id];if(!record)throw Error("Missing Dates module: "+id);const exports=cache[id]=Object.create(null),scope=Object.create(null);for(const[local,dep,original]of record.imports)Object.defineProperty(scope,local,{enumerable:true,get:()=>load(dep)[original]});record.run(scope,exports,load);return exports;}load("test-generator/js/app.js");})();</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "version": "QuranAQ-v1031.26 Dates",
+  "date": "2026-10-31",
+  "forkOf": "Approved QuranAQ-v1030.26 Strawberry",
+  "publication": "local only - do not upload",
+  "futureDevelopment": "QuranAQ-v1030.26 Strawberry / Test2",
+  "library": {
+    "repository": "hassanme2050/Quran-Arabic-Quiz",
+    "branch": "main",
+    "folder": "Test2"
+  },
+  "outputs": {
+    "index.html": {
+      "bytes": 785455,
+      "sha256": "c7af0af5b7f623f992430e36c686efca2560a6902582f416a01406ad2b14c22f"
+    },
+    "Editor.html": {
+      "bytes": 61725,
+      "sha256": "6cf1f3a5592bc9bdf1100e0782aa11727c7b89034bc1e5d177c481c555bd6097"
+    },
+    "Test-Generator.html": {
+      "bytes": 43760,
+      "sha256": "ca7062d64f78cc76feae5cefafe4735e8b95add8e1c07446226ce4e1990b89e0"
+    },
+    "admin/index.html": {
+      "bytes": 12611,
+      "sha256": "19cc344d373f908f641eaa221f5f787a6050eb9cbc5f0d3eade1671aa2802dd6"
+    },
+    "Editor/index.html": {
+      "bytes": 61725,
+      "sha256": "6cf1f3a5592bc9bdf1100e0782aa11727c7b89034bc1e5d177c481c555bd6097"
+    },
+    "Quiz Generator/index.html": {
+      "bytes": 43760,
+      "sha256": "ca7062d64f78cc76feae5cefafe4735e8b95add8e1c07446226ce4e1990b89e0"
+    }
+  },
+  "embeddedQuranFont": "kfgqpc_hafs_v30.ttf",
+  "questAyahDetails": true,
+  "refreshed": "2026-10-31",
+  "dashboardSettings": "GitHub main/Test2/dbs.json",
+  "adminDashboard": true,
+  "sessionUnlockGoTaps": 7,
+  "androidPackages": "Existing local APKs predate the admin dashboard update",
+  "adminModule": "admin/index.html",
+  "adminEmbeddedInStudent": false,
+  "settingsRefresh": "Home focus and 15-second polling; hidden options removed"
+}

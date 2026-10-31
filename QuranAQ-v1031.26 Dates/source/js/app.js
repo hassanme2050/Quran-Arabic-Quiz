@@ -1,0 +1,158 @@
+import {initializeSettings,onSettingsChange,canUse,featureState,recordGoTap,syncBookSelector} from './feature-settings.js';
+import {refreshAvailability} from './vocabulary.js?v=1030.26-dates3';
+import { openQuest, initializeQuest } from './quest.js?v=1030.26-dates3';
+import { state } from './state.js?v=1030.26-dates3';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1030.26-dates3';
+import { shuffleArray, getRandomSubset } from './utils.js?v=1030.26-dates3';
+import { setMenuRefreshHandler, switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-dates3';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1030.26-dates3';
+import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1030.26-dates3';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-dates3';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1030.26-dates3';
+import { copyScreenshotToClipboard } from './platform.js?v=1030.26-dates3';
+import {openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse} from './word-details.js?v=1030.26-dates3';
+
+// Both fields are normalized together, including swapped or out-of-bounds ranges.
+export function normalizeCustomRange() {
+    const count = activeBook !== 'book_a' ? Math.max(0,...vocabularyList.map(item=>item.number)) : vocabularyList.length;
+    if (!count) return;
+    const first = document.getElementById('range-input-start');
+    const last = document.getElementById('range-input-end');
+    const clamp = value => Math.max(1, Math.min(count, value));
+    let start = clamp(parseInt(first.value, 10) || 1);
+    let end = clamp(parseInt(last.value, 10) || count);
+    if (start > end) [start, end] = [end, start];
+    const minimum = Math.min(10, count);
+    if (end - start + 1 < minimum) {
+        end = Math.min(count, start + minimum - 1);
+        start = Math.max(1, end - minimum + 1);
+        launchToastAlert('⚠️ Custom range requires at least ' + minimum + ' words. Adjusted automatically!');
+    }
+    first.value = start;
+    last.value = end;
+    first.max = last.max = count;
+}
+function validateLiveCustomBounds() { normalizeCustomRange(); }
+function triggerSelectedSession(mode) {
+    if (!vocabularyList.length) return;
+    if (state.activeStrategySetting === 'custom') normalizeCustomRange();
+    startSession(state.activeStrategySetting, mode);
+}
+export function updateSegmentSelection(targetStrategy) {
+    state.activeStrategySetting = targetStrategy;
+    const pill = document.getElementById('active-slider-pill');
+    const optAll = document.getElementById('opt-all');
+    const optLast = document.getElementById('opt-last');
+    const optCustom = document.getElementById('opt-custom');
+    const drawer = document.getElementById('range-drawer-box');
+    
+    optAll.classList.remove('active');
+    optLast.classList.remove('active');
+    optCustom.classList.remove('active');
+    
+    if (targetStrategy === 'all') {
+        pill.style.transform = 'translateX(0%)';
+        optAll.classList.add('active');
+        drawer.classList.remove('open');
+    } else if (targetStrategy === 'last') {
+        pill.style.transform = 'translateX(100%)';
+        optLast.classList.add('active');
+        drawer.classList.remove('open');
+    } else if (targetStrategy === 'custom') {
+        pill.style.transform = 'translateX(200%)';
+        optCustom.classList.add('active');
+        drawer.classList.add('open');
+        
+        let startInp = document.getElementById('range-input-start');
+        validateLiveCustomBounds(startInp, 'start');
+    }
+}
+
+export function startSession(strategy, mode) {
+    if(!canUse(activeBook,mode==='flashcard'?'review':'quiz'))return;
+    if (!vocabularyList.length) return;
+    cancelPendingAnswer();
+    cancelQuizAttempt();
+    state.currentMode = mode;
+    state.quizHistory = [];
+    
+    document.getElementById('status-message').classList.add('hidden');
+    
+    if (strategy === 'all') {
+        state.currentPool = [...vocabularyList];
+        state.sessionWords = getRandomSubset(state.currentPool, 10);
+    } else if (strategy === 'last') {
+        state.currentPool = vocabularyList.slice(-10);
+        state.sessionWords = [...state.currentPool];
+        shuffleArray(state.sessionWords);
+    } else if (strategy === 'custom') {
+        let startIdx = parseInt(document.getElementById('range-input-start').value) - 1;
+        let endIdx = parseInt(document.getElementById('range-input-end').value) - 1;
+        state.currentPool = activeBook !== 'book_a' ? vocabularyList.filter(item => item.number >= startIdx + 1 && item.number <= endIdx + 1) : vocabularyList.slice(startIdx, endIdx + 1);
+        state.sessionWords = getRandomSubset(state.currentPool, 10);
+    }
+
+    state.currentIndex = 0;
+    
+    if (state.currentMode === 'flashcard') {
+        document.getElementById('app-title').classList.remove('dictionary-title');
+        document.getElementById('app-title').textContent = "Quran Arabic Flashcards";
+        switchView('flashcard-view');
+        
+        const eyeNode = document.getElementById('card-eye-toggle');
+        if (state.globalPersistentEyeToggleStatus) {
+            eyeNode.classList.add('visible-state');
+            eyeNode.setAttribute('title', 'Hide Meaning Permanently');
+        } else {
+            eyeNode.classList.remove('visible-state');
+            eyeNode.setAttribute('title', 'Show Meaning Permanently');
+        }
+        
+        showCard();
+    } else {
+        document.getElementById('app-title').classList.remove('dictionary-title');
+        document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+        switchView('quiz-view');
+        showQuizQuestion();
+    }
+}
+
+function updateFeatureControls(force=false){if(!force&&document.getElementById('menu-view').classList.contains('hidden'))return;const selector=document.getElementById('vocabulary-book-selector');syncBookSelector(selector);refreshAvailability();if(selector.value&&selector.value!==activeBook)loadVocabulary(selector.value);else if(!selector.value){document.getElementById('status-message').textContent='No books are currently enabled.';document.getElementById('menu-view').classList.remove('hidden');}}
+async function handleGoClick(){if(recordGoTap()){updateFeatureControls();if(!vocabularyList.length&&document.getElementById('vocabulary-book-selector').value===activeBook)loadVocabulary(activeBook);launchToastAlert('Session unlocked');return;}if(document.getElementById('quiz-code-field').value.trim()&&canUse(activeBook,'quizCode'))startQuizWithCode();}
+async function initializeApp(){
+    initializeDictionarySearch();
+    document.getElementById('verse-details-view').addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeWordDetails();}if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();navigateWordVerse(event.key==='ArrowLeft'?-1:1);}});
+    initializeQuest();
+    const actions = {
+        openQuest, updateSegmentSelection, validateLiveCustomBounds, triggerSelectedSession,
+        startQuizWithCode, handleGoClick, openDictionaryMode, setDictionarySort, exitToHome,
+        handleFlashCardBodyClick, handleEyeToggleIntercept, handleCardProgression,
+        toggleSummaryTableVisibility, copyScreenshotToClipboard,
+        openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse
+    };
+    document.querySelectorAll('[data-action]').forEach(element => {
+        element.addEventListener(element.dataset.event || 'click', event => {
+            const action = actions[element.dataset.action];
+            if(element.dataset.action==='openWordDetails')event.stopPropagation();
+            if (element.dataset.action === 'handleEyeToggleIntercept') action(event);
+            else action(element.dataset.value);
+        });
+    });
+    const input = document.getElementById('quiz-code-field');
+    document.getElementById('quiz-participant-form').addEventListener('submit',event=>{event.preventDefault();startParticipantQuiz();});
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') startQuizWithCode();
+    });
+    input.addEventListener('input', clearQuizCodeError);
+    const selector = document.getElementById('vocabulary-book-selector');
+    selector.addEventListener('change', () => { clearQuizCodeError(); if(canUse(selector.value))loadVocabulary(selector.value); });
+    await initializeSettings();
+    onSettingsChange(()=>updateFeatureControls());
+    setMenuRefreshHandler(()=>updateFeatureControls());
+    const refresh=()=>{if(!document.getElementById('menu-view').classList.contains('hidden'))initializeSettings();};
+    window.addEventListener('focus',refresh);
+    const poll=()=>{refresh();setTimeout(poll,15000);};setTimeout(poll,15000);
+    updateFeatureControls(true);
+    if(canUse(selector.value))await loadVocabulary(selector.value);
+}
+initializeApp();

@@ -1,0 +1,15 @@
+{
+  "variant": "dates",
+  "version": "1030.26",
+  "build": "debug",
+  "packageId": "com.hassanme2050.quranaq.dates",
+  "bytes": 1537675,
+  "sha256": "2fac293e7a2b11ee7fe4bceb8977672a1fd9791cc940c673285bb560d84b98eb",
+  "buildRunId": 41180675271,
+  "buildJobId": 124477266524,
+  "source": "Approved Strawberry Test2",
+  "library": "GitHub main/Test2",
+  "signatureVerified": true,
+  "lintPassed": true,
+  "deviceInstallationTested": false
+}

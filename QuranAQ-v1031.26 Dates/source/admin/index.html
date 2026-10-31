@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dates Admin Dashboard</title><link rel="stylesheet" href="admin.css"></head>
+<body><main class="admin-card"><header class="admin-heading"><div><p class="eyebrow">Quran Arabic Quiz</p><h1>&#x1F6E0;&#xFE0F; Dates Admin</h1></div><button type="button" id="admin-close" class="secondary hidden">&#x1F512; Sign out</button></header>
+<form id="admin-login"><label for="admin-password">Editor password</label><input id="admin-password" type="password" autocomplete="current-password" required><label for="admin-token">GitHub token (Contents read/write)</label><input id="admin-token" type="password" autocomplete="off" required><button id="admin-login-button" type="submit">&#x1F513; Open Dashboard</button></form>
+<p id="admin-message" role="status" aria-live="polite"></p><section id="admin-settings" class="hidden"><div class="admin-table-scroll"><table id="admin-matrix" aria-label="Book and mode availability"></table></div><div class="admin-actions"><button id="admin-save" type="button">&#x1F4BE; Save</button><button id="admin-cancel" type="button" class="secondary">&#x21A9;&#xFE0F; Cancel</button></div></section></main>
+<script type="module" src="app.js"></script></body></html>
