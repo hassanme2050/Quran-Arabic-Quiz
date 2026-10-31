@@ -1,4 +1,4 @@
-# QuranAQ-v1031.26 Dates
+# QuranAQ
 
 Local-only portability fork of QuranAQ-v1030.26 Strawberry. Dates has not been uploaded to GitHub. Normal feature development continues in the Strawberry folder and GitHub Test2.
 
