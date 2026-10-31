@@ -1,0 +1,51 @@
+name: Build approved Strawberry and Dates Android packages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/android-approved-packages.yml','.github/android-package-build/**']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        variant: [strawberry, dates]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Prepare approved app and online-library assets
+        run: node .github/android-package-build/prepare-assets.cjs Test2 ${{ matrix.variant }}
+      - name: Install Android platform
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Build, lint and verify installable package
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          TASK="${VARIANT^}"
+          gradle -p .github/android-package-build "assemble${TASK}Debug" "lint${TASK}Debug" --no-daemon
+          APK=".github/android-package-build/app/build/outputs/apk/$VARIANT/debug/app-$VARIANT-debug.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 8
+      - name: Transfer package for local storage only
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto'),variant=process.env.VARIANT;
+          const bytes=fs.readFileSync('.github/android-package-build/app/build/outputs/apk/'+variant+'/debug/app-'+variant+'-debug.apk');
+          console.log('APK_META|'+variant+'|'+JSON.stringify({bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')}));
+          const data=bytes.toString('base64');for(let start=0;start<data.length;start+=60000)console.log('APK_LOCAL|'+variant+'|'+String(start/60000).padStart(4,'0')+'|'+data.slice(start,start+60000));
+          console.log('APK_LOCAL_COMPLETE|'+variant);
+          NODE
