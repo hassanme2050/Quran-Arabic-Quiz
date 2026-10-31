@@ -1,7 +1,7 @@
-import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1030.26-strawberry4';
-import {parseLughatBook} from '../../shared/lughat.js?v=1030.26-strawberry4';
-import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1030.26-strawberry4';
-import {parseQuranVocabulary} from '../../shared/quran-vocabulary.js?v=1030.26-strawberry4';
+import {parseVocabularyRecords} from '../../shared/vocabulary.js?v=1030.26-strawberry7';
+import {parseLughatBook} from '../../shared/lughat.js?v=1030.26-strawberry7';
+import {parseTajweedBook,validateTajweedQuestion} from '../../shared/tajweed.js?v=1030.26-strawberry7';
+import {parseQuranVocabulary} from '../../shared/quran-vocabulary.js?v=1030.26-strawberry7';
 
 export const recordNumber=(record,index)=>record.number??index+1;
 export const editableMeaning=record=>record.rawMeaning??record.meaning;

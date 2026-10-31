@@ -1,8 +1,8 @@
-import {state} from './state.js?v=1030.26-editor4';
-import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry4';
-import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1030.26-editor4';
-import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1030.26-editor4';
-import {validateEditorUpdate} from './book.js?v=1030.26-editor4';
+import {state} from './state.js?v=1030.26-editor5';
+import {launchToastAlert} from '../../shared/ui.js?v=1030.26-strawberry7';
+import {saveVocabularyRecord,saveVerificationBoundary} from './github.js?v=1030.26-editor5';
+import {setEditorLocked,hasUnsavedEdits,applySavedText,questionField,wrongAnswerValues} from './records.js?v=1030.26-editor5';
+import {validateEditorUpdate} from './book.js?v=1030.26-editor5';
 
 function selectedRecord() {
     const record=state.records[state.loadedIndex];

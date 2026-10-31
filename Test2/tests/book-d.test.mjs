@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry4';
-import {createVerseLoader,parseVerseResponse} from '../shared/quran-verses.js?v=1030.26-strawberry4';
-import {replaceQuranVocabularyRecord} from '../editor/js/book.js?v=1030.26-editor4';
-import {encodeQuizCode,decodeTeacherQuizCode} from '../shared/quiz-codes.js?v=1030.26-strawberry4';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry7';
+import {createVerseLoader,parseVerseResponse} from '../shared/quran-verses.js?v=1030.26-strawberry7';
+import {replaceQuranVocabularyRecord} from '../editor/js/book.js?v=1030.26-editor5';
+import {encodeQuizCode,decodeTeacherQuizCode} from '../shared/quiz-codes.js?v=1030.26-strawberry7';
 const source=fs.readFileSync(new URL('../Quran-Vocabulary-Meaning-Arabic-English.txt',import.meta.url),'utf8');
 const reference={surah:12,ayah:34,key:'12:34'};
 test('Book D Editor saves references and rejects stale or invalid changes while preserving other source rows',()=>{

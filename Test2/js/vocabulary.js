@@ -1,10 +1,10 @@
-import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-strawberry4';
-import { parseLughatBook } from '../shared/lughat.js?v=1030.26-strawberry4';
-import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-strawberry4';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry4';
-import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry4';
-import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1030.26-strawberry4';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry4';
+import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-strawberry7';
+import { parseLughatBook } from '../shared/lughat.js?v=1030.26-strawberry7';
+import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-strawberry7';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry7';
+import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry7';
+import { switchView, cancelPendingAnswer, clearQuizCodeError } from './ui.js?v=1030.26-strawberry7';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry7';
 export let vocabularyList = [];
 export let dictionaryVocabularyList = [];
 export let activeBook = 'book_a';

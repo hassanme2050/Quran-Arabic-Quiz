@@ -1,24 +1,33 @@
-import {state} from './state.js?v=1030.26-strawberry4';
-import {activeBook} from './vocabulary.js?v=1030.26-strawberry4';
-import {switchView} from './ui.js?v=1030.26-strawberry4';
-import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry4';
-import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry4';
+import {state} from './state.js?v=1030.26-strawberry7';
+import {activeBook} from './vocabulary.js?v=1030.26-strawberry7';
+import {renderTajweedContext} from '../shared/tajweed.js?v=1030.26-strawberry7';
+import {loadQuranVerse} from '../shared/quran-verses.js?v=1030.26-strawberry7';
 let session=null,request=0,controller;
 const byId=id=>document.getElementById(id);
 function cancelRequest(){request++;controller?.abort();controller=null;}
-export function cancelWordDetails(){cancelRequest();session=null;byId('verse-details-view').classList.add('hidden');byId('flashcard-view').inert=false;}
+export function cancelWordDetails(){
+    cancelRequest();
+    if(session)byId(session.viewId).inert=false;
+    session=null;byId('verse-details-view').classList.add('hidden');
+}
 export function openWordDetails(){
-    const record=state.sessionWords[state.currentIndex];
-    if(activeBook!=='book_d'||state.currentMode!=='flashcard'||!record?.references?.length)return;
-    cancelRequest();session={record,index:0,wordIndex:state.currentIndex};
-    byId('flashcard-view').inert=true;
+    const wordIndex=state.currentIndex,record=state.sessionWords[wordIndex];
+    if(state.currentMode!=='flashcard')return;
+    openAyahDetails(record,{viewId:'flashcard-view',triggerId:'card-details-btn',
+        isCurrent:()=>state.currentIndex===wordIndex&&state.sessionWords[wordIndex]===record});
+}
+export function openAyahDetails(record,{viewId,triggerId,isCurrent}){
+    if(activeBook!=='book_d'||!record?.references?.length||byId(viewId).classList.contains('hidden')||!isCurrent())return;
+    cancelWordDetails();session={record,index:0,viewId,triggerId,isCurrent};
+    byId(viewId).inert=true;
     renderTajweedContext(byId('verse-context'),record);byId('verse-details-view').classList.remove('hidden');renderVerse();
     byId('verse-back-btn').focus();
 }
 export function closeWordDetails(){
     if(!session)return;
-    const sameWord=activeBook==='book_d'&&state.currentIndex===session.wordIndex&&state.sessionWords[state.currentIndex]===session.record;
-    cancelWordDetails();if(sameWord){switchView('flashcard-view');byId('card-details-btn').focus();}
+    const current=session;
+    const sameCard=activeBook==='book_d'&&!byId(current.viewId).classList.contains('hidden')&&current.isCurrent();
+    cancelWordDetails();if(sameCard)byId(current.triggerId).focus();
 }
 export function navigateWordVerse(direction){
     if(!session)return;

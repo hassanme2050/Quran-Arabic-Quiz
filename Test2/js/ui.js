@@ -1,7 +1,7 @@
-export { launchToastAlert } from '../shared/ui.js?v=1030.26-strawberry4';
-import { state } from './state.js?v=1030.26-strawberry4';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry4';
-import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry4';
+export { launchToastAlert } from '../shared/ui.js?v=1030.26-strawberry7';
+import { state } from './state.js?v=1030.26-strawberry7';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry7';
+import {cancelWordDetails} from './word-details.js?v=1030.26-strawberry7';
 const views = ['menu-view', 'flashcard-view', 'quiz-view', 'quiz-participant-view', 'quiz-countdown-view', 'quiz-finished-view', 'review-finished-view', 'dictionary-view', 'quest-map-view', 'quest-review-view', 'quest-quiz-view', 'quest-result-view'];
 export function switchView(viewId) {
   for (const id of views) document.getElementById(id).classList.toggle('hidden', id !== viewId);

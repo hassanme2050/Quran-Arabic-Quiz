@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry4';
+import {parseQuranVocabulary} from '../shared/quran-vocabulary.js?v=1030.26-strawberry7';
 const root=new URL('../',import.meta.url);
 const server=spawn(process.execPath,[fileURLToPath(new URL('serve.cjs',root))],{env:{...process.env,PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
 const api=/https:\/\/(api\.alquran\.cloud|alquran\.api\.islamic\.network)\/v1\/ayah\//;
@@ -30,7 +30,7 @@ try{
   assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isEnabled());assert(await page.locator('[data-action="openQuest"]').isEnabled());assert(await page.locator('[data-action="openDictionaryMode"]').isEnabled());assert(await page.locator('#quiz-code-entry').isVisible());
   await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').click();
   for(let i=0;i<9;i++){
-   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry4');return state.sessionWords[state.currentIndex];});
+   const item=await page.evaluate(async()=>{const {state}=await import('/js/state.js?v=1030.26-strawberry7');return state.sessionWords[state.currentIndex];});
    const choices=await page.locator('#quiz-options-box button').allTextContents();assert(choices.includes(item.meaning));assert(choices.every(value=>!value.includes('Alternative Choice')));
    await page.locator('#quiz-options-box button').nth(choices.indexOf(item.meaning)).click();
    if(i<8)await page.locator('#quiz-counter').filter({hasText:'Question '+(i+2)+' of 9'}).waitFor();
@@ -70,7 +70,25 @@ try{
   await findWord('ذَٰلِكَ');mode='hold';let waiting=new Promise(resolve=>{ready=resolve;});await page.locator('#card-details-btn').click();await waiting;
   await page.locator('#verse-next-btn').click();await page.locator('#verse-english').filter({hasText:'22:11'}).waitFor();await fulfill(held,'55:45').catch(()=>{});assert.equal(await page.locator('#verse-reference').textContent(),'22:11');assert((await page.locator('#verse-english').textContent()).includes('22:11'));
   await page.locator('#verse-back-btn').click();waiting=new Promise(resolve=>{ready=resolve;});await page.locator('#card-details-btn').click();await waiting;await page.locator('#verse-back-btn').click();await fulfill(held,'55:45').catch(()=>{});assert(await page.locator('#flashcard-view').isVisible());
-  mode='normal';await page.locator('#flashcard-view [data-action="exitToHome"]').click();await page.selectOption('#vocabulary-book-selector','book_a');await page.locator('#status-message').filter({hasText:'Loaded'}).waitFor();
+  mode='normal';await page.locator('#flashcard-view [data-action="exitToHome"]').click();
+  await page.locator('[data-action="openQuest"]').click();await page.locator('#quest-continue').click();
+  const questReviewCounter=await page.locator('#quest-review-counter').textContent(),questWord=await page.locator('#quest-review-word').textContent();
+  const questSave=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage).filter(([key])=>key.startsWith('quranaq.quest.'))));
+  await page.locator('#quest-review-details-btn').click();await page.locator('#verse-english:not(.hidden)').waitFor();
+  assert(await page.locator('#quest-review-view').isVisible());assert(await page.locator('#quest-review-view').evaluate(el=>el.inert));
+  assert.equal(await page.locator('#verse-reference').textContent(),'12:34');await page.locator('#verse-next-btn').click();await page.locator('#verse-english').filter({hasText:'34:32'}).waitFor();
+  await page.screenshot({path:'artifacts/book-d-quest-details-'+viewport.width+'.png',fullPage:true});
+  await page.keyboard.press('Escape');assert(await page.locator('#verse-details-view').isHidden());assert.equal(await page.locator('#quest-review-counter').textContent(),questReviewCounter);assert.equal(await page.locator('#quest-review-word').textContent(),questWord);
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'quest-review-details-btn');assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage).filter(([key])=>key.startsWith('quranaq.quest.')))),questSave);
+  const countReview=Number(questReviewCounter.match(/of (\d+)/)[1]);for(let i=0;i<countReview;i++)await page.locator('#quest-review-next').click();
+  await page.locator('#quest-quiz-view:not(.hidden)').waitFor();const questionCounter=await page.locator('#quest-question-counter').textContent(),questionWord=await page.locator('#quest-question-word').textContent();
+  await page.locator('#quest-question-details-btn').click();await page.locator('#verse-english:not(.hidden)').waitFor();assert((await page.locator('#verse-word-meaning').textContent()).startsWith(questionWord));
+  await page.locator('#verse-back-btn').click();assert.equal(await page.locator('#quest-question-counter').textContent(),questionCounter);assert.equal(await page.evaluate(()=>document.activeElement.id),'quest-question-details-btn');
+  const correctMeaning=parseQuranVocabulary(fs.readFileSync(new URL('Quran-Vocabulary-Meaning-Arabic-English.txt',root),'utf8')).records.find(r=>r.word===questionWord).meaning;
+  const questChoices=await page.locator('#quest-answer-options button').allTextContents();await page.locator('#quest-answer-options button').nth(questChoices.indexOf(correctMeaning)).click();assert(await page.locator('#quest-question-details-btn').isDisabled());
+  await page.locator('#quest-question-counter').filter({hasText:'Question 2 of'}).waitFor();assert(await page.locator('#quest-question-details-btn').isEnabled());
+  await page.locator('#quest-quiz-view [data-quest-action="map"]').click();await page.locator('#quest-map-view [data-quest-action="home"]').click();
+  await page.selectOption('#vocabulary-book-selector','book_a');await page.locator('#status-message').filter({hasText:'Loaded'}).waitFor();
   assert(await page.locator('[data-value="quiz"][data-action="triggerSelectedSession"]').isEnabled());assert(await page.locator('[data-action="openDictionaryMode"]').isEnabled());
   await page.locator('[data-value="flashcard"][data-action="triggerSelectedSession"]').click();assert(await page.locator('#card-details-btn').isHidden());assert.deepEqual(errors,[]);await context.close();
  }

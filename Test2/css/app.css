@@ -615,13 +615,14 @@ button.exit-btn:hover {
 .verse-source a { color:inherit; }
 #verse-error { color:#9b2525; line-height:1.7; }
 #verse-reference { color:var(--counter-teal); font-size:13px; font-variant-numeric:tabular-nums; }
-#card-details-btn { display:flex; justify-content:center; align-items:center; gap:8px; }
+#card-details-btn,.quest-details-icon { display:flex; justify-content:center; align-items:center; gap:8px; }
 
 #app-title { white-space:nowrap; font-size:clamp(20px,5.8vw,36px); }
 .question-context { text-align:center; }
 .question-context strong { font-size:20px; }
 .question-context span { font-size:16px; }
-#card-details-btn { position:absolute; bottom:12px; right:52px; width:32px; height:32px; padding:0; background:transparent; color:#7c9090; font-size:27px; border:0; box-shadow:none; z-index:3; }
+#card-details-btn,.quest-details-icon { position:absolute; bottom:12px; right:52px; width:32px; height:32px; padding:0; background:transparent; color:#7c9090; font-size:27px; border:0; box-shadow:none; z-index:3; }
+[data-book="book_d"] .quest-review-card,[data-book="book_d"] .quest-question-card { padding-bottom:48px; }
 .verse-modal { position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,.96); overflow-y:auto; padding:65px max(20px,calc((100vw - 600px)/2)) 30px; box-sizing:border-box; }
 .verse-modal .verse-card { background:#101b1b; border-color:#536b6b; box-shadow:none; color:white; }
 .verse-modal .arabic-text-render,.verse-modal .verse-translation { color:white; }

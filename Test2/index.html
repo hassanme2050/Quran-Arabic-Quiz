@@ -6,9 +6,9 @@
     <title>Quran Arabic Quiz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=1030.26-strawberry4">
-    <link rel="stylesheet" href="css/app.css?v=1030.26-quranfont6">
-    <link rel="stylesheet" href="css/quest.css?v=1030.26-strawberry4">
+    <link rel="stylesheet" href="shared/typography.css?v=1030.26-strawberry7">
+    <link rel="stylesheet" href="css/app.css?v=1030.26-questdetails7">
+    <link rel="stylesheet" href="css/quest.css?v=1030.26-strawberry7">
 </head>
 <body>
     <div class="app-wrapper">
@@ -240,6 +240,7 @@
             <div class="quest-session-progress" id="quest-review-counter"></div>
 
             <div class="display-card-frame quest-review-card">
+                <button id="quest-review-details-btn" type="button" class="quest-details-icon hidden" aria-label="More details: Quran verses"><span aria-hidden="true">ⓘ</span></button>
                 <span class="quest-book-number" id="quest-review-number"></span>
                 <div id="quest-review-word" class="arabic-text-render" lang="ar" dir="rtl"></div>
                 <div id="quest-review-meaning" class="meaning-text-render"></div>
@@ -257,6 +258,7 @@
             <div class="quest-session-progress" id="quest-question-counter"></div>
 
             <div class="display-card-frame quest-question-card">
+                <button id="quest-question-details-btn" type="button" class="quest-details-icon hidden" aria-label="More details: Quran verses"><span aria-hidden="true">ⓘ</span></button>
                 <span class="quest-book-number" id="quest-question-number"></span>
                 <div class="arabic-text-render" id="quest-question-word" lang="ar" dir="rtl"></div>
             </div>
@@ -285,6 +287,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=1030.26-strawberry4"></script>
+    <script type="module" src="js/app.js?v=1030.26-strawberry7"></script>
 </body>
 </html>

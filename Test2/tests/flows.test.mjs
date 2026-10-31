@@ -5,9 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import {withVerificationAt} from './book-b-fixture.mjs';
-import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry4';
-import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1030.26-strawberry4';
-import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1030.26-editor4';
+import { encodeQuizCode, decodeTeacherQuizCode } from '../shared/quiz-codes.js?v=1030.26-strawberry7';
+import { parseVocabularyRecords, rootFileUrl, loadBook } from '../shared/vocabulary.js?v=1030.26-strawberry7';
+import { replaceVocabularyRecord, saveVocabularyRecord, repositoryVocabularyPath } from '../editor/js/github.js?v=1030.26-editor5';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -125,10 +125,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator selection spans pages, updates one tile, stops at 20 and invalidates stale codes', async () => {
         dom('test-generator/index.html');
-        await import('../test-generator/js/app.js?v=1030.26-strawberry4');
-        const {state} = await import('../test-generator/js/state.js?v=1030.26-strawberry4');
-        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js?v=1030.26-strawberry4');
-        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js?v=1030.26-strawberry4');
+        await import('../test-generator/js/app.js?v=1030.26-strawberry7');
+        const {state} = await import('../test-generator/js/state.js?v=1030.26-strawberry7');
+        const {renderInventoryTilesGrid,changeMatrixActivePage} = await import('../test-generator/js/grid.js?v=1030.26-strawberry7');
+        const {toggleWordSelection,processSelectedHexadecimalQuizCode} = await import('../test-generator/js/selection.js?v=1030.26-strawberry7');
         state.fullVocabularyInventory = records;
         renderInventoryTilesGrid();
         assert.equal(state.totalCardsPerPageLimit,50);
@@ -158,8 +158,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Generator login keeps failed loads visible and resets selection after a successful load', async () => {
         dom('test-generator/index.html');
-        const {state} = await import('../test-generator/js/state.js?v=1030.26-strawberry4');
-        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js?v=1030.26-strawberry4');
+        const {state} = await import('../test-generator/js/state.js?v=1030.26-strawberry7');
+        const {evaluateTeacherCredentials} = await import('../test-generator/js/auth.js?v=1030.26-strawberry7');
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
         globalThis.fetch = async url => String(url).endsWith('CP.txt')
@@ -183,10 +183,10 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('student runs complete 20- and legacy 10-question quizzes and cancels pending answers on exit', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry4');
-        const quiz = await import('../js/quiz.js?v=1030.26-strawberry4');
-        const {state} = await import('../js/state.js?v=1030.26-strawberry4');
-        const {exitToHome} = await import('../js/ui.js?v=1030.26-strawberry4');
+        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry7');
+        const quiz = await import('../js/quiz.js?v=1030.26-strawberry7');
+        const {state} = await import('../js/state.js?v=1030.26-strawberry7');
+        const {exitToHome} = await import('../js/ui.js?v=1030.26-strawberry7');
         vocabulary.parseVocabulary(vocabularyText);
         const beginCodeQuiz=()=>{
             quiz.startQuizWithCode();
@@ -225,8 +225,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('dictionary sorting never changes book order and reuses unchanged rows', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry4');
-        const dictionary = await import('../js/dictionary.js?v=1030.26-strawberry4');
+        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry7');
+        const dictionary = await import('../js/dictionary.js?v=1030.26-strawberry7');
         vocabulary.parseVocabulary(vocabularyText);
         const original = structuredClone(vocabulary.vocabularyList);
         dictionary.openDictionaryMode();
@@ -244,8 +244,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor rejects missing credentials and passwords absent from CP.txt', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor4');
-        const {state} = await import('../editor/js/state.js?v=1030.26-editor4');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor5');
+        const {state} = await import('../editor/js/state.js?v=1030.26-editor5');
         state.token='';
         const requests=[];
         globalThis.fetch = async (url,options) => {
@@ -276,8 +276,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor uses current UTF-8 passwords from CP.txt and blocks duplicate submissions', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor4');
-        const {state} = await import('../editor/js/state.js?v=1030.26-editor4');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor5');
+        const {state} = await import('../editor/js/state.js?v=1030.26-editor5');
         const configured='test-only-\u0627\u0644\u0641';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value=' '+configured+' ';
@@ -307,8 +307,8 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
     await t.test('Editor stays gated after password-file or vocabulary failures and can retry', async () => {
         dom('editor/index.html');
         el('verify-open-btn').disabled=false;
-        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor4');
-        const {state} = await import('../editor/js/state.js?v=1030.26-editor4');
+        const {evaluateAdministrativeCredentials} = await import('../editor/js/auth.js?v=1030.26-editor5');
+        const {state} = await import('../editor/js/state.js?v=1030.26-editor5');
         state.token='';
         el('login-book-selector').value='book_a';
         el('admin-passcode-box').value='test-only-password';
@@ -336,11 +336,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Editor loads and navigates book numbers, rejects mismatched save target, and blocks conflicts', async () => {
         dom('editor/index.html');
-        await import('../editor/js/app.js?v=1030.26-editor4');
-        const {state} = await import('../editor/js/state.js?v=1030.26-editor4');
-        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1030.26-editor4');
-        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1030.26-editor4');
-        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1030.26-editor4');
+        await import('../editor/js/app.js?v=1030.26-editor5');
+        const {state} = await import('../editor/js/state.js?v=1030.26-editor5');
+        const {initializeVocabularyDataStream} = await import('../editor/js/vocabulary.js?v=1030.26-editor5');
+        const {navigateWord,loadTargetInventoryRecord} = await import('../editor/js/records.js?v=1030.26-editor5');
+        const {saveWordUpdateToGitHub} = await import('../editor/js/save.js?v=1030.26-editor5');
         let requests = 0;
         globalThis.fetch = async () => { requests++; return {ok:true,text:async()=>vocabularyText}; };
         assert(await initializeVocabularyDataStream());
@@ -385,9 +385,9 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Book B Editor loads all entries, including unverified and repeated source numbers', async () => {
         dom('editor/index.html');
-        const {state}=await import('../editor/js/state.js?v=1030.26-editor4');
-        const {initializeVocabularyDataStream}=await import('../editor/js/vocabulary.js?v=1030.26-editor4');
-        const {navigateWord,loadTargetInventoryRecord}=await import('../editor/js/records.js?v=1030.26-editor4');
+        const {state}=await import('../editor/js/state.js?v=1030.26-editor5');
+        const {initializeVocabularyDataStream}=await import('../editor/js/vocabulary.js?v=1030.26-editor5');
+        const {navigateWord,loadTargetInventoryRecord}=await import('../editor/js/records.js?v=1030.26-editor5');
         const text=withVerificationAt(read('Lughat-AlQuran-word-meaning.txt'),20);
         state.activeBook='book_b';state.activeFile='Lughat-AlQuran-word-meaning.txt';
         globalThis.fetch=async()=>({ok:true,text:async()=>text});
@@ -427,11 +427,11 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
 
     await t.test('Book B sessions exclude unverified words, dictionary keeps them, and codes enforce book identity', async () => {
         dom('index.html');
-        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry4');
-        const quiz = await import('../js/quiz.js?v=1030.26-strawberry4');
-        const dictionary = await import('../js/dictionary.js?v=1030.26-strawberry4');
-        const cards = await import('../js/flashcards.js?v=1030.26-strawberry4');
-        const {state} = await import('../js/state.js?v=1030.26-strawberry4');
+        const vocabulary = await import('../js/vocabulary.js?v=1030.26-strawberry7');
+        const quiz = await import('../js/quiz.js?v=1030.26-strawberry7');
+        const dictionary = await import('../js/dictionary.js?v=1030.26-strawberry7');
+        const cards = await import('../js/flashcards.js?v=1030.26-strawberry7');
+        const {state} = await import('../js/state.js?v=1030.26-strawberry7');
         const headings = read('Lughat-AlQuran-word-meaning.txt').split(/\r?\n/).slice(0,2).join('\n');
         const rows = Array.from({length:30},(_,i)=>String(i+1).padStart(4,'0')+' word'+(i+1)+' \u27F5 meaning'+(i+1)+' (note)');
         const text = headings+'\n'+rows.slice(0,20).join('\n')+'\n-----\n'+rows.slice(20).join('\n');

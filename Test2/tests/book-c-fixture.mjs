@@ -1,4 +1,4 @@
-import {parseTajweedBook} from '../shared/tajweed.js?v=1030.26-strawberry4';
+import {parseTajweedBook} from '../shared/tajweed.js?v=1030.26-strawberry7';
 export function withTajweedVerificationAt(text,number){
     const lines=String(text).split(/\r\n|\n|\r/).filter(line=>!/^\s*-{5,}(?:\s.*)?$/.test(line));
     const record=parseTajweedBook(lines.join('\n')).records.find(item=>item.number===number);

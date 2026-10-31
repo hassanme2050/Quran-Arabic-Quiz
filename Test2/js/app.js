@@ -1,14 +1,14 @@
-import { openQuest, initializeQuest } from './quest.js?v=1030.26-strawberry4';
-import { state } from './state.js?v=1030.26-strawberry4';
-import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1030.26-strawberry4';
-import { shuffleArray, getRandomSubset } from './utils.js?v=1030.26-strawberry4';
-import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry4';
-import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1030.26-strawberry4';
-import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1030.26-strawberry4';
-import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry4';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1030.26-strawberry4';
-import { copyScreenshotToClipboard } from './platform.js?v=1030.26-strawberry4';
-import {openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse} from './word-details.js?v=1030.26-strawberry4';
+import { openQuest, initializeQuest } from './quest.js?v=1030.26-strawberry7';
+import { state } from './state.js?v=1030.26-strawberry7';
+import { vocabularyList, loadVocabulary, activeBook } from './vocabulary.js?v=1030.26-strawberry7';
+import { shuffleArray, getRandomSubset } from './utils.js?v=1030.26-strawberry7';
+import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js?v=1030.26-strawberry7';
+import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js?v=1030.26-strawberry7';
+import { showQuizQuestion, startQuizWithCode, startParticipantQuiz, toggleSummaryTableVisibility } from './quiz.js?v=1030.26-strawberry7';
+import {cancelQuizAttempt} from './quiz-attempt.js?v=1030.26-strawberry7';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=1030.26-strawberry7';
+import { copyScreenshotToClipboard } from './platform.js?v=1030.26-strawberry7';
+import {openWordDetails,closeWordDetails,navigateWordVerse,retryWordVerse} from './word-details.js?v=1030.26-strawberry7';
 
 // Both fields are normalized together, including swapped or out-of-bounds ranges.
 export function normalizeCustomRange() {
