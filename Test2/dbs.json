@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "books": {
+    "book_a": {
+      "state": "enable",
+      "review": "enable",
+      "quiz": "enable",
+      "quest": "enable",
+      "dictionary": "enable",
+      "quizCode": "enable"
+    },
+    "book_b": {
+      "state": "enable",
+      "review": "enable",
+      "quiz": "enable",
+      "quest": "enable",
+      "dictionary": "enable",
+      "quizCode": "enable"
+    },
+    "book_c": {
+      "state": "enable",
+      "review": "enable",
+      "quiz": "enable",
+      "quest": "enable",
+      "dictionary": "disable",
+      "quizCode": "hide"
+    },
+    "book_d": {
+      "state": "enable",
+      "review": "enable",
+      "quiz": "enable",
+      "quest": "enable",
+      "dictionary": "enable",
+      "quizCode": "enable"
+    }
+  }
+}
