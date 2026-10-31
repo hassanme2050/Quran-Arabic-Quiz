@@ -18,11 +18,11 @@
       "quizCode": "enable"
     },
     "book_c": {
-      "state": "hide",
-      "review": "enable",
-      "quiz": "enable",
-      "quest": "enable",
-      "dictionary": "disable",
+      "state": "enable",
+      "review": "disable",
+      "quiz": "disable",
+      "quest": "disable",
+      "dictionary": "hide",
       "quizCode": "hide"
     },
     "book_d": {
