@@ -30,7 +30,7 @@
       "review": "enable",
       "quiz": "enable",
       "quest": "enable",
-      "dictionary": "enable",
+      "dictionary": "disable",
       "quizCode": "enable"
     }
   }
