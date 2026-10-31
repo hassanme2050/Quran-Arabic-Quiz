@@ -626,3 +626,6 @@ button.exit-btn:hover {
 .verse-modal .verse-card { background:#101b1b; border-color:#536b6b; box-shadow:none; color:white; }
 .verse-modal .arabic-text-render,.verse-modal .verse-translation { color:white; }
 #verse-back-btn { position:fixed; top:12px; right:16px; width:44px; height:44px; margin:0; padding:0; font-size:32px; z-index:3001; }
+
+@font-face { font-family: "Quran Hafs"; src: url("../resources/font/kfgqpc_hafs_v30.ttf") format("truetype"); font-weight:normal; font-style:normal; font-display:swap; }
+#verse-arabic { font-family:"Quran Hafs",serif; font-weight:normal; font-synthesis:none; }
