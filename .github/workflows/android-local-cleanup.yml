@@ -1,0 +1,19 @@
+name: Remove temporary Android transfer logs
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/android-local-cleanup.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove temporary package-transfer logs after verified local download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method DELETE repos/hassanme2050/Quran-Arabic-Quiz/actions/runs/41180675271/logs
+          echo 'Temporary APK-transfer logs removed. Packages were verified and saved locally.'
