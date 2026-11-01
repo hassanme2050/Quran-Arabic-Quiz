@@ -18,7 +18,7 @@
       "quizCode": "hide"
     },
     "book_c": {
-      "state": "disable",
+      "state": "enable",
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
@@ -26,7 +26,7 @@
       "quizCode": "hide"
     },
     "book_d": {
-      "state": "hide",
+      "state": "enable",
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
