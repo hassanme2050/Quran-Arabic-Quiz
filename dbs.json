@@ -26,9 +26,9 @@
       "quizCode": "hide"
     },
     "book_d": {
-      "state": "disable",
-      "review": "enable",
-      "quiz": "enable",
+      "state": "hide",
+      "review": "disable",
+      "quiz": "disable",
       "quest": "hide",
       "dictionary": "disable",
       "quizCode": "hide"
