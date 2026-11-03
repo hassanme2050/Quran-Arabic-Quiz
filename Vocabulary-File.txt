@@ -96,3 +96,8 @@
 فِيمَا = In what
 كَمَا = As / just as
 لِمَا = For what / that which
+مِمَّا = Out Of what
+كَ = Your
+هُمْ = Them
+أَمَّا = As to / As for
+إِمَّا = If ; Either / or
