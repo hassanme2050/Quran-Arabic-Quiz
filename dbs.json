@@ -22,7 +22,7 @@
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
-      "dictionary": "disable",
+      "dictionary": "hide",
       "quizCode": "hide"
     },
     "book_d": {
@@ -30,7 +30,7 @@
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
-      "dictionary": "disable",
+      "dictionary": "hide",
       "quizCode": "hide"
     }
   }
