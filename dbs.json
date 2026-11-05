@@ -18,19 +18,19 @@
       "quizCode": "hide"
     },
     "book_c": {
-      "state": "enable",
+      "state": "hide",
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
-      "dictionary": "hide",
+      "dictionary": "disable",
       "quizCode": "hide"
     },
     "book_d": {
-      "state": "enable",
+      "state": "hide",
       "review": "disable",
       "quiz": "disable",
       "quest": "hide",
-      "dictionary": "hide",
+      "dictionary": "disable",
       "quizCode": "hide"
     }
   }
