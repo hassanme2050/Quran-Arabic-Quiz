@@ -60,7 +60,7 @@ export function startQuizWithCode() {
     document.getElementById('participant-quiz-info').textContent=(activeBook==='book_c'?'Book C':activeBook==='book_d'?'Book D':activeBook==='book_b'?'Book B':'Book A - 500 Arabic Word (Arabic to English)')+' · '+selectedWords.length+' questions';
     document.getElementById('participant-start-btn').disabled=false;
     document.getElementById('status-message').classList.add('hidden');
-    document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
+    document.getElementById('app-title').textContent = 'QuranFahm.app';
     switchView('quiz-participant-view');
     document.getElementById('participant-name').focus();
     preloadScorecardRenderer();
