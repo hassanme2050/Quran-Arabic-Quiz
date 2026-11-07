@@ -1,8 +1,5 @@
 name: QuranFahm first signed APK and AAB
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/quranfahm-release.yml']
   workflow_dispatch:
 permissions:
   contents: read
