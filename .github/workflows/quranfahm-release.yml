@@ -1,0 +1,55 @@
+name: QuranFahm first signed APK and AAB
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/quranfahm-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Prepare approved Dates from X and GitHub root library
+        run: node .github/android-package-build/prepare-assets.cjs X dates
+      - name: Prepare release identity, supplied icon and new upload key
+        run: node .github/quranfahm-release/release.cjs prepare
+      - name: Preserve encrypted signing backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuranFahm-encrypted-signing-backup
+          path: |
+            quranfahm-release-output/signing-backup.encrypted.json
+            quranfahm-release-output/upload-certificate.pem
+          retention-days: 7
+      - name: Install build platform
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Build signed release APK and AAB
+        run: gradle -p .github/android-package-build assembleDatesRelease bundleDatesRelease lintDatesRelease --no-daemon
+      - name: Verify signatures and app identity
+        run: |
+          APK='.github/android-package-build/app/build/outputs/apk/dates/release/app-dates-release.apk'
+          AAB='.github/android-package-build/app/build/outputs/bundle/datesRelease/app-dates-release.aab'
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 10
+          jarsigner -verify "$AAB" | tee /tmp/quranfahm-aab-verification.txt
+          grep -q 'jar verified' /tmp/quranfahm-aab-verification.txt
+      - name: Collect packages and transfer for local storage
+        run: node .github/quranfahm-release/release.cjs collect
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QuranFahm-signed-APK-AAB-v1107.26
+          path: quranfahm-release-output/
+          retention-days: 7
