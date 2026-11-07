@@ -2,3 +2,10 @@
 **/android/output/
 *.apk
 *.aab
+
+# Signing keys, credentials and local package archives must never be committed.
+*.p12
+*.jks
+*.keystore
+**/Signing/
+**/ZZ-Android-Packages/
