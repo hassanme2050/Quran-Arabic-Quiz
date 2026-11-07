@@ -1,0 +1,4 @@
+# Android build outputs and packages are kept locally.
+**/android/output/
+*.apk
+*.aab
