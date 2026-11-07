@@ -28,7 +28,7 @@ export function exitToHome() {
   cancelPendingAnswer();
     cancelQuizAttempt();
   document.getElementById('app-title').classList.remove('dictionary-title');
-  document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
+  document.getElementById('app-title').textContent = 'QuranFahm.app';
   document.getElementById('status-message').classList.remove('hidden');
   clearQuizCodeError();
   switchView('menu-view');
