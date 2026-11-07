@@ -111,7 +111,7 @@ export function startSession(strategy, mode) {
         showCard();
     } else {
         document.getElementById('app-title').classList.remove('dictionary-title');
-        document.getElementById('app-title').textContent = "Quran Arabic Quiz";
+        document.getElementById('app-title').textContent = "QuranFahm.app";
         switchView('quiz-view');
         showQuizQuestion();
     }
