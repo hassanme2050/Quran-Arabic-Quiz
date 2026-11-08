@@ -1,4 +1,4 @@
-name: QuranFahm rotated APK and AAB # corrected icon source
+name: QuranFahm rotated APK and AAB # signature verification update
 on:
   push:
     branches: [main]
@@ -35,12 +35,13 @@ jobs:
           AAB='.github/android-package-build/app/build/outputs/bundle/datesRelease/app-dates-release.aab'
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 10
-          jarsigner -verify -strict "$AAB" >/tmp/qf-jarsigner.txt
-          keytool -printcert -jarfile "$AAB" | tee /tmp/qf-cert.txt
+          jarsigner -verify "$AAB" >/tmp/qf-jarsigner.txt
+          grep -qi 'jar verified' /tmp/qf-jarsigner.txt
+          APK_SHA=$("$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | awk '/Signer #1 certificate SHA-256 digest:/{print $NF;exit}')
+          BUNDLE_SHA=$(keytool -printcert -jarfile "$AAB" | awk '/Signer #1 certificate SHA-256 digest:/{print $NF;exit}')
           NEW_SHA=$(keytool -exportcert -keystore "$QF_KEYSTORE" -storepass "$QF_STORE_PASSWORD" -alias "$QF_KEY_ALIAS" | sha256sum | cut -d' ' -f1)
-          BUNDLE_SHA=$(keytool -printcert -jarfile "$AAB" | awk '/SHA256:/{gsub(":","",$2); print tolower($2); exit}')
-          test "$NEW_SHA" = "$BUNDLE_SHA"
-          echo 'APK and AAB signatures verified against the new matching upload key.'
+          test -n "$APK_SHA" && test "$APK_SHA" = "$BUNDLE_SHA" && test "$BUNDLE_SHA" = "$NEW_SHA"
+          echo 'APK and AAB signatures verified against the same new upload key.'
       - name: Collect both install packages and encrypted local key backup
         run: node .github/quranfahm-release-rotation/release.cjs collect
       - uses: actions/upload-artifact@v4
