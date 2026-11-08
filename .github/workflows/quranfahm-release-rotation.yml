@@ -1,4 +1,4 @@
-name: QuranFahm rotated APK and AAB
+name: QuranFahm rotated APK and AAB # corrected icon source
 on:
   push:
     branches: [main]
