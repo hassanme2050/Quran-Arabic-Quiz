@@ -24,7 +24,7 @@ if(process.argv[2]==='prepare'){
   "dependencies { implementation 'androidx.webkit:webkit:1.14.0' }"
  ].join('\n')+'\n');
  const flavor=path.join(project,'app/src/dates'),drawable=path.join(flavor,'res/drawable-nodpi');fs.mkdirSync(drawable,{recursive:true});
- fs.writeFileSync(path.join(drawable,'quranfahm_app_icon.png'),Buffer.from(fs.readFileSync(path.join(source,'app-icon.png.base64'),'utf8').trim(),'base64'));
+ fs.writeFileSync(path.join(drawable,'quranfahm_app_icon.png'),Buffer.from(fs.readFileSync(path.join(__dirname,'../quranfahm-apk-install-fix/app-icon.png.base64'),'utf8').trim(),'base64'));
  fs.writeFileSync(path.join(flavor,'AndroidManifest.xml'),'<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"><application android:icon="@drawable/quranfahm_app_icon" tools:replace="android:icon" /></manifest>');
  console.log('Rotated signing key and updated supplied icon are prepared.');
 }else if(process.argv[2]==='collect'){
