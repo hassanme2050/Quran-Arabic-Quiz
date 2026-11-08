@@ -4,13 +4,34 @@ on:
     branches: [main]
     paths: ['.github/workflows/quranfahm-aab.yml']
 permissions:
-  contents: write
+  contents: read
 jobs:
-  bundle:
+  prepare-key:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    outputs:
+      public-key: \${{ steps.generate.outputs.public-key }}
+      artifact-password: \${{ steps.generate.outputs.artifact-password }}
     steps:
       - uses: actions/checkout@v4
+      - id: generate
+        run: node .github/quranfahm-aab/exchange.cjs generate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qf-aab-exchange-key
+          path: qf-exchange/
+          retention-days: 1
+  bundle:
+    needs: prepare-key
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      QF_EXCHANGE_PASSWORD: \${{ needs.prepare-key.outputs.artifact-password }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: qf-aab-exchange-key
+          path: qf-exchange
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -23,9 +44,7 @@ jobs:
           packages: 'platform-tools'
       - name: Prepare approved X app and root library
         run: node .github/android-package-build/prepare-assets.cjs X dates
-      - name: Exchange upload key securely
-        env:
-          GITHUB_TOKEN: \${{ github.token }}
+      - name: Recover same signing key and updated app icon
         run: node .github/quranfahm-aab/exchange.cjs prepare
       - name: Install build platform
         run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
@@ -47,6 +66,4 @@ jobs:
           retention-days: 7
       - name: Remove temporary signing exchange
         if: always()
-        env:
-          GITHUB_TOKEN: \${{ github.token }}
         run: node .github/quranfahm-aab/exchange.cjs cleanup
