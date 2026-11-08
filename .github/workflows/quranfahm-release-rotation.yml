@@ -1,0 +1,53 @@
+name: QuranFahm rotated APK and AAB
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/quranfahm-release-rotation.yml']
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Prepare approved X app and GitHub-root book library
+        run: node .github/android-package-build/prepare-assets.cjs X dates
+      - name: Generate replacement signing key and use current icon
+        run: node .github/quranfahm-release-rotation/release.cjs prepare
+      - name: Install build platform
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Build signed APK and Android App Bundle
+        run: gradle -p .github/android-package-build assembleDatesRelease bundleDatesRelease --no-daemon
+      - name: Verify APK and AAB signatures and app identity
+        run: |
+          APK='.github/android-package-build/app/build/outputs/apk/dates/release/app-dates-release.apk'
+          AAB='.github/android-package-build/app/build/outputs/bundle/datesRelease/app-dates-release.aab'
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 10
+          jarsigner -verify -strict "$AAB" >/tmp/qf-jarsigner.txt
+          keytool -printcert -jarfile "$AAB" | tee /tmp/qf-cert.txt
+          NEW_SHA=$(keytool -exportcert -keystore "$QF_KEYSTORE" -storepass "$QF_STORE_PASSWORD" -alias "$QF_KEY_ALIAS" | sha256sum | cut -d' ' -f1)
+          BUNDLE_SHA=$(keytool -printcert -jarfile "$AAB" | awk '/SHA256:/{gsub(":","",$2); print tolower($2); exit}')
+          test "$NEW_SHA" = "$BUNDLE_SHA"
+          echo 'APK and AAB signatures verified against the new matching upload key.'
+      - name: Collect both install packages and encrypted local key backup
+        run: node .github/quranfahm-release-rotation/release.cjs collect
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QuranFahm-APK-AAB-v1107.26-RotatedSigning
+          path: quranfahm-rotation-output/
+          retention-days: 7
+      - name: Remove runner keystore
+        if: always()
+        run: rm -f "$QF_KEYSTORE"
