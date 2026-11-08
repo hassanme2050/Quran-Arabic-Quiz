@@ -1,0 +1,52 @@
+name: QuranFahm signed AAB
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/quranfahm-aab.yml']
+permissions:
+  contents: write
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Prepare approved X app and root library
+        run: node .github/android-package-build/prepare-assets.cjs X dates
+      - name: Exchange upload key securely
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: node .github/quranfahm-aab/exchange.cjs prepare
+      - name: Install build platform
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Build signed Android App Bundle
+        run: gradle -p .github/android-package-build bundleDatesRelease --no-daemon
+      - name: Verify AAB signature and app identity
+        run: |
+          AAB='.github/android-package-build/app/build/outputs/bundle/datesRelease/app-dates-release.aab'
+          jarsigner -verify -strict "$AAB" >/tmp/qf-jarsigner.txt
+          keytool -printcert -jarfile "$AAB" | tee /tmp/qf-cert.txt
+          grep -qi 'SHA256: C2:3F:8D:3C:1A:69:BE:94:EF:FA:38:E0:5F:58:9F:57:C4:CB:8F:1F:01:65:52:3F:34:2C:61:78:EB:9A:3F:EA' /tmp/qf-cert.txt
+          echo 'AAB signature verified against the working InstallFix APK upload certificate.'
+      - name: Collect AAB
+        run: node .github/quranfahm-aab/exchange.cjs collect
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QuranFahm-AAB-v1107.26-InstallFix
+          path: quranfahm-aab-output/
+          retention-days: 7
+      - name: Remove temporary signing exchange
+        if: always()
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: node .github/quranfahm-aab/exchange.cjs cleanup
