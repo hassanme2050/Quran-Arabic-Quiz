@@ -1,6 +1,6 @@
 import {BOOK_IDS,FEATURE_KEYS,nextSetting,validateSettings} from '../shared/dashboard-settings.js';
 import {LIBRARY,libraryPath,libraryUrl} from '../shared/library-config.js';
-const labels={state:'Availability',review:'Review Mode',quiz:'Quiz Mode',quest:'Quest Mode',dictionary:'Dictionary Mode',quizCode:'Quiz Code'},names=['Book 1 - A','Book 2 - B','Book 3 - C','Book 4 - D'],states={enable:['\u2705','Enable'],disable:['\u26d4','Disable'],hide:['\ud83d\ude48','Hide']};
+const labels={state:'Availability',review:'Review Mode',quiz:'Quiz Mode',quest:'Quest Mode',dictionary:'Dictionary Mode',quizCode:'Quiz Code',spelling:'Spelling Mode'},names=['Book 1 - A','Book 2 - B','Book 3 - C','Book 4 - D'],states={enable:['\u2705','Enable'],disable:['\u26d4','Disable'],hide:['\ud83d\ude48','Hide']};
 let draft=null,sha='',token='',busy=false;
 const el=id=>document.getElementById(id),endpoint='https://api.github.com/repos/'+LIBRARY.owner+'/'+LIBRARY.repository+'/contents/'+libraryPath('dbs.json');
 const encode=text=>btoa(Array.from(new TextEncoder().encode(text),n=>String.fromCharCode(n)).join(''));
