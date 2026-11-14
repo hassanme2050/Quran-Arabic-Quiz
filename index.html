@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Arabic Quiz</title>
+    <title>QuranFahm.app</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="shared/typography.css?v=20261028-peaches-summary1">
-    <link rel="stylesheet" href="css/app.css?v=20261028-peaches-summary1">
+    <link rel="stylesheet" href="shared/typography.css?v=20261114-p2-r5">
+    <link rel="stylesheet" href="css/app.css?v=20261114-p2-r5">
 </head>
 <body>
     <div class="app-wrapper">
-        <h1 id="app-title">Quran Arabic Quiz</h1>
+        <h1 id="app-title">QuranFahm.app</h1>
         
         <div class="status-banner" id="status-message">Connecting to Vocabulary Records...</div>
 
@@ -24,6 +24,9 @@
                 <div class="segment-option" id="opt-custom" data-action="updateSegmentSelection" data-value="custom">Custom Range</div>
             </div>
 
+            <div id="book5-round-picker" class="range-drawer-panel">
+                <div class="range-flex-row"><label for="book5-round-select">Round</label><select id="book5-round-select" aria-label="Ten word round"><option value="1">1 — Words 1–10</option><option value="2">2 — Words 11–20</option><option value="3">3 — Words 21–30</option><option value="4">4 — Words 31–40</option><option value="5">5 — Words 41–50</option><option value="6">6 — Words 51–60</option><option value="7">7 — Words 61–70</option><option value="8">8 — Words 71–80</option><option value="9">9 — Words 81–90</option><option value="10">10 — Words 91–100</option></select></div>
+            </div>
             <div class="range-drawer-panel" id="range-drawer-box">
                 <div class="range-flex-row">
                     <span>From</span>
@@ -36,18 +39,23 @@
             <div class="menu-action-layout">
                 <button data-action="triggerSelectedSession" data-value="flashcard">Review Mode</button>
                 <button data-action="triggerSelectedSession" data-value="quiz">Quiz Mode</button>
-                <button data-action="openDictionaryMode">Dictionary Mode</button>
+                <button id="dictionary-mode-button" data-action="openDictionaryMode">Dictionary Mode</button>
+                <button id="spelling-mode-button" class="hidden" data-action="triggerSelectedSession" data-value="spelling">Spelling Mode</button>
             </div>
 
             <!-- Book Selection Dropdown element positioned under Quiz Mode -->
             <select class="custom-select-menu" id="vocabulary-book-selector">
                 <option value="book_a" selected>Book A - Arabic to English</option>
                 <option value="book_b">Book B - Lughat Al-Quran (Arabic to Urdu)</option>
-                <option value="book_c" disabled>Book C - Tajweed (Disabled)</option>
+                <option value="book_e">Book E - Pace Academy - English to Arabic</option>
             </select>
 
+            <div id="book-level-submenu" class="book-level-submenu hidden">
+                <label for="book-level-select">Level</label>
+                <select id="book-level-select" class="custom-select-menu"><option value="1">Level 1 — KG - Grade 3</option><option value="2">Level 2 — Grades 4 - 6</option><option value="3">Level 3 — Grades 7 - 8</option><option value="4">Level 4 — Grades 9 - 10</option></select>
+            </div>
             <!-- Student quiz-code entry -->
-            <div class="custom-input-field-group">
+            <div id="quiz-code-group" class="custom-input-field-group">
                 <input type="text" class="custom-text-input" id="quiz-code-field" placeholder="I have a quiz code" aria-label="Enter quiz code" autocomplete="off" autocapitalize="characters" spellcheck="false">
                 <button id="quiz-code-btn" style="padding: 14px 22px;" type="button" data-action="startQuizWithCode">GO</button>
             </div>
@@ -55,7 +63,7 @@
         </div>
 
 
-        <!-- Dictionary Mode is a separate module; it does not alter quiz/review session state. -->
+        <!-- Dictionary is available for Books A and B. -->
         <div id="dictionary-view" class="hidden">
             <div id="dictionary-toolbar" class="dictionary-sort" role="group" aria-label="Sort dictionary">
                 <div class="dictionary-sort-pill" id="dictionary-sort-pill"></div>
@@ -108,15 +116,18 @@
             </div>
         </div>
 
+        <div id="spelling-view" class="hidden" data-book="book_e"><div class="counter-label-text" id="spelling-counter"></div><div class="display-card-frame spelling-prompt-card"><div id="spelling-english-prompt" class="spelling-english-prompt"></div></div><input id="spelling-answer" class="custom-text-input spelling-answer" type="text" lang="ar" dir="rtl" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the Arabic word" placeholder="Type the Arabic word"><div id="spelling-feedback" role="status" aria-live="polite"></div><div class="navigation-buttons"><button id="spelling-submit-button" data-action="submitSpellingAnswer">Submit</button><button id="spelling-next-button" class="hidden" data-action="advanceSpelling">Next Word</button><button class="exit-btn" data-action="exitToHome">Exit to Menu</button></div></div>
+
         <!-- Reordered Quiz Summary Screen Layout Panels -->
         <div id="quiz-finished-view" class="hidden">
             <div id="screenshot-target-scorecard">
-                <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
-                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">Quran Arabic Quiz Scorecard</p>
+                <h2 id="scorecard-heading" style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
+                <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">QuranFahm.app Scorecard</p>
                 <div class="summary-metric-circle">
                     <div class="summary-score-big" id="score-text-value">0/10</div>
                     <div class="summary-percent-small" id="percent-text-value">0%</div>
                 </div>
+                <p id="spelling-mistake-count" class="hidden"></p>
             </div>
             
             <button class="exit-btn" id="toggle-table-btn" style="width:100%; margin-bottom: 15px;" data-action="toggleSummaryTableVisibility">📊 Show Performance Summary</button>
@@ -140,6 +151,6 @@
     </div>
 
     <div class="toast-popup" id="toast-alert">Notification Popup</div>
-    <script type="module" src="js/app.js?v=20261028-peaches-summary1"></script>
+    <script type="module" src="js/app.js?v=20261114-p2-r5"></script>
 </body>
 </html>
