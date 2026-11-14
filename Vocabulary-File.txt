@@ -101,3 +101,8 @@
 هُمْ = Them
 أَمَّا = As to / As for
 إِمَّا = If ; Either / or
+أَنَّمَا = That
+إِنَّمَا = Verily; Is but
+كَأَنَّمَا = As if
+كُلَّمَا = Whenever
+بِ = With, in, from
