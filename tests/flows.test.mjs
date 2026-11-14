@@ -114,7 +114,7 @@ test('shared data, teacher selection, student sessions and Editor saves', async 
         assert.equal(new URL(requested[0][0]).href, rootFileUrl('Vocabulary-File.txt').href);
         assert.equal(requested[0][1].cache, 'no-store');
         await assert.rejects(loadBook('missing'));
-        assert.equal(repositoryVocabularyPath('Vocabulary-File.txt','https://hassanme2050.github.io/Quran-Arabic-Quiz/TEST/editor/js/github.js'), 'TEST/Vocabulary-File.txt');
+        assert.equal(repositoryVocabularyPath('Vocabulary-File.txt','https://hassanme2050.github.io/Quran-Arabic-Quiz/TEST/editor/js/github.js'), 'Vocabulary-File.txt');
         assert.equal(repositoryVocabularyPath('Vocabulary-File.txt','https://hassanme2050.github.io/Quran-Arabic-Quiz/editor/js/github.js'), 'Vocabulary-File.txt');
         assert.equal(repositoryVocabularyPath('Vocabulary-File.txt','http://127.0.0.1:8124/editor/js/github.js'), 'Vocabulary-File.txt');
         assert.equal(new URL('../Vocabulary-File.txt','https://hassanme2050.github.io/Quran-Arabic-Quiz/TEST/shared/vocabulary.js').pathname, '/Quran-Arabic-Quiz/TEST/Vocabulary-File.txt');
