@@ -1,12 +1,18 @@
 import { parseLughatBook } from './lughat.js';
-// The application root is resolved relative to this module, never to the page URL.
+import { parseBook5Records } from './book5.js';
+// Hosted previews share the repository-root library; local previews use local TXT files.
 export const BOOK_FILES = Object.freeze({
     book_a: 'Vocabulary-File.txt',
     book_b: 'Lughat-AlQuran-word-meaning.txt',
-    book_c: 'Vocabulary-Tajweed-File.txt'
+    book_c: 'Vocabulary-Tajweed-File.txt',
+    book_e: 'QuranFahm-Book-5-word-meaning.txt'
 });
 export function rootFileUrl(filename) {
-    return new URL('../' + filename, import.meta.url);
+    const moduleUrl = new URL(import.meta.url);
+    if (moduleUrl.hostname === 'hassanme2050.github.io') {
+        return new URL(filename, 'https://raw.githubusercontent.com/hassanme2050/Quran-Arabic-Quiz/main/');
+    }
+    return new URL('../' + filename, moduleUrl);
 }
 export async function fetchRootText(filename) {
     const response = await fetch(rootFileUrl(filename), { cache: 'no-store' });
@@ -27,5 +33,7 @@ export async function loadBook(bookId) {
     const filename = BOOK_FILES[bookId];
     if (!filename) throw new Error('Unknown vocabulary book.');
     const text = await fetchRootText(filename);
-    return bookId === 'book_b' ? parseLughatBook(text).records : parseVocabularyRecords(text);
+    if (bookId === 'book_b') return parseLughatBook(text).records;
+    if (bookId === 'book_e') return parseBook5Records(text).records;
+    return parseVocabularyRecords(text);
 }
