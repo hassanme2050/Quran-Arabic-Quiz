@@ -1,3 +1,4 @@
+import { readPreferences, writePreferences } from './preferences.js';
 import { state } from './state.js';
 import { vocabularyList, loadVocabulary, activeBook, setActiveBook5Level } from './vocabulary.js';
 import { shuffleArray, getRandomSubset } from './utils.js';
@@ -8,6 +9,17 @@ import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } fro
 import { copyScreenshotToClipboard } from './platform.js';
 import { startSpellingSession, submitSpellingAnswer, advanceSpelling } from './spelling.js?v=20261114-p2-r5';
 
+let restoringPreferences = true;
+function savePreferences() {
+    if (restoringPreferences) return;
+    writePreferences({
+        book: document.getElementById('vocabulary-book-selector').value,
+        level: Number(document.getElementById('book-level-select').value),
+        round: state.activeRound, strategy: state.activeStrategySetting,
+        from: Number(document.getElementById('range-input-start').value),
+        to: Number(document.getElementById('range-input-end').value)
+    });
+}
 export function normalizeCustomRange() {
     const count = ['book_b', 'book_e'].includes(activeBook)
         ? (vocabularyList.at(-1)?.number || 0) : vocabularyList.length;
@@ -28,7 +40,7 @@ export function normalizeCustomRange() {
     last.value = end;
     first.max = last.max = count;
 }
-function validateLiveCustomBounds() { normalizeCustomRange(); }
+function validateLiveCustomBounds() { normalizeCustomRange(); savePreferences(); }
 function triggerSelectedSession(mode) {
     if (!vocabularyList.length) return;
     if (state.activeStrategySetting === 'custom') normalizeCustomRange();
@@ -50,10 +62,12 @@ export function updateSegmentSelection(strategy) {
     document.getElementById('range-drawer-box').classList.toggle('open', strategy === 'custom');
     updateRoundDrawer();
     if (strategy === 'custom') normalizeCustomRange();
+    savePreferences();
 }
 function chooseBook5Round(round) {
     state.activeRound = Math.max(1, Math.min(10, Number(round) || 1));
     document.getElementById('book5-round-select').value = state.activeRound;
+    savePreferences();
 }
 export function startSession(strategy, mode) {
     if (!vocabularyList.length || (mode === 'spelling' && activeBook !== 'book_e')) return;
@@ -113,7 +127,7 @@ function updateBookControls(id) {
         chooseBook5Round(1);
     }
 }
-function initializeApp() {
+async function initializeApp() {
     initializeDictionarySearch();
     const actions = {
         updateSegmentSelection, validateLiveCustomBounds, triggerSelectedSession,
@@ -138,6 +152,7 @@ function initializeApp() {
     document.getElementById('book-level-select').addEventListener('change', event => {
         setActiveBook5Level(event.target.value);
         if (state.activeStrategySetting === 'custom') normalizeCustomRange();
+        savePreferences();
     });
     document.getElementById('book5-round-select').addEventListener('change', event => {
         chooseBook5Round(event.target.value);
@@ -149,12 +164,27 @@ function initializeApp() {
         }
     });
     const selector = document.getElementById('vocabulary-book-selector');
-    selector.addEventListener('change', () => {
+    selector.addEventListener('change', async () => {
+        restoringPreferences = true;
         clearQuizCodeError();
         updateBookControls(selector.value);
-        loadVocabulary(selector.value);
+        await loadVocabulary(selector.value);
+        restoringPreferences = false;
+        savePreferences();
     });
-    updateBookControls(selector.value || 'book_a');
-    loadVocabulary(selector.value || 'book_a');
+    const saved = readPreferences();
+    selector.value = saved.book || 'book_a';
+    updateBookControls(selector.value);
+    if (saved.level) {
+        document.getElementById('book-level-select').value = saved.level;
+        setActiveBook5Level(saved.level);
+    }
+    chooseBook5Round(saved.round || 1);
+    await loadVocabulary(selector.value);
+    if (saved.from) document.getElementById('range-input-start').value = saved.from;
+    if (saved.to) document.getElementById('range-input-end').value = saved.to;
+    updateSegmentSelection(saved.strategy || 'all');
+    restoringPreferences = false;
+    savePreferences();
 }
 initializeApp();
