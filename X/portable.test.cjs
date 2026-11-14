@@ -1,10 +1,10 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const defaultDashboard={schema:1,books:Object.fromEntries(['book_a','book_b','book_c','book_d'].map(id=>[id,{state:'enable',review:'enable',quiz:'enable',quest:'enable',dictionary:id==='book_c'?'disable':'enable',quizCode:id==='book_c'?'hide':'enable'}]))};
 const fixtures=JSON.parse(fs.readFileSync(path.join(__dirname,'source/tests/fixtures/library.json'),'utf8'));
-const prefix='https://raw.githubusercontent.com/hassanme2050/Quran-Arabic-Quiz/main/Test2/';
+const prefix='https://raw.githubusercontent.com/hassanme2050/Quran-Arabic-Quiz/main/';
 class Element{
  constructor(tag='div'){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.attributes={};this.events={};this.style={setProperty(name,value){this[name]=value;}};this.className='';this.value='';this.disabled=false;this._text='';this.clientHeight=400;this.scrollTop=0;
-  this.classList={contains:n=>this.className.split(/\s+/).includes(n),add:n=>{if(!this.classList.contains(n))this.className+=' '+n;},remove:n=>{this.className=this.className.split(/\s+/).filter(x=>x!==n).join(' ');},toggle:(n,force)=>{const flag=force??!this.classList.contains(n);this.classList[flag?'add':'remove'](n);return flag;}};
+  this.classList={contains:n=>this.className.split(/\s+/).includes(n),add:(...names)=>{for(const n of names)if(!this.classList.contains(n))this.className+=' '+n;},remove:(...names)=>{this.className=this.className.split(/\s+/).filter(x=>!names.includes(x)).join(' ');},toggle:(n,force)=>{const flag=force??!this.classList.contains(n);this.classList[flag?'add':'remove'](n);return flag;}};
  }
  get textContent(){return this._text+this.children.map(c=>c.textContent).join('');}set textContent(text){this._text=String(text);this.children=[];}
  set innerHTML(text){this.textContent=text;}get innerHTML(){return this.textContent;}
@@ -42,7 +42,7 @@ async function launch(filename,location,settings=defaultDashboard){
    return {ok:true,status:200,text:async()=>name==='CP.txt'?Buffer.from('test-only').toString('base64'):books[name]};
   }
   if(target.startsWith('https://api.github.com/')){
-   assert(target.startsWith('https://api.github.com/repos/hassanme2050/Quran-Arabic-Quiz/contents/Test2/'));if(options.headers?.Authorization)assert.equal(options.headers.Authorization,'Bearer test-only-token');else assert(target.includes('/dbs.json'));
+   assert(target.startsWith('https://api.github.com/repos/hassanme2050/Quran-Arabic-Quiz/contents/'));if(options.headers?.Authorization)assert.equal(options.headers.Authorization,'Bearer test-only-token');else assert(target.includes('/dbs.json'));
    const name=decodeURIComponent(new URL(target).pathname.split('/').at(-1));
    if(env.failSave&&options.method==='PUT')return {ok:false,status:403};
    if(options.method==='PUT'){const body=JSON.parse(options.body);assert.equal(body.sha,shas[name]||'current-sha');books[name]=Buffer.from(body.content,'base64').toString('utf8');shas[name]='saved-'+(Number((shas[name]||'').split('-')[1]||0)+1);return {ok:true,json:async()=>({content:{sha:shas[name]}})};}
@@ -96,7 +96,7 @@ for(const location of ['file:///D:/Teacher/Renamed%20Editor.html','https://other
   const app=await launch('Editor.html',location);app.e('login-book-selector').value='book_d';app.e('admin-passcode-box').value='test-only';app.e('admin-token-box').value='test-only-token';
   await app.e('editor-login-form').trigger('submit');await app.flush();await app.delay(300);assert(!app.e('lookup-go-btn').disabled);assert(app.e('edit-references-field').value.includes(':'));
   app.e('edit-references-field').value='Reviewed 2:255';await app.action('saveWordUpdateToGitHub');await app.flush();assert(app.e('toast-alert').textContent.includes('saved to GitHub'));
-  const writes=app.requests.filter(r=>r.options.method==='PUT');assert.equal(writes.length,1);assert(writes[0].url.endsWith('/contents/Test2/Quran-Vocabulary-Meaning-Arabic-English.txt'));assert(app.books['Quran-Vocabulary-Meaning-Arabic-English.txt'].includes('Reviewed 2:255'));
+  const writes=app.requests.filter(r=>r.options.method==='PUT');assert.equal(writes.length,1);assert(writes[0].url.endsWith('/contents/Quran-Vocabulary-Meaning-Arabic-English.txt'));assert(app.books['Quran-Vocabulary-Meaning-Arabic-English.txt'].includes('Reviewed 2:255'));
  });
 }
 test('portable Generator authenticates from GitHub and produces a Book A code without local TXT/CP files',async()=>{
@@ -115,7 +115,7 @@ test('separate admin cycles emoji states, Cancel discards edits, Save writes onl
  assert(!app.e('admin-settings').classList.contains('hidden'));assert.equal(cell(app,0,1).textContent,'\u2705 Enable');await cell(app,0,1).trigger('click');await cell(app,0,2).trigger('click');await cell(app,0,2).trigger('click');
  await app.e('admin-save').trigger('click');await app.flush();assert(!app.e('admin-settings').classList.contains('hidden'));assert(app.e('admin-message').textContent.includes('Saved'));
  const saved=JSON.parse(app.books['dbs.json']);assert.equal(saved.books.book_a.review,'disable');assert.equal(saved.books.book_a.quiz,'hide');
- assert.equal(app.requests.filter(r=>r.options.method==='PUT').length,1);assert(app.requests.find(r=>r.options.method==='PUT').url.endsWith('/Test2/dbs.json'));
+ assert.equal(app.requests.filter(r=>r.options.method==='PUT').length,1);assert(app.requests.find(r=>r.options.method==='PUT').url.endsWith('/dbs.json'));
  const student=await launch('index.html','file:///D:/Moved/student.html',saved);await student.action('triggerSelectedSession','flashcard');assert(student.e('flashcard-view').classList.contains('hidden'));
  assert(!app.e('admin-token').value);assert(!app.e('admin-password').value);
 });
@@ -157,4 +157,171 @@ test('Save keeps authentication and new SHA for repeat saves; Cancel restores cu
 test('home refresh removes hidden books, updates buttons/code row, and restores options on enable',async()=>{
  const app=await launch('index.html','file:///C:/Dates/index.html');const settings=JSON.parse(JSON.stringify(defaultDashboard));settings.books.book_b.state='hide';settings.books.book_a.quiz='hide';settings.books.book_a.quizCode='hide';app.books['dbs.json']=JSON.stringify(settings);await app.delay(15000);assert(!app.e('vocabulary-book-selector').children.some(o=>o.value==='book_b'));assert(app.e('quiz-code-entry').classList.contains('hidden'));assert(app.e('quiz-code-btn').classList.contains('hidden'));await app.action('triggerSelectedSession','quiz');assert(app.e('quiz-view').classList.contains('hidden'));
  settings.books.book_b.state='enable';settings.books.book_a.quiz='enable';settings.books.book_a.quizCode='enable';app.books['dbs.json']=JSON.stringify(settings);await app.delay(15000);assert(app.e('vocabulary-book-selector').children.some(o=>o.value==='book_b'));assert(!app.e('quiz-code-entry').classList.contains('hidden'));assert(!app.e('quiz-code-btn').classList.contains('hidden'));await app.action('openQuest');assert(app.e('quest-book-selector').children.some(o=>o.value==='book_b'));
+});
+
+test('ten-word drawer selects consecutive rounds, resets by book and keeps the shorter final round',async()=>{
+ const app=await launch('index.html','file:///C:/Local-Dates/index.html');
+ assert.equal(app.e('opt-last').textContent,'10 Words');
+ assert.equal(app.e('ten-word-round').children.length,10);
+ await app.action('updateSegmentSelection','last');
+ assert(app.e('ten-word-round-drawer').classList.contains('open'));
+ app.e('ten-word-round').value='2';await app.e('ten-word-round').trigger('change');
+ await app.action('triggerSelectedSession','flashcard');
+ const words=fixtures['Vocabulary-File.txt'].split(/\r?\n/).filter(line=>line.includes('='));
+ assert.equal(app.e('card-arabic-field').textContent,words[10].split('=')[0].trim());
+ assert.equal(app.e('card-counter').textContent,'Word 1 of 10');
+ for(let i=0;i<20;i++)await app.action('handleCardProgression');
+ assert(!app.e('review-finished-view').classList.contains('hidden'));
+ await app.action('exitToHome');app.e('ten-word-round').value='10';await app.e('ten-word-round').trigger('change');
+ await app.action('triggerSelectedSession','flashcard');assert.equal(app.e('card-counter').textContent,'Word 1 of 8');
+ await app.action('exitToHome');app.e('vocabulary-book-selector').value='book_d';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert.equal(app.e('ten-word-round').value,'1');assert.equal(app.e('ten-word-round').children.length,1);
+ await app.action('triggerSelectedSession','quiz');assert.equal(app.e('quiz-counter').textContent,'Question 1 of 9');
+ await app.action('exitToHome');await app.action('updateSegmentSelection','custom');assert(!app.e('ten-word-round-drawer').classList.contains('open'));assert(app.e('range-drawer-box').classList.contains('open'));
+});
+
+test('spelling submits once, uses MCQ feedback, advances automatically and shows every answer at the end',async()=>{
+ const app=await launch('index.html','file:///C:/Local-Dates/index.html');
+ const entries=[
+  ['الْقَمَرُ','Moon','قمر'],['بَيْتٌ','Home','البيت'],['رَجُلٌ','Man','رجل'],
+  ['مَدٌّ','Lengthening','مد'],['آدَمُ','Adam','ادم'],['هَٰذَا','This','هذا'],
+  ['رَحِیْمٌ','Merciful','رحيم'],['كِتَابٍ','Book','كتاب'],['عِلْمٌ','Knowledge','علم'],
+  ['نَجْمٌ','Star','بيت'],['بَحْرٌ','Sea','بحر'],['نَهْرٌ','River','نهر']
+ ];
+ app.books['Vocabulary-File.txt']=entries.map(([word,meaning])=>word+' = '+meaning).join('\n');
+ await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ await app.action('updateSegmentSelection','last');await app.action('triggerSelectedSession','spelling');
+ assert(!app.e('spelling-view').classList.contains('hidden'));
+ assert.equal(app.e('spelling-counter').textContent,'Question 1 of 10');
+ assert.equal(app.e('spelling-prompt').textContent,'Moon');
+ assert.equal(app.e('spelling-answer').getAttribute('lang'),'ar');
+ assert.equal(app.e('spelling-answer').getAttribute('dir'),'rtl');
+ await app.e('spelling-form').trigger('submit');
+ assert.equal(app.e('spelling-counter').textContent,'Question 1 of 10');
+ assert(!app.e('spelling-submit-button').disabled);
+ assert(app.e('spelling-feedback').textContent.includes('Type'));
+ for(let i=0;i<10;i++){
+  assert.equal(app.e('spelling-prompt').textContent,entries[i][1]);
+  assert(!app.e('spelling-submit-button').classList.contains('correct-choice'));
+  assert(!app.e('spelling-submit-button').classList.contains('wrong-choice'));
+  app.e('spelling-answer').value=entries[i][2];await app.e('spelling-form').trigger('submit');
+  assert(app.e('spelling-answer').disabled);assert(app.e('spelling-submit-button').disabled);
+  assert(app.e('spelling-submit-button').classList.contains(i===9?'wrong-choice':'correct-choice'));
+  assert.equal(app.e('spelling-feedback').textContent,'');
+  await app.e('spelling-form').trigger('submit');await app.delay(1200);
+ }
+ assert.equal(app.e('score-text-value').textContent,'9/10');
+ assert.equal(app.e('scorecard-title').textContent,'Spelling Complete!');
+ assert(app.e('summary-table-container').classList.contains('hidden'));
+ assert(app.e('scorecard-participant-details').classList.contains('hidden'));
+ await app.action('toggleSummaryTableVisibility');
+ const table=app.e('summary-table-container').children[0],rows=table.children[1].children;
+ assert.equal(rows.length,10);
+ assert.deepEqual(table.children[0].children[0].children.map(c=>c.textContent),['#','Result','Meaning','Correct Arabic','Your Answer']);
+ assert.equal(rows[9].children[4].textContent,'بيت');
+ assert.equal(rows[9].children[1].textContent,'✗');
+ assert.equal(rows[0].children[1].textContent,'✓');
+ assert.equal(app.e('quiz-finished-view').dataset.mode,'spelling');
+ await app.action('exitToHome');app.e('ten-word-round').value='2';await app.e('ten-word-round').trigger('change');
+ await app.action('triggerSelectedSession','spelling');assert.equal(app.e('spelling-counter').textContent,'Question 1 of 2');
+ app.e('spelling-answer').value='بحر';await app.e('spelling-form').trigger('submit');await app.action('exitToHome');await app.delay(1200);
+ assert(app.e('spelling-view').classList.contains('hidden'));assert(!app.e('menu-view').classList.contains('hidden'));
+ await app.action('triggerSelectedSession','quiz');assert.equal(app.e('quiz-counter').textContent,'Question 1 of 2');
+ for(let i=0;i<2;i++){await app.e('quiz-options-box').children[0].trigger('click');await app.delay(1200);}
+ assert.equal(app.e('scorecard-title').textContent,'Quiz Complete!');
+ assert.equal(app.e('quiz-finished-view').dataset.mode,'quiz');
+ assert.equal(app.requests.filter(r=>r.options.method==='PUT').length,0);
+});
+
+test('Book B spelling uses Urdu meanings and the selected custom range before the verification boundary',async()=>{
+ const app=await launch('index.html','file:///D:/Dates/Quiz.html');
+ app.e('vocabulary-book-selector').value='book_b';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ app.e('range-input-start').value='11';app.e('range-input-end').value='20';
+ await app.action('updateSegmentSelection','custom');await app.action('triggerSelectedSession','spelling');
+ assert.equal(app.e('spelling-counter').textContent,'Question 1 of 10');
+ const allowed=fixtures['Lughat-AlQuran-word-meaning.txt'].split('\n')
+   .filter(line=>/^00(1[1-9]|20) /.test(line))
+   .map(line=>line.split('⟵')[1].trim().replace(/\([^)]*\)/g,'').trim());
+ for(let i=0;i<10;i++){
+  assert(allowed.includes(app.e('spelling-prompt').textContent));
+  assert.equal(app.e('spelling-prompt').lang,'ur');assert.equal(app.e('spelling-prompt').dir,'rtl');
+  app.e('spelling-answer').value='خطأ';await app.e('spelling-form').trigger('submit');await app.delay(1200);
+ }
+ assert.equal(app.e('score-text-value').textContent,'0/10');
+ await app.action('exitToHome');await app.action('updateSegmentSelection','last');
+ app.e('ten-word-round').value='3';await app.e('ten-word-round').trigger('change');await app.action('triggerSelectedSession','spelling');
+ assert.equal(app.e('spelling-counter').textContent,'Question 1 of 4');
+});
+
+test('Tajweed spelling grades only Arabic terms, omits pronunciation hints and skips English-only/unverified answers',async()=>{
+ const app=await launch('index.html','file:///D:/Dates/Quiz.html');
+ app.e('vocabulary-book-selector').value='book_c';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ await app.action('updateSegmentSelection','last');await app.action('triggerSelectedSession','spelling');
+ const pairs=[['Beautification','تحسين'],['Articulation point','مخرج'],['Letter qualities','صفات']];
+ for(const [index,[prompt,answer]] of pairs.entries()){
+  assert.equal(app.e('spelling-counter').textContent,'Question '+(index+1)+' of 3');
+  assert.equal(app.e('spelling-prompt').textContent,prompt);
+  assert(app.e('spelling-context').textContent.includes('Foundations'));
+  app.e('spelling-answer').value=answer;await app.e('spelling-form').trigger('submit');await app.delay(1200);
+ }
+ assert.equal(app.e('score-text-value').textContent,'3/3');
+ assert.equal(app.e('quiz-finished-view').dataset.mode,'spelling');
+});
+
+test('Book D spelling keeps all available words and category context without changing Review or Dictionary',async()=>{
+ const app=await launch('index.html','https://elsewhere.example/dates/');
+ app.e('vocabulary-book-selector').value='book_d';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ await app.action('triggerSelectedSession','spelling');assert.equal(app.e('spelling-counter').textContent,'Question 1 of 9');
+ assert.equal(app.e('spelling-prompt').lang,'en');assert(app.e('spelling-context').textContent.includes('Main Category'));
+ await app.action('exitToHome');await app.action('triggerSelectedSession','flashcard');assert(!app.e('flashcard-view').classList.contains('hidden'));
+ await app.action('exitToHome');await app.action('openDictionaryMode');assert.equal(app.e('dictionary-count').textContent,'9 words');
+ assert(app.e('vocabulary-book-selector').children.every(o=>o.value!=='book_e'));
+});
+
+test('Admin Spelling column saves per-book enable, disable and hide states while legacy config still loads',async()=>{
+ const admin=await launch('admin/index.html','file:///D:/Dates/admin.html');await adminLogin(admin);
+ assert.equal(admin.e('admin-matrix').children[0].children[7].textContent,'Spelling Mode');
+ await cell(admin,0,6).trigger('click');
+ await cell(admin,1,6).trigger('click');await cell(admin,1,6).trigger('click');
+ await admin.e('admin-save').trigger('click');
+ const saved=JSON.parse(admin.books['dbs.json']);
+ assert.equal(saved.books.book_a.spelling,'disable');assert.equal(saved.books.book_b.spelling,'hide');
+ assert.equal(saved.books.book_c.spelling,'enable');assert.equal(saved.books.book_d.spelling,'enable');
+ assert(!admin.e('admin-settings').classList.contains('hidden'));
+ const student=await launch('index.html','file:///D:/Dates/main.html',saved);
+ assert(student.e('spelling-mode-button').disabled);assert(!student.e('spelling-mode-button').classList.contains('hidden'));
+ await student.action('triggerSelectedSession','spelling');assert(student.e('spelling-view').classList.contains('hidden'));
+ student.e('vocabulary-book-selector').value='book_b';await student.e('vocabulary-book-selector').trigger('change');await student.flush();
+ assert(student.e('spelling-mode-button').classList.contains('hidden'));
+ await student.action('triggerSelectedSession','spelling');assert(student.e('spelling-view').classList.contains('hidden'));
+ student.e('vocabulary-book-selector').value='book_d';await student.e('vocabulary-book-selector').trigger('change');await student.flush();
+ assert(!student.e('spelling-mode-button').classList.contains('hidden'));assert(!student.e('spelling-mode-button').disabled);
+ await student.action('triggerSelectedSession','spelling');assert(!student.e('spelling-view').classList.contains('hidden'));
+ assert.equal(student.requests.filter(r=>r.options.method==='PUT').length,0);
+});
+
+test('Spelling permission refresh and seven-tap override follow existing settings behavior',async()=>{
+ const saved=JSON.parse(JSON.stringify(defaultDashboard));for(const row of Object.values(saved.books))row.spelling='disable';
+ const app=await launch('index.html','file:///D:/Dates/main.html',saved);
+ assert(app.e('spelling-mode-button').disabled);
+ for(let i=0;i<6;i++)await app.action('handleGoClick');
+ assert(app.e('spelling-mode-button').disabled);await app.action('handleGoClick');await app.flush();
+ assert(!app.e('spelling-mode-button').disabled);
+ await app.action('triggerSelectedSession','spelling');assert(!app.e('spelling-view').classList.contains('hidden'));
+ const reload=await launch('index.html','file:///D:/Dates/main.html',saved);assert(reload.e('spelling-mode-button').disabled);
+ saved.books.book_a.spelling='enable';reload.books['dbs.json']=JSON.stringify(saved);await reload.delay(15000);
+ assert(!reload.e('spelling-mode-button').disabled);
+ saved.books.book_a.spelling='hide';reload.books['dbs.json']=JSON.stringify(saved);await reload.delay(15000);
+ assert(reload.e('spelling-mode-button').classList.contains('hidden'));
+});
+
+test('a Tajweed selection without Arabic answers stays on the menu and never exposes unverified answers',async()=>{
+ const app=await launch('index.html','file:///D:/Dates/main.html');
+ app.books['Tajweed-Question-Bank.txt']=fixtures['Tajweed-Question-Bank.txt'].split(/\r?\n/)
+   .filter(line=>!/^(1|9|10)\)/.test(line)).join('\n');
+ app.e('vocabulary-book-selector').value='book_c';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert(app.e('spelling-mode-button').disabled);
+ await app.action('triggerSelectedSession','spelling');
+ assert(app.e('spelling-view').classList.contains('hidden'));assert(!app.e('menu-view').classList.contains('hidden'));
+ assert(app.e('toast-alert').textContent.includes('No Arabic spelling'));
 });
