@@ -2,6 +2,6 @@
 export const state = {
   currentPool: [], sessionWords: [], currentIndex: 0,
   isMeaningVisible: false, currentMode: 'flashcard', quizHistory: [],
-  activeStrategySetting: 'all', globalPersistentEyeToggleStatus: false,
+  activeStrategySetting: 'all', activeRound: 1, globalPersistentEyeToggleStatus: false,
   answerTimer: null
 };
