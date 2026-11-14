@@ -62,7 +62,7 @@ export function openDictionaryMode() {
         return;
     }
     document.getElementById('status-message').classList.add('hidden');
-    document.getElementById('app-title').textContent = 'Quran Arabic Dictionary';
+    document.getElementById('app-title').textContent = 'QuranFahm.app Dictionary';
     document.getElementById('app-title').classList.add('dictionary-title');
     setDictionarySort(dictionarySortMode);
     switchView('dictionary-view');
