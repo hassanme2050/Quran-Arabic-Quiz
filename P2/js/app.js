@@ -3,10 +3,10 @@ import { vocabularyList, loadVocabulary, activeBook, setActiveBook5Level } from 
 import { shuffleArray, getRandomSubset } from './utils.js';
 import { switchView, launchToastAlert, exitToHome, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
 import { showCard, handleEyeToggleIntercept, handleFlashCardBodyClick, handleCardProgression } from './flashcards.js';
-import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js?v=20261113-p2-r2';
-import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=20261113-p2-r2';
+import { showQuizQuestion, startQuizWithCode, toggleSummaryTableVisibility } from './quiz.js?v=20261114-p2-r3';
+import { openDictionaryMode, setDictionarySort, initializeDictionarySearch } from './dictionary.js?v=20261114-p2-r3';
 import { copyScreenshotToClipboard } from './platform.js';
-import { startSpellingSession, submitSpellingAnswer, advanceSpelling } from './spelling.js?v=20261113-p2-r2';
+import { startSpellingSession, submitSpellingAnswer, advanceSpelling } from './spelling.js?v=20261114-p2-r3';
 
 export function normalizeCustomRange() {
     const count = ['book_b', 'book_e'].includes(activeBook)
