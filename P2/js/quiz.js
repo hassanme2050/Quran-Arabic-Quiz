@@ -23,11 +23,11 @@ export function displayQuizSummary() {
     count.classList.toggle('hidden', !spelling);
     count.textContent = mistakes.length + (mistakes.length === 1 ? ' mistake' : ' mistakes');
     const container = document.getElementById('summary-table-container');
-    container.classList.toggle('hidden', !spelling);
+    container.classList.add('hidden');
     const toggle = document.getElementById('toggle-table-btn');
-    toggle.textContent = spelling ? 'Hide Mistakes' : '📊 Show Performance Summary';
+    toggle.textContent = 'Show Summary';
 
-    if (spelling && !mistakes.length) {
+    if (!state.quizHistory.length) {
         const message = document.createElement('p');
         message.className = 'spelling-perfect-score';
         message.textContent = 'No mistakes. Well done!';
@@ -47,7 +47,7 @@ export function displayQuizSummary() {
             head.appendChild(cell);
         });
         const body = table.createTBody();
-        (spelling ? mistakes : state.quizHistory).forEach(item => {
+        state.quizHistory.forEach(item => {
             const row = body.insertRow();
             const values = [item.index, item.isCorrect ? '✓' : '×', item.word, item.correct, item.chosen];
             const classes = [
@@ -73,7 +73,7 @@ export function displayQuizSummary() {
 export function toggleSummaryTableVisibility() {
     const container = document.getElementById('summary-table-container');
     container.classList.toggle('hidden');
-    const label = state.currentMode === 'spelling' ? 'Mistakes' : 'Performance Summary';
+    const label = 'Summary';
     document.getElementById('toggle-table-btn').textContent =
         (container.classList.contains('hidden') ? 'Show ' : 'Hide ') + label;
 }
