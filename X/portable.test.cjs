@@ -20,7 +20,7 @@ class Element{
  contains(element){return this===element||this.children.some(child=>child.contains(element));}
  getBoundingClientRect(){return {top:0,height:64,width:600,bottom:64};}scrollTo({top}){this.scrollTop=top;}
 }
-async function launch(filename,location,settings=defaultDashboard){
+async function launch(filename,location,settings=defaultDashboard,storage=new Map()){
  const html=fs.readFileSync(path.join(__dirname,filename),'utf8');const script=html.match(/<script id="dates-app-bundle">([\s\S]*?)<\/script>/)[1];
  const markup=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');const elements=new Map(),all=[],timers=new Map(),requests=[],shas={},books={...fixtures,'dbs.json':JSON.stringify(settings)};let serial=0;
  for(const m of markup.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi)){
@@ -34,7 +34,7 @@ async function launch(filename,location,settings=defaultDashboard){
  if(elements.has('quest-map-nodes'))elements.get('quest-map-nodes').parentElement=new Element('div');
  const document={getElementById:id=>{assert(elements.has(id),'Missing element '+id);return elements.get(id);},createElement:tag=>new Element(tag),createDocumentFragment:()=>new Element('fragment'),querySelectorAll:selector=>selector==='[data-action]'?all.filter(e=>e.dataset.action):selector==='[data-quest-action]'?all.filter(e=>e.dataset.questAction):selector==='.quest-session-save'?all.filter(e=>e.classList.contains('quest-session-save')):[],head:new Element('head'),body:new Element('body'),fonts:{ready:Promise.resolve()}};
  const env={console,document,URL,URLSearchParams,Date,performance,AbortController,DOMException,TextEncoder,TextDecoder,Blob,Map,Set,btoa:s=>Buffer.from(s,'binary').toString('base64'),atob:s=>Buffer.from(s,'base64').toString('binary'),location:new URL(location),navigator:{},innerWidth:1000,confirm:()=>true,addEventListener(){},html2canvas(){},setTimeout(fn,delay){const n=++serial;timers.set(n,{fn,delay});return n;},clearTimeout:n=>timers.delete(n),requestAnimationFrame:fn=>env.setTimeout(fn,16)};
- const storage=new Map();env.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};env.window=env;
+ env.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};env.window=env;
  env.fetch=async(url,options={})=>{
   const target=String(url);requests.push({url:target,options});
   if(target.startsWith(prefix)){
@@ -324,4 +324,70 @@ test('a Tajweed selection without Arabic answers stays on the menu and never exp
  await app.action('triggerSelectedSession','spelling');
  assert(app.e('spelling-view').classList.contains('hidden'));assert(!app.e('menu-view').classList.contains('hidden'));
  assert(app.e('toast-alert').textContent.includes('No Arabic spelling'));
+});
+
+const selectedBookKey='quranaq.dates.selected-book.v1';
+test('the home book choice survives reload and startup fetches only the remembered book',async()=>{
+ const storage=new Map(),location='https://hassanme2050.github.io/Quran-Arabic-Quiz/X/';
+ const app=await launch('index.html',location,defaultDashboard,storage);
+ assert.equal(app.e('vocabulary-book-selector').value,'book_a');
+ app.e('vocabulary-book-selector').value='book_d';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert.equal(storage.get(selectedBookKey),'book_d');
+ const reload=await launch('index.html',location,defaultDashboard,storage);
+ assert.equal(reload.e('vocabulary-book-selector').value,'book_d');
+ assert(reload.e('status-message').textContent.includes('Loaded 9 words'));
+ const books=reload.requests.filter(r=>r.url.includes('.txt'));
+ assert.equal(books.length,1);assert(books[0].url.includes('Quran-Vocabulary-Meaning-Arabic-English.txt'));
+ await reload.action('triggerSelectedSession','spelling');assert.equal(reload.e('spelling-counter').textContent,'Question 1 of 9');
+ assert.equal(reload.requests.filter(r=>r.options.method==='PUT').length,0);
+});
+test('remembered books respect Admin hide and disable without losing the user preference',async()=>{
+ for(const restriction of ['hide','disable']){
+  const storage=new Map([[selectedBookKey,'book_b']]),settings=JSON.parse(JSON.stringify(defaultDashboard));
+  settings.books.book_b.state=restriction;
+  const app=await launch('index.html','file:///C:/Dates/index.html',settings,storage);
+  assert.equal(app.e('vocabulary-book-selector').value,'book_a');
+  assert(app.e('status-message').textContent.includes('Loaded 98 words'));
+  assert.equal(storage.get(selectedBookKey),'book_b');
+  const option=app.e('vocabulary-book-selector').children.find(o=>o.value==='book_b');
+  if(restriction==='hide')assert(!option);else assert(option.disabled);
+  const restored=await launch('index.html','file:///C:/Dates/index.html',defaultDashboard,storage);
+  assert.equal(restored.e('vocabulary-book-selector').value,'book_b');
+  assert(restored.e('status-message').textContent.includes('24 verified words'));
+ }
+});
+test('unknown saved books are ignored and unavailable storage never prevents selecting or loading a book',async()=>{
+ const unknown=await launch('index.html','file:///D:/Dates.html',defaultDashboard,new Map([[selectedBookKey,'book_e']]));
+ assert.equal(unknown.e('vocabulary-book-selector').value,'book_a');
+ const denied={get(){throw Error('Storage blocked');},set(){throw Error('Storage blocked');}};
+ const app=await launch('index.html','file:///D:/Dates.html',defaultDashboard,denied);
+ assert(app.e('status-message').textContent.includes('Loaded 98 words'));
+ app.e('vocabulary-book-selector').value='book_d';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert(app.e('status-message').textContent.includes('Loaded 9 words'));
+ assert.equal(app.e('vocabulary-book-selector').value,'book_d');
+});
+test('remembered book selection cannot bypass restrictions after a seven-tap session unlock',async()=>{
+ const settings=JSON.parse(JSON.stringify(defaultDashboard));for(const row of Object.values(settings.books))row.state='disable';
+ const storage=new Map([[selectedBookKey,'book_b']]);
+ const app=await launch('index.html','file:///D:/Dates.html',settings,storage);
+ assert.equal(app.e('vocabulary-book-selector').value,'');
+ assert.equal(app.requests.filter(r=>r.url.includes('.txt')).length,0);
+ for(let i=0;i<7;i++)await app.action('handleGoClick');await app.flush();
+ app.e('vocabulary-book-selector').value='book_d';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert.equal(storage.get(selectedBookKey),'book_d');
+ const reload=await launch('index.html','file:///D:/Dates.html',settings,storage);
+ assert.equal(reload.e('vocabulary-book-selector').value,'');
+ assert.equal(reload.requests.filter(r=>r.url.includes('.txt')).length,0);
+});
+test('a later explicit book choice replaces the previous one while Admin fallback does not',async()=>{
+ const storage=new Map([[selectedBookKey,'book_d']]);
+ const app=await launch('index.html','file:///D:/Dates.html',defaultDashboard,storage);
+ const settings=JSON.parse(JSON.stringify(defaultDashboard));settings.books.book_d.state='hide';
+ app.books['dbs.json']=JSON.stringify(settings);await app.delay(15000);
+ assert.equal(app.e('vocabulary-book-selector').value,'book_a');assert.equal(storage.get(selectedBookKey),'book_d');
+ app.e('vocabulary-book-selector').value='book_c';await app.e('vocabulary-book-selector').trigger('change');await app.flush();
+ assert.equal(storage.get(selectedBookKey),'book_c');
+ const reload=await launch('index.html','file:///D:/Dates.html',settings,storage);
+ assert.equal(reload.e('vocabulary-book-selector').value,'book_c');
+ assert(reload.e('status-message').textContent.includes('verified Tajweed questions'));
 });
