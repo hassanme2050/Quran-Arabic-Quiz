@@ -626,3 +626,6 @@ button.exit-btn:hover {
 }
 #spelling-mistake-count { color: #475569; font-weight: 600; }
 .spelling-perfect-score { color: var(--counter-teal); text-align: center; }
+
+#spelling-submit-button.correct-choice { background-color:#10b981!important;color:white!important;box-shadow:0 4px 12px rgba(16,185,129,.4)!important;}
+#spelling-submit-button.wrong-choice {background-color:#ef4444!important;color:white!important;box-shadow:0 4px 12px rgba(239,68,68,.4)!important;}
