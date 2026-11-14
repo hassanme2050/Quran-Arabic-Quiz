@@ -1,10 +1,11 @@
 # QuranFahm.app — Dates v1114.26
 
 - Local development copy based on QuranAQ-v1107.26 Dates, verified against all 89 files in GitHub X on November 14, 2026. User tested and approved the app, Spelling and Admin.
+- Remembers the last home-screen book in browser storage. Refresh restores it only when Admin allows it; otherwise the first available book is used. If storage is blocked, normal book selection still works. This refinement awaits user testing.
 - Replaces Last 10 Words with 10 Words (10 Questions for Tajweed). Select rounds 1–10, 11–20 and onward; the last round may be shorter. Review, Quiz and Spelling respect the selected range and verified records.
 - Spelling shows the existing English/Urdu meaning and grades the typed Arabic word without harakat or the optional definite article. Submit uses the Quiz feedback colors, advances automatically and shows the final score with a complete summary. No spelling hints are displayed. Book 5 is not included.
 - Tajweed spelling uses verified bilingual Arabic-answer entries. English-only answers are excluded; pronunciation labels and root hints are omitted. A selected round may therefore have fewer spelling words.
 - Admin has a separate Spelling column for Enable/Disable/Hide per book. Older root dbs.json files remain valid; a missing Spelling setting defaults to enabled, subject to the book's existing availability. The local Admin module still saves to the shared GitHub root when you press Save.
 - Open index.html for students or admin/index.html for Admin. Editor.html and Test-Generator.html remain separate portable modules. Internet is required for the four books, CP.txt and dbs.json at the GitHub repository root: hassanme2050/Quran-Arabic-Quiz, main branch.
-- Rebuild with node build-portable.cjs. Run node --test portable.test.cjs source/tests/spelling.test.mjs; all 33 checks passed. Desktop and mobile browser checks also passed using mocked resources, without online writes.
+- Rebuild with node build-portable.cjs. Run node --test portable.test.cjs source/tests/spelling.test.mjs; all 38 checks passed. Browser reload checks covered retained selection, hidden/disabled books and blocked storage. Earlier desktop/mobile checks also passed; test resources were mocked, without online writes.
 - User-tested and approved release published to https://hassanme2050.github.io/Quran-Arabic-Quiz/X/. Admin: https://hassanme2050.github.io/Quran-Arabic-Quiz/X/admin/. Root books, CP.txt and dbs.json are preserved. Android packages and local test screenshots are excluded.
