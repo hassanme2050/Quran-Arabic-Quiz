@@ -106,3 +106,8 @@
 كَأَنَّمَا = As if
 كُلَّمَا = Whenever
 بِ = With, in, from
+عَنْ = About
+فِي = IN
+كَ = As, Like
+لِ = For
+مِنْ = From
