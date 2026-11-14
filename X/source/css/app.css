@@ -635,3 +635,32 @@ button.exit-btn:hover {
 .mode-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}.mode-pair>button{min-width:0;width:100%;white-space:nowrap;padding-left:8px;padding-right:8px}
 .study-mode-group{padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.035)}
 .study-mode-group .segmented-slider-container{margin:0;max-width:none}.study-mode-group .range-drawer-panel{max-width:none}.study-mode-buttons{margin-top:12px}.secondary-modes{margin-top:12px;gap:12px}.quiz-field-hidden{justify-content:flex-end}
+
+/* Ten-word rounds use the existing Custom Range drawer. */
+#ten-word-round-drawer:not(.open){visibility:hidden;}
+#ten-word-round{min-width:0;max-width:100%;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:8px 12px;color:#fff;font:inherit;font-size:16px;outline:none;}
+#ten-word-round:focus{border-color:var(--button-gold);}
+#ten-word-round option{background:#073636;color:#fff;}
+
+/* Spelling shares the Quiz feedback and scorecard styling. */
+.spelling-mode-button { width:100%; margin-top:12px; }
+.spelling-word-card { cursor:default; min-height:140px; margin-bottom:15px; }
+.spelling-prompt { font-size:28px; font-weight:600; line-height:1.8; text-align:center; overflow-wrap:anywhere; max-width:100%; }
+[data-book="book_b"] .spelling-prompt,
+#quiz-finished-view[data-book="book_b"][data-mode="spelling"] .summary-spelling-prompt {
+    font-family:'Noto Nastaliq Urdu','Noto Naskh Arabic','Segoe UI',serif; direction:rtl; line-height:2;
+}
+[data-book="book_b"] .spelling-prompt { font-size:32px; }
+#spelling-form { display:flex; flex-direction:column; gap:12px; }
+#spelling-form label { color:var(--counter-teal); font-weight:600; }
+#spelling-answer { width:100%; font-family:var(--arabic-font); font-size:28px; line-height:1.8; text-align:center; }
+#spelling-answer:focus { border-color:var(--button-gold); }
+#spelling-feedback { margin:0; color:#fecaca; min-height:1.3em; }
+#spelling-form .quiz-options { margin-top:0; }
+#quiz-finished-view[data-mode="spelling"] .summary-spelling-prompt {
+    font-family:'Segoe UI',Arial,sans-serif; font-size:20px; font-weight:600; line-height:1.8; text-align:center; direction:ltr;
+}
+#quiz-finished-view[data-mode="spelling"] .summary-spelling-answer {
+    font-family:var(--arabic-font); font-size:24px; line-height:1.8; text-align:center; direction:rtl; color:#0d5454;
+}
+#quiz-finished-view[data-mode="spelling"] .summary-spelling-typed { font-size:20px; color:#475569; }
