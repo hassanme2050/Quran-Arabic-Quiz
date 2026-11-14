@@ -1,11 +1,20 @@
-QuranAQ-v1031.26 Dates - October 30, 2026
-Purpose: local-only portable fork. Do not upload Dates to GitHub.
-Future feature development continues in QuranAQ-v1030.26 Strawberry and Test2/.
-Run the three standalone HTML files at the top of this folder. Source edits require node build-portable.cjs before the standalone files change.
-All four runtime TXT files and CP.txt remain on GitHub main/Test2. Reads and Editor saves use one shared fixed configuration; deployment/file location cannot redirect writes.
-No automatic fallback to local TXT copies. Do not overwrite the live GitHub libraries from a code deployment.
-70 automated checks passed. Real browser/UI verification was stopped by the computer-use URL check.
+QuranAQ-v1114.26 Dates (Status: User tested, working and approved)
+Date: November 14, 2026
 
-Quran ayah text uses the supplied KFGQPC Hafs v30 font, embedded in the standalone Student HTML so moving it needs no font folder.
+Local
+- User tested and confirmed the app, Spelling Mode and Admin work correctly; approved publication to GitHub X.
+- Created from QuranAQ-v1107.26 Dates after confirming all 89 files match the current GitHub X version. Book 5 Pace Academy is not included.
+- Replaced Last 10 Words with a Custom Range-style round dropdown; Review, Quiz and Spelling use the selected group of ten verified entries, with shorter final rounds where needed.
+- Added meaning-to-Arabic Spelling across Books A-D, accepting harakat-free answers and optional Al. Tajweed uses bilingual Arabic-answer entries; only the Arabic word is graded, with pronunciation/root hints omitted. Submit flashes green/red, advances, and shows the score plus all answers at the end.
+- Added per-book Enable/Disable/Hide for Spelling in the separate Admin dashboard; existing root configuration remains compatible. Rebuilt the portable pages; 33 automated checks and desktop/mobile browser checks passed.
 
-October 31: Refreshed from approved Strawberry, preserved Book D Quest ayah details and portability, then added Dates-only Admin availability controls backed by shared Test2/dbs.json, paired Review/Quiz buttons, and a seven-Go-click session override. Save/Cancel, write failures, conflicts, hidden books and recovery are covered by 79 automated checks. Separated Admin into admin/index.html, removed all Admin UI/code from the Student bundle, fixed emoji encoding and grouped study settings with Review/Quiz. Hiding removes book options from both pickers and the whole Quiz Code row; home settings refresh automatically. Save keeps the session, Cancel reloads saved settings, and Sign out discards drafts. Admin uses a near-black background; the Student group has no surrounding box. Dates code stays local; existing APKs predate the dashboard.
+Github/Server (https://hassanme2050.github.io/Quran-Arabic-Quiz/X/)
+- Published the user-tested and approved Dates v1114.26 release to X, including Spelling, Admin controls and ten-word rounds. Root books, CP and configuration are preserved; no Android packages or local screenshots are uploaded.
+
+Local build and validation
+- Student: index.html; Admin: admin/index.html; Editor and Quiz Generator remain separate portable modules.
+- Edit source/, then run node build-portable.cjs to refresh the four embedded HTML outputs.
+- Automated checks: node --test portable.test.cjs source/tests/spelling.test.mjs
+- Browser checks: node spelling.browser.cjs (Playwright and Edge); screenshots are local in test-artifacts/. All browser-test resources and Admin saves are mocked; tests never write online.
+- Root library: hassanme2050/Quran-Arabic-Quiz, main branch, folder ''. Do not replace online book TXT files with deployment files.
+- No APK/AAB was built. Source version: QuranAQ-v1107.26 Dates.
