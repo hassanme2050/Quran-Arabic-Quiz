@@ -29,7 +29,7 @@
       "state": "disable",
       "review": "disable",
       "quiz": "disable",
-      "quest": "disable",
+      "quest": "hide",
       "dictionary": "disable",
       "quizCode": "hide"
     }
