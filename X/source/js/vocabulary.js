@@ -1,3 +1,5 @@
+import { spellingEntries } from '../shared/spelling.js';
+import { refreshTenWordRounds } from './ten-word-rounds.js';
 import { fetchRootText, parseVocabularyRecords, BOOK_FILES } from '../shared/vocabulary.js?v=1030.26-dates3';
 import { parseLughatBook } from '../shared/lughat.js?v=1030.26-dates3';
 import { parseTajweedBook } from '../shared/tajweed.js?v=1030.26-dates3';
@@ -32,7 +34,7 @@ export async function loadVocabulary(bookId = 'book_a') {
     }
 }
 export function refreshAvailability(){setSessionAvailability(vocabularyList.length>0);}
-function setSessionAvailability(available){document.querySelectorAll('[data-action]').forEach(element=>{const action=element.dataset.action,key=action==='triggerSelectedSession'?(element.dataset.value==='flashcard'?'review':'quiz'):action==='openQuest'?'quest':action==='openDictionaryMode'?'dictionary':null;if(key){element.classList.toggle('hidden',featureState(activeBook,key)==='hide');element.disabled=!canUse(activeBook,key)||!(key==='dictionary'?dictionaryVocabularyList.length:available);}});const field=document.getElementById('quiz-code-field');field.classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');field.disabled=!canUse(activeBook,'quizCode')||!available;document.getElementById('quiz-code-entry').classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-btn').classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-entry').classList.toggle('quiz-field-hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-btn').disabled=false;}
+function setSessionAvailability(available){document.querySelectorAll('[data-action]').forEach(element=>{const action=element.dataset.action,key=action==='triggerSelectedSession'?(element.dataset.value==='flashcard'?'review':element.dataset.value):action==='openQuest'?'quest':action==='openDictionaryMode'?'dictionary':null;if(key){element.classList.toggle('hidden',featureState(activeBook,key)==='hide');element.disabled=!canUse(activeBook,key)||!(key==='dictionary'?dictionaryVocabularyList.length:key==='spelling'?available&&spellingEntries(vocabularyList,activeBook).length:available);}});const field=document.getElementById('quiz-code-field');field.classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');field.disabled=!canUse(activeBook,'quizCode')||!available;document.getElementById('quiz-code-entry').classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-btn').classList.toggle('hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-entry').classList.toggle('quiz-field-hidden',featureState(activeBook,'quizCode')==='hide');document.getElementById('quiz-code-btn').disabled=false;}
 export function parseVocabulary(text, bookId = 'book_a') {
     activeBook = bookId;
     const parsed = bookId === 'book_b' ? parseLughatBook(text) : bookId === 'book_c' ? parseTajweedBook(text) : bookId==='book_d'?parseQuranVocabulary(text):{records:parseVocabularyRecords(text), warnings:[]};
@@ -57,7 +59,8 @@ export function parseVocabulary(text, bookId = 'book_a') {
     meaningSort.textContent = bookId === 'book_b' ? 'Urdu' : bookId==='book_c'?'Answer':'English';
     document.getElementById('dict-sort-arabic').textContent=bookId==='book_c'?'Question':'Arabic';
     document.getElementById('opt-all').textContent=bookId==='book_c'?'All Questions':'All Words';
-    document.getElementById('opt-last').textContent=bookId==='book_c'?'Last 10':'Last 10 Words';
+    document.getElementById('opt-last').textContent=bookId==='book_c'?'10 Questions':'10 Words';
+    refreshTenWordRounds(vocabularyList, bookId);
     setSessionAvailability(vocabularyList.length > 0);
     clearQuizCodeError();
     switchView('menu-view');
