@@ -1,3 +1,4 @@
+import { readSelectedBook, rememberSelectedBook } from './selected-book.js';
 import { spellingEntries } from '../shared/spelling.js';
 import { initializeSpelling, startSpellingSession } from './spelling.js';
 import { tenWordRound, selectTenWordRound } from './ten-word-rounds.js';
@@ -131,7 +132,7 @@ export function startSession(strategy, mode) {
     }
 }
 
-function updateFeatureControls(force=false){if(!force&&document.getElementById('menu-view').classList.contains('hidden'))return;const selector=document.getElementById('vocabulary-book-selector');syncBookSelector(selector);refreshAvailability();if(selector.value&&selector.value!==activeBook)loadVocabulary(selector.value);else if(!selector.value){document.getElementById('status-message').textContent='No books are currently enabled.';document.getElementById('menu-view').classList.remove('hidden');}}
+function updateFeatureControls(force=false,loadSelectedBook=true){if(!force&&document.getElementById('menu-view').classList.contains('hidden'))return;const selector=document.getElementById('vocabulary-book-selector');syncBookSelector(selector);refreshAvailability();if(loadSelectedBook&&selector.value&&selector.value!==activeBook)loadVocabulary(selector.value);else if(!selector.value){document.getElementById('status-message').textContent='No books are currently enabled.';document.getElementById('menu-view').classList.remove('hidden');}}
 async function handleGoClick(){if(recordGoTap()){updateFeatureControls();if(!vocabularyList.length&&document.getElementById('vocabulary-book-selector').value===activeBook)loadVocabulary(activeBook);launchToastAlert('Session unlocked');return;}if(document.getElementById('quiz-code-field').value.trim()&&canUse(activeBook,'quizCode'))startQuizWithCode();}
 async function initializeApp(){
     initializeDictionarySearch();
@@ -161,14 +162,20 @@ async function initializeApp(){
     });
     input.addEventListener('input', clearQuizCodeError);
     const selector = document.getElementById('vocabulary-book-selector');
-    selector.addEventListener('change', () => { clearQuizCodeError(); if(canUse(selector.value))loadVocabulary(selector.value); });
+    selector.addEventListener('change', () => {
+        clearQuizCodeError();
+        if(canUse(selector.value)){rememberSelectedBook(selector.value);loadVocabulary(selector.value);}
+    });
     await initializeSettings();
     onSettingsChange(()=>updateFeatureControls());
     setMenuRefreshHandler(()=>updateFeatureControls());
     const refresh=()=>{if(!document.getElementById('menu-view').classList.contains('hidden'))initializeSettings();};
     window.addEventListener('focus',refresh);
     const poll=()=>{refresh();setTimeout(poll,15000);};setTimeout(poll,15000);
-    updateFeatureControls(true);
+    // Apply Admin permissions before restoring a browser preference.
+    updateFeatureControls(true,false);
+    const savedBook=readSelectedBook();
+    if(savedBook&&canUse(savedBook))selector.value=savedBook;
     if(canUse(selector.value))await loadVocabulary(selector.value);
 }
 initializeApp();
