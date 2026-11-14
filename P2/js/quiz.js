@@ -11,5 +11,69 @@ export function generateQuizChoices(correct){const answer=answerOf(correct),prom
 export function getMeaningTokens(s){return String(s).toLowerCase().split(/[,;/،؛]/).map(x=>x.trim()).filter(Boolean);}
 export function showQuizQuestion(){const item=state.sessionWords[state.currentIndex],prompt=document.getElementById('quiz-arabic-field'),isE=activeBook==='book_e';document.getElementById('quiz-counter').textContent='Question '+(state.currentIndex+1)+' of '+state.sessionWords.length;prompt.textContent=promptOf(item);prompt.classList.toggle('book5-english-prompt',isE);prompt.dir=isE?'ltr':'auto';prompt.lang=isE?'en':'ar';const box=document.getElementById('quiz-options-box');box.innerHTML='';generateQuizChoices(item).forEach(choice=>{const btn=document.createElement('button');btn.textContent=answerOf(choice);btn.dir=(activeBook==='book_b'||isE)?'rtl':'auto';btn.lang=isE?'ar':activeBook==='book_b'?'ur':'en';if(isE)btn.classList.add('book5-arabic-answer');btn.onclick=()=>evaluateQuizAnswer(btn,choice,item);box.appendChild(btn);});}
 export function evaluateQuizAnswer(button,chosen,correct){const box=document.getElementById('quiz-options-box'),buttons=box.getElementsByTagName('button');for(const b of buttons)b.disabled=true;const isCorrect=answerOf(chosen)===answerOf(correct);state.quizHistory.push({index:state.currentIndex+1,word:promptOf(correct),chosen:answerOf(chosen),correct:answerOf(correct),isCorrect});if(isCorrect)button.classList.add('correct-choice');else{button.classList.add('wrong-choice');for(const b of buttons)if(b.textContent===answerOf(correct))b.classList.add('correct-choice');}state.answerTimer=setTimeout(()=>{state.answerTimer=null;state.currentIndex++;if(state.currentIndex<state.sessionWords.length)showQuizQuestion();else displayQuizSummary();},1200);}
-export function displayQuizSummary(){const score=state.quizHistory.filter(h=>h.isCorrect).length;document.getElementById('score-text-value').textContent=score+'/'+state.sessionWords.length;document.getElementById('percent-text-value').textContent=Math.round(score/state.sessionWords.length*100)+'%';const c=document.getElementById('summary-table-container');c.classList.add('hidden');document.getElementById('toggle-table-btn').textContent='📊 Show Performance Summary';const table=document.createElement('table');table.className='summary-table';const head=table.createTHead().insertRow();[ '#','Result',activeBook==='book_e'?'English Word':'Word',activeBook==='book_e'?'Arabic Answer':'Correct Meaning','Your Choice' ].forEach(label=>{const th=document.createElement('th');th.textContent=label;head.appendChild(th);});const body=table.createTBody();state.quizHistory.forEach(item=>{const row=body.insertRow(),vals=[item.index,item.isCorrect?'✓':'×',item.word,item.correct,item.chosen],classes=['',item.isCorrect?'classic-indicator-pass':'classic-indicator-fail',activeBook==='book_e'?'large-bold-cell':'large-bold-cell large-arabic-cell','large-bold-cell','small-choice-cell'];vals.forEach((v,i)=>{const td=row.insertCell();td.textContent=String(v);td.className=classes[i];if(activeBook==='book_e'&&i>=3){td.dir='rtl';td.lang='ar';td.classList.add('book5-arabic-answer');}});});c.replaceChildren(table);switchView('quiz-finished-view');}
-export function toggleSummaryTableVisibility(){const c=document.getElementById('summary-table-container'),b=document.getElementById('toggle-table-btn');c.classList.toggle('hidden');b.textContent=c.classList.contains('hidden')?'📊 Show Performance Summary':'📊 Hide Performance Summary';}
+export function displayQuizSummary() {
+    const spelling = state.currentMode === 'spelling';
+    const score = state.quizHistory.filter(item => item.isCorrect).length;
+    const total = state.sessionWords.length;
+    const mistakes = state.quizHistory.filter(item => !item.isCorrect);
+    document.getElementById('scorecard-heading').textContent = spelling ? 'Spelling Complete!' : 'Quiz Complete!';
+    document.getElementById('score-text-value').textContent = score + '/' + total;
+    document.getElementById('percent-text-value').textContent = (total ? Math.round(score / total * 100) : 0) + '%';
+    const count = document.getElementById('spelling-mistake-count');
+    count.classList.toggle('hidden', !spelling);
+    count.textContent = mistakes.length + (mistakes.length === 1 ? ' mistake' : ' mistakes');
+    const container = document.getElementById('summary-table-container');
+    container.classList.toggle('hidden', !spelling);
+    const toggle = document.getElementById('toggle-table-btn');
+    toggle.textContent = spelling ? 'Hide Mistakes' : '📊 Show Performance Summary';
+
+    if (spelling && !mistakes.length) {
+        const message = document.createElement('p');
+        message.className = 'spelling-perfect-score';
+        message.textContent = 'No mistakes. Well done!';
+        container.replaceChildren(message);
+    } else {
+        const table = document.createElement('table');
+        table.className = 'summary-table';
+        const head = table.createTHead().insertRow();
+        const labels = [
+            '#', 'Result', activeBook === 'book_e' ? 'English Word' : 'Word',
+            activeBook === 'book_e' ? 'Arabic Answer' : 'Correct Meaning',
+            spelling ? 'Your Answer' : 'Your Choice'
+        ];
+        labels.forEach(label => {
+            const cell = document.createElement('th');
+            cell.textContent = label;
+            head.appendChild(cell);
+        });
+        const body = table.createTBody();
+        (spelling ? mistakes : state.quizHistory).forEach(item => {
+            const row = body.insertRow();
+            const values = [item.index, item.isCorrect ? '✓' : '×', item.word, item.correct, item.chosen];
+            const classes = [
+                '', item.isCorrect ? 'classic-indicator-pass' : 'classic-indicator-fail',
+                activeBook === 'book_e' ? 'large-bold-cell' : 'large-bold-cell large-arabic-cell',
+                'large-bold-cell', 'small-choice-cell'
+            ];
+            values.forEach((value, index) => {
+                const cell = row.insertCell();
+                cell.textContent = String(value);
+                cell.className = classes[index];
+                if (activeBook === 'book_e' && index >= 3) {
+                    cell.dir = 'rtl';
+                    cell.lang = 'ar';
+                    cell.classList.add('book5-arabic-answer');
+                }
+            });
+        });
+        container.replaceChildren(table);
+    }
+    switchView('quiz-finished-view');
+}
+export function toggleSummaryTableVisibility() {
+    const container = document.getElementById('summary-table-container');
+    container.classList.toggle('hidden');
+    const label = state.currentMode === 'spelling' ? 'Mistakes' : 'Performance Summary';
+    document.getElementById('toggle-table-btn').textContent =
+        (container.classList.contains('hidden') ? 'Show ' : 'Hide ') + label;
+}
