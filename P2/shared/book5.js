@@ -19,3 +19,8 @@ export function parseBook5Records(text) {
 export function normalizeArabicAnswer(value) {
   return String(value ?? '').normalize('NFC').replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '').replace(/\s+/g, ' ').trim();
 }
+
+export function arabicAnswersMatch(answer, expected) {
+    const key = value => normalizeArabicAnswer(value).replace(/^[اٱ]ل(?=.)/, '');
+    return key(answer) === key(expected);
+}
