@@ -3,7 +3,7 @@
   "date": "2026-11-14",
   "forkOf": "QuranAQ-v1107.26 Dates; all 89 source files matched GitHub X before editing",
   "publication": "Published to https://hassanme2050.github.io/Quran-Arabic-Quiz/X/",
-  "status": "User tested, working and approved; 33 automated checks and desktop/mobile browser checks passed",
+  "status": "Previous release user tested and approved; book-memory refinement passed 38 automated checks and browser reload checks; user testing pending",
   "library": {
     "repository": "hassanme2050/Quran-Arabic-Quiz",
     "branch": "main",
@@ -11,8 +11,8 @@
   },
   "outputs": {
     "index.html": {
-      "bytes": 800543,
-      "sha256": "306b9a0564b3138e0b985eb65a1044071493c64b233fea9db692cb1f4658c860"
+      "bytes": 801943,
+      "sha256": "afc00853a3edc21a4de68d869f24703638d29df630ef85c6a41287892668fb8d"
     },
     "Editor.html": {
       "bytes": 61732,
@@ -31,6 +31,7 @@
     "Ten-word rounds for Review, Quiz and Spelling, preserving verification boundaries",
     "Meaning-to-Arabic Spelling for Books A-D; Tajweed uses bilingual Arabic-answer entries",
     "Arabic answers ignore harakat, recitation marks and optional definite articles; no spelling hints",
-    "Separate Admin Spelling column with enable/disable/hide per book; backward-compatible root dbs.json"
+    "Separate Admin Spelling column with enable/disable/hide per book; backward-compatible root dbs.json",
+    "Remember the last home-screen book in browser storage; restore only if Admin permits it"
   ]
 }
