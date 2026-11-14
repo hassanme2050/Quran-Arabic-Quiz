@@ -1,8 +1,8 @@
 import { state } from './state.js';
 import { activeBook } from './vocabulary.js';
-import { normalizeArabicAnswer, arabicAnswersMatch } from '../shared/book5.js?v=20261114-p2-r3';
+import { normalizeArabicAnswer, arabicAnswersMatch } from '../shared/book5.js?v=20261114-p2-r5';
 import { switchView } from './ui.js';
-import { displayQuizSummary } from './quiz.js?v=20261114-p2-r3';
+import { displayQuizSummary } from './quiz.js?v=20261114-p2-r5';
 
 let submitted = false;
 function render() {
