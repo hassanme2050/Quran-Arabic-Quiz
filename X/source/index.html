@@ -18,12 +18,16 @@
 
         <!-- Dashboard View Framework Layout -->
         <div id="menu-view" class="hidden">
-            <div class="study-mode-group" role="group" aria-label="Review and quiz settings">
+            <div class="study-mode-group" role="group" aria-label="Review, quiz and spelling settings">
             <div class="segmented-slider-container">
                 <div class="slider-pill" id="active-slider-pill"></div>
                 <div class="segment-option active" id="opt-all" data-action="updateSegmentSelection" data-value="all">All Words</div>
-                <div class="segment-option" id="opt-last" data-action="updateSegmentSelection" data-value="last">Last 10 Words</div>
+                <div class="segment-option" id="opt-last" data-action="updateSegmentSelection" data-value="last">10 Words</div>
                 <div class="segment-option" id="opt-custom" data-action="updateSegmentSelection" data-value="custom">Custom Range</div>
+            </div>
+
+            <div class="range-drawer-panel" id="ten-word-round-drawer">
+                <div class="range-flex-row"><label for="ten-word-round">Round</label><select id="ten-word-round" aria-label="Choose a ten word round"></select></div>
             </div>
 
             <div class="range-drawer-panel" id="range-drawer-box">
@@ -37,6 +41,7 @@
 
             <div class="mode-pair study-mode-buttons"><button data-action="triggerSelectedSession" data-value="flashcard">Review Mode</button>
                 <button data-action="triggerSelectedSession" data-value="quiz">Quiz Mode</button></div>
+                <button id="spelling-mode-button" class="spelling-mode-button" data-action="triggerSelectedSession" data-value="spelling">Spelling Mode</button>
             </div>
             <div class="menu-action-layout secondary-modes">
                 <button data-action="openQuest">Quest Mode</button>
@@ -165,10 +170,28 @@
             </div>
         </div>
 
+
+        <section id="spelling-view" class="hidden" aria-label="Spelling practice">
+            <p id="spelling-context" class="question-context hidden"></p>
+            <div class="counter-label-text" id="spelling-counter"></div>
+            <div class="display-card-frame spelling-word-card">
+                <div id="spelling-prompt" class="spelling-prompt" dir="auto"></div>
+            </div>
+            <form id="spelling-form">
+                <label for="spelling-answer">Type the Arabic word</label>
+                <input id="spelling-answer" class="custom-text-input" type="text" dir="rtl" lang="ar" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-describedby="spelling-feedback">
+                <p id="spelling-feedback" role="status" aria-live="polite"></p>
+                <div class="quiz-options"><button id="spelling-submit-button" type="submit">Submit</button></div>
+            </form>
+            <div class="navigation-buttons">
+                <button class="exit-btn" type="button" data-action="exitToHome">← Exit to Menu</button>
+            </div>
+        </section>
+
         <!-- Reordered Quiz Summary Screen Layout Panels -->
         <div id="quiz-finished-view" class="hidden">
             <div id="screenshot-target-scorecard">
-                <h2 style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
+                <h2 id="scorecard-title" style="margin: 0 0 5px 0; color: #073636; font-size: 24px; font-weight: bold;">Quiz Complete!</h2>
                 <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; font-weight: 500;">QuranFahm.app Scorecard</p>
                 <div class="scorecard-content">
                     <div class="summary-metric-circle">
