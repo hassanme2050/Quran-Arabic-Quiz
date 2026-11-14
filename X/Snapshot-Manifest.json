@@ -1,48 +1,36 @@
 {
-  "version": "QuranAQ-v1031.26 Dates",
-  "date": "2026-10-31",
-  "forkOf": "Approved QuranAQ-v1030.26 Strawberry",
-  "publication": "local only - do not upload",
-  "futureDevelopment": "QuranAQ-v1030.26 Strawberry / Test2",
+  "version": "QuranAQ-v1114.26 Dates",
+  "date": "2026-11-14",
+  "forkOf": "QuranAQ-v1107.26 Dates; all 89 source files matched GitHub X before editing",
+  "publication": "Published to https://hassanme2050.github.io/Quran-Arabic-Quiz/X/",
+  "status": "User tested, working and approved; 33 automated checks and desktop/mobile browser checks passed",
   "library": {
     "repository": "hassanme2050/Quran-Arabic-Quiz",
     "branch": "main",
-    "folder": "Test2"
+    "folder": ""
   },
   "outputs": {
     "index.html": {
-      "bytes": 785455,
-      "sha256": "c7af0af5b7f623f992430e36c686efca2560a6902582f416a01406ad2b14c22f"
+      "bytes": 800543,
+      "sha256": "306b9a0564b3138e0b985eb65a1044071493c64b233fea9db692cb1f4658c860"
     },
     "Editor.html": {
-      "bytes": 61725,
-      "sha256": "6cf1f3a5592bc9bdf1100e0782aa11727c7b89034bc1e5d177c481c555bd6097"
+      "bytes": 61732,
+      "sha256": "6730f22ea70f314e137c221109550d8bddfe11cc83a89cb810383ede84849a0a"
     },
     "Test-Generator.html": {
-      "bytes": 43760,
-      "sha256": "ca7062d64f78cc76feae5cefafe4735e8b95add8e1c07446226ce4e1990b89e0"
+      "bytes": 43767,
+      "sha256": "2ac6ab3100855d32596373527cd72560c77d840584e910da12abafd6bc062b6d"
     },
     "admin/index.html": {
-      "bytes": 12611,
-      "sha256": "19cc344d373f908f641eaa221f5f787a6050eb9cbc5f0d3eade1671aa2802dd6"
-    },
-    "Editor/index.html": {
-      "bytes": 61725,
-      "sha256": "6cf1f3a5592bc9bdf1100e0782aa11727c7b89034bc1e5d177c481c555bd6097"
-    },
-    "Quiz Generator/index.html": {
-      "bytes": 43760,
-      "sha256": "ca7062d64f78cc76feae5cefafe4735e8b95add8e1c07446226ce4e1990b89e0"
+      "bytes": 13007,
+      "sha256": "41a9202ef99686bf75560f5b4ac4c06372be5b7d45948677ae7123565f21aa75"
     }
   },
-  "embeddedQuranFont": "kfgqpc_hafs_v30.ttf",
-  "questAyahDetails": true,
-  "refreshed": "2026-10-31",
-  "dashboardSettings": "GitHub main/Test2/dbs.json",
-  "adminDashboard": true,
-  "sessionUnlockGoTaps": 7,
-  "androidPackages": "Existing local APKs predate the admin dashboard update",
-  "adminModule": "admin/index.html",
-  "adminEmbeddedInStudent": false,
-  "settingsRefresh": "Home focus and 15-second polling; hidden options removed"
+  "features": [
+    "Ten-word rounds for Review, Quiz and Spelling, preserving verification boundaries",
+    "Meaning-to-Arabic Spelling for Books A-D; Tajweed uses bilingual Arabic-answer entries",
+    "Arabic answers ignore harakat, recitation marks and optional definite articles; no spelling hints",
+    "Separate Admin Spelling column with enable/disable/hide per book; backward-compatible root dbs.json"
+  ]
 }
