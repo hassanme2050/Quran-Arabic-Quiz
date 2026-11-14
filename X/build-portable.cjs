@@ -49,7 +49,7 @@ function build(page,output,renderer=false){
     });
     if(/<script[^>]+\bsrc=|<link[^>]+rel="stylesheet"[^>]+href="(?!https:)/.test(html))throw Error('Unbundled local asset in '+output);
     const license=renderer?fs.readFileSync(path.join(source,'licenses/html2canvas-LICENSE.txt'),'utf8'):'';
-    html='<!-- QuranAQ-v1030.26 Dates: standalone HTML; books remain on GitHub.\n'+license.replace(/-->/g,'-- >')+'\n-->\n'+html;
+    html='<!-- QuranAQ-v1114.26 Dates: standalone HTML; books remain on GitHub.\n'+license.replace(/-->/g,'-- >')+'\n-->\n'+html;
     fs.mkdirSync(path.dirname(path.join(root,output)),{recursive:true});
     fs.writeFileSync(path.join(root,output),html,'utf8');console.log(output+': '+Buffer.byteLength(html)+' bytes');
 }
