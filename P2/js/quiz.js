@@ -7,8 +7,53 @@ import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer 
 function promptOf(item){return activeBook==='book_e'?item.meaning:item.word;}
 function answerOf(item){return activeBook==='book_e'?item.word:item.meaning;}
 export function startQuizWithCode(){const input=document.getElementById('quiz-code-field'),code=input.value.trim().toUpperCase().replace(/\s+/g,'');clearQuizCodeError();if(!vocabularyList.length){showQuizCodeError('Vocabulary is not loaded yet.');return;}if(activeBook==='book_e'){showQuizCodeError('Quiz codes are not available for Book 5.');return;}const book=code.startsWith('B2:')?'book_b':'book_a';if(book!==activeBook){showQuizCodeError('Select '+(book==='book_b'?'Book B':'Book A')+' for this quiz code.');return;}const nums=code?decodeTeacherQuizCode(code):null;if(!nums){showQuizCodeError('Invalid quiz code. Please check with your teacher.');input.focus();return;}const selected=[];for(const n of nums){const matches=activeBook==='book_b'?vocabularyList.filter(x=>x.number===n):[];const item=activeBook==='book_b'?(matches.length===1?matches[0]:null):vocabularyList[n-1];if(!Number.isInteger(n)||n<1||!item){showQuizCodeError('Quiz code is unavailable with this book file.');return;}selected.push(item);}cancelPendingAnswer();state.sessionWords=selected;shuffleArray(state.sessionWords);state.currentPool=[...vocabularyList];state.currentMode='quiz';state.currentIndex=0;state.quizHistory=[];document.getElementById('status-message').classList.add('hidden');document.getElementById('app-title').textContent='QuranFahm.app';switchView('quiz-view');showQuizQuestion();}
-export function generateQuizChoices(correct){const answer=answerOf(correct),prompt=promptOf(correct);let pool=vocabularyList.filter(x=>promptOf(x)!==prompt&&answerOf(x)!==answer);shuffleArray(pool);const choices=[correct];for(const item of pool){if(choices.length>=4)break;if(!choices.some(c=>answerOf(c).toLowerCase()===answerOf(item).toLowerCase()))choices.push(item);}while(choices.length<4)choices.push({word:'—',meaning:'Alternative Choice Option '+(choices.length+1)});shuffleArray(choices);return choices;}
-export function getMeaningTokens(s){return String(s).toLowerCase().split(/[,;/،؛]/).map(x=>x.trim()).filter(Boolean);}
+export function generateQuizChoices(correct){if(activeBook!=='book_e')return generateOriginalQuizChoices(correct);const answer=answerOf(correct),prompt=promptOf(correct);let pool=vocabularyList.filter(x=>promptOf(x)!==prompt&&answerOf(x)!==answer);shuffleArray(pool);const choices=[correct];for(const item of pool){if(choices.length>=4)break;if(!choices.some(c=>answerOf(c).toLowerCase()===answerOf(item).toLowerCase()))choices.push(item);}while(choices.length<4)choices.push({word:'—',meaning:'Alternative Choice Option '+(choices.length+1)});shuffleArray(choices);return choices;}
+
+function generateOriginalQuizChoices(correctItem) {
+    let choices = [correctItem];
+    const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
+
+    let validDistractors = vocabularyList.filter(item => {
+        if (item.word === correctItem.word) return false;
+        
+        const itemMeaningsLower = getMeaningTokens(item.meaning);
+        if (item.meaning.toLowerCase() === correctItem.meaning.toLowerCase()) return false;
+        
+        const hasOverlap = itemMeaningsLower.some(token => correctMeaningsLower.includes(token));
+        return !hasOverlap;
+    });
+
+    if (validDistractors.length < 3) {
+        validDistractors = vocabularyList.filter(item => item.word !== correctItem.word);
+    }
+
+    shuffleArray(validDistractors);
+
+    for (let i = 0; i < validDistractors.length; i++) {
+        if (choices.length >= 4) break;
+        if (!choices.some(c => c.meaning.toLowerCase() === validDistractors[i].meaning.toLowerCase())) {
+            choices.push(validDistractors[i]);
+        }
+    }
+
+    while (choices.length < 4) {
+        choices.push({ word: '—', meaning: 'Alternative Choice Option ' + (choices.length + 1) });
+    }
+
+    shuffleArray(choices);
+    return choices;
+}
+
+export function getMeaningTokens(meaningString) {
+    if (activeBook === 'book_b') return meaningString.split(/[\u060C,\u061B;/]/).map(token => token.trim()).filter(Boolean);
+    return meaningString.toLowerCase()
+        .replace(/[!.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .split('/')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+}
+
+
 export function showQuizQuestion(){const item=state.sessionWords[state.currentIndex],prompt=document.getElementById('quiz-arabic-field'),isE=activeBook==='book_e';document.getElementById('quiz-counter').textContent='Question '+(state.currentIndex+1)+' of '+state.sessionWords.length;prompt.textContent=promptOf(item);prompt.classList.toggle('book5-english-prompt',isE);prompt.dir=isE?'ltr':'auto';prompt.lang=isE?'en':'ar';const box=document.getElementById('quiz-options-box');box.innerHTML='';generateQuizChoices(item).forEach(choice=>{const btn=document.createElement('button');btn.textContent=answerOf(choice);btn.dir=(activeBook==='book_b'||isE)?'rtl':'auto';btn.lang=isE?'ar':activeBook==='book_b'?'ur':'en';if(isE)btn.classList.add('book5-arabic-answer');btn.onclick=()=>evaluateQuizAnswer(btn,choice,item);box.appendChild(btn);});}
 export function evaluateQuizAnswer(button,chosen,correct){const box=document.getElementById('quiz-options-box'),buttons=box.getElementsByTagName('button');for(const b of buttons)b.disabled=true;const isCorrect=answerOf(chosen)===answerOf(correct);state.quizHistory.push({index:state.currentIndex+1,word:promptOf(correct),chosen:answerOf(chosen),correct:answerOf(correct),isCorrect});if(isCorrect)button.classList.add('correct-choice');else{button.classList.add('wrong-choice');for(const b of buttons)if(b.textContent===answerOf(correct))b.classList.add('correct-choice');}state.answerTimer=setTimeout(()=>{state.answerTimer=null;state.currentIndex++;if(state.currentIndex<state.sessionWords.length)showQuizQuestion();else displayQuizSummary();},1200);}
 export function displayQuizSummary() {
