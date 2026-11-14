@@ -7,8 +7,7 @@
       "quiz": "enable",
       "quest": "hide",
       "dictionary": "enable",
-      "quizCode": "enable",
-      "spelling": "enable"
+      "quizCode": "enable"
     },
     "book_b": {
       "state": "enable",
@@ -16,8 +15,7 @@
       "quiz": "enable",
       "quest": "hide",
       "dictionary": "enable",
-      "quizCode": "hide",
-      "spelling": "disable"
+      "quizCode": "hide"
     },
     "book_c": {
       "state": "disable",
@@ -25,17 +23,15 @@
       "quiz": "disable",
       "quest": "hide",
       "dictionary": "disable",
-      "quizCode": "hide",
-      "spelling": "disable"
+      "quizCode": "hide"
     },
     "book_d": {
       "state": "disable",
       "review": "disable",
       "quiz": "disable",
-      "quest": "hide",
+      "quest": "disable",
       "dictionary": "disable",
-      "quizCode": "hide",
-      "spelling": "disable"
+      "quizCode": "hide"
     }
   }
 }
