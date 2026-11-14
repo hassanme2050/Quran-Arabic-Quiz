@@ -552,8 +552,77 @@ button.exit-btn:hover {
 /* Toolbar highlighting changes color only; never lifts or scales controls. */
 #dictionary-toolbar button,#dictionary-toolbar button:hover,#dictionary-toolbar button:active { transform:none !important; box-sizing:border-box; }
 
-/* Book 5 English prompt and Arabic answer presentation */
-.book-level-submenu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}.book-level-submenu button{padding:10px 8px;background:#263238;color:#f1f5f9;border:1px solid #53636b;border-radius:10px}.book-level-submenu button.selected{background:var(--button-gold);color:#1a1002}.book-level-submenu small{display:block;font-size:11px;margin-top:3px}.book5-round-picker{display:grid;grid-template-columns:repeat(5,58px);justify-content:center;gap:9px;margin:12px auto 16px}.book5-round-picker button{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;background:#334155;color:#fff;border:1px solid #64748b}.book5-round-picker button.selected{background:var(--button-gold);color:#1a1002}.spelling-prompt-card{min-height:130px;display:flex;align-items:center;justify-content:center}.spelling-english-prompt{font-size:clamp(28px,7vw,42px);font-weight:700;color:#0c4d4d;text-align:center}.spelling-answer{direction:rtl;text-align:center;font-family:var(--arabic-font);font-size:28px;line-height:1.8;margin:12px 0}.book5-english-prompt{font-family:inherit!important;direction:ltr!important;text-align:center!important;font-size:clamp(24px,6vw,36px)!important;line-height:1.35!important}.book5-arabic-answer{font-family:var(--arabic-font)!important;direction:rtl!important;text-align:center!important;line-height:1.8!important;font-size:24px!important}#spelling-feedback{min-height:28px;margin:6px;font-weight:700;color:#d8e9e9}#spelling-feedback:not(:empty){text-align:center}
-@media(max-width:420px){.book5-round-picker{grid-template-columns:repeat(5,40px);gap:7px}.book5-round-picker button{width:40px;height:40px;min-height:40px}.book-level-submenu{gap:6px}}
-
-.book5-round-picker button{width:58px;height:58px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:2px}.book5-round-picker button strong{font-size:17px;line-height:1}.book5-round-picker button small{font-size:9px;line-height:1.15;font-weight:600}@media(max-width:420px){.book5-round-picker{grid-template-columns:repeat(5,56px);gap:6px}.book5-round-picker button{width:56px;height:56px;min-height:56px}}
+/* Book E controls and English-to-Arabic presentation. */
+.book-level-submenu {
+    max-width: 480px;
+    margin: 8px auto 5px;
+    text-align: left;
+}
+.book-level-submenu label {
+    display: block;
+    margin: 0 0 6px 4px;
+    color: var(--counter-teal);
+    font-size: 13px;
+    font-weight: 600;
+}
+.book-level-submenu .custom-select-menu { margin: 0; }
+.range-flex-row select {
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    outline: none;
+}
+.range-flex-row select:focus { border-color: var(--button-gold); }
+.range-flex-row select option { background: #073636; color: #fff; }
+#book5-round-picker:not(.open) { visibility: hidden; }
+.spelling-prompt-card {
+    min-height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.spelling-english-prompt {
+    font-size: clamp(28px, 7vw, 42px);
+    font-weight: 700;
+    color: #0c4d4d;
+    text-align: center;
+}
+.spelling-answer {
+    width: 100%;
+    max-width: 480px;
+    direction: rtl;
+    text-align: center;
+    font-family: var(--arabic-font);
+    font-size: 28px;
+    line-height: 1.8;
+    margin: 12px 0;
+}
+.book5-english-prompt {
+    font-family: inherit !important;
+    direction: ltr !important;
+    text-align: center !important;
+    font-size: clamp(24px, 6vw, 36px) !important;
+    line-height: 1.35 !important;
+}
+.book5-arabic-answer {
+    font-family: var(--arabic-font) !important;
+    direction: rtl !important;
+    text-align: center !important;
+    line-height: 1.8 !important;
+    font-size: 24px !important;
+}
+#spelling-feedback {
+    min-height: 28px;
+    margin: 6px;
+    font-weight: 700;
+    color: #d8e9e9;
+    text-align: center;
+}
+#spelling-mistake-count { color: #475569; font-weight: 600; }
+.spelling-perfect-score { color: var(--counter-teal); text-align: center; }
