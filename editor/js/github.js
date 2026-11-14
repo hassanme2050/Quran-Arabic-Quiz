@@ -2,16 +2,9 @@ import { parseVocabularyRecords, BOOK_FILES } from '../../shared/vocabulary.js';
 const OWNER = 'hassanme2050';
 const REPOSITORY = 'Quran-Arabic-Quiz';
 const BRANCH = 'main';
-// Match the loaded app's folder on GitHub Pages, including TEST deployments.
-export function repositoryVocabularyPath(filename, moduleUrl = import.meta.url) {
+// Shared libraries are edited at the repository root.
+export function repositoryVocabularyPath(filename) {
     if (!Object.values(BOOK_FILES).includes(filename)) throw new Error('Unknown vocabulary file.');
-    const appRoot = new URL('../../', moduleUrl);
-    if (appRoot.hostname === OWNER + '.github.io') {
-        const repositoryRoot = '/' + REPOSITORY + '/';
-        if (!appRoot.pathname.startsWith(repositoryRoot)) throw new Error('Unexpected repository URL.');
-        return decodeURIComponent(appRoot.pathname.slice(repositoryRoot.length)) + filename;
-    }
-    // Local previews retain the configured repository-root destination.
     return filename;
 }
 // Pure row replacement: preserve original book order, unrelated text and line endings.
