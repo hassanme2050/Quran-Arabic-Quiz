@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700&display=swap');
+
+:root {
+    --arabic-font: 'Alexandria', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Shared by student screens and both teacher tools. */
+.arabic-text-render,
+.large-arabic-cell,
+.dictionary-word,
+.tile-arabic-text,
+.large-arabic-input {
+    font-family: var(--arabic-font);
+    font-weight: 600;
+    letter-spacing: normal;
+}
+
+.dictionary-jump[data-script="arabic"] button {
+    font-family: var(--arabic-font);
+    font-weight: 600;
+}
