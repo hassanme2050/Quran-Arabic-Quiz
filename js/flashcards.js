@@ -4,12 +4,17 @@ import { switchView } from './ui.js';
 
 export function showCard() {
     document.getElementById('card-counter').textContent = "Word " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
-    document.getElementById('card-arabic-field').textContent = state.sessionWords[state.currentIndex].word;
     const item = state.sessionWords[state.currentIndex];
+    const prompt = document.getElementById('card-arabic-field');
+    prompt.textContent = activeBook === 'book_e' ? item.meaning : item.word;
+    prompt.classList.toggle('book5-english-prompt', activeBook === 'book_e');
+    prompt.dir = activeBook === 'book_e' ? 'ltr' : 'rtl';
+    prompt.lang = activeBook === 'book_e' ? 'en' : 'ar';
     const meaningField = document.getElementById('card-meaning-field');
-    meaningField.textContent = item.meaning + (item.explanation ? ' ' + item.explanation : '');
-    meaningField.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
-    meaningField.lang = activeBook === 'book_b' ? 'ur' : 'en';
+    meaningField.textContent = (activeBook === 'book_e' ? item.word : item.meaning) + (item.explanation ? ' ' + item.explanation : '');
+    meaningField.classList.toggle('book5-arabic-answer', activeBook === 'book_e');
+    meaningField.dir = (activeBook === 'book_b' || activeBook === 'book_e') ? 'rtl' : 'auto';
+    meaningField.lang = activeBook === 'book_b' ? 'ur' : activeBook === 'book_e' ? 'ar' : 'en';
     
     if (state.globalPersistentEyeToggleStatus) {
         state.isMeaningVisible = true;
