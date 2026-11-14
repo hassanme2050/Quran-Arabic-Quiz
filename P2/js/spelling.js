@@ -1,8 +1,8 @@
 import { state } from './state.js';
 import { activeBook } from './vocabulary.js';
-import { normalizeArabicAnswer } from '../shared/book5.js';
+import { normalizeArabicAnswer, arabicAnswersMatch } from '../shared/book5.js?v=20261114-p2-r3';
 import { switchView } from './ui.js';
-import { displayQuizSummary } from './quiz.js?v=20261113-p2-r2';
+import { displayQuizSummary } from './quiz.js?v=20261114-p2-r3';
 
 let submitted = false;
 function render() {
@@ -16,7 +16,9 @@ function render() {
     input.value = '';
     input.disabled = false;
     document.getElementById('spelling-feedback').textContent = '';
-    document.getElementById('spelling-submit-button').classList.remove('hidden');
+    const submit = document.getElementById('spelling-submit-button');
+    submit.classList.remove('hidden', 'correct-choice', 'wrong-choice');
+    submit.disabled = false;
     const next = document.getElementById('spelling-next-button');
     next.classList.add('hidden');
     next.textContent = state.currentIndex === state.sessionWords.length - 1 ? 'See Score' : 'Next Word';
@@ -40,7 +42,7 @@ export function submitSpellingAnswer() {
         input.focus();
         return;
     }
-    const isCorrect = normalizeArabicAnswer(answer) === normalizeArabicAnswer(item.word);
+    const isCorrect = arabicAnswersMatch(answer, item.word);
     state.quizHistory.push({
         index: state.currentIndex + 1,
         word: item.meaning,
@@ -50,11 +52,14 @@ export function submitSpellingAnswer() {
     });
     submitted = true;
     input.disabled = true;
-    feedback.textContent = isCorrect ? 'Correct!' : 'Answer recorded. Review it with your score.';
-    document.getElementById('spelling-submit-button').classList.add('hidden');
-    const next = document.getElementById('spelling-next-button');
-    next.classList.remove('hidden');
-    next.focus();
+    feedback.textContent = '';
+    const submit = document.getElementById('spelling-submit-button');
+    submit.disabled = true;
+    submit.classList.add(isCorrect ? 'correct-choice' : 'wrong-choice');
+    state.answerTimer = setTimeout(() => {
+        state.answerTimer = null;
+        advanceSpelling();
+    }, 1200);
 }
 export function advanceSpelling() {
     if (!submitted || state.currentMode !== 'spelling') return;
