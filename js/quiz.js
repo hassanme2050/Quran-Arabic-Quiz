@@ -4,57 +4,12 @@ import { state } from './state.js';
 import { vocabularyList, activeBook } from './vocabulary.js';
 import { shuffleArray } from './utils.js';
 import { switchView, showQuizCodeError, clearQuizCodeError, cancelPendingAnswer } from './ui.js';
+function promptOf(item){return activeBook==='book_e'?item.meaning:item.word;}
+function answerOf(item){return activeBook==='book_e'?item.word:item.meaning;}
+export function startQuizWithCode(){const input=document.getElementById('quiz-code-field'),code=input.value.trim().toUpperCase().replace(/\s+/g,'');clearQuizCodeError();if(!vocabularyList.length){showQuizCodeError('Vocabulary is not loaded yet.');return;}if(activeBook==='book_e'){showQuizCodeError('Quiz codes are not available for Book 5.');return;}const book=code.startsWith('B2:')?'book_b':'book_a';if(book!==activeBook){showQuizCodeError('Select '+(book==='book_b'?'Book B':'Book A')+' for this quiz code.');return;}const nums=code?decodeTeacherQuizCode(code):null;if(!nums){showQuizCodeError('Invalid quiz code. Please check with your teacher.');input.focus();return;}const selected=[];for(const n of nums){const matches=activeBook==='book_b'?vocabularyList.filter(x=>x.number===n):[];const item=activeBook==='book_b'?(matches.length===1?matches[0]:null):vocabularyList[n-1];if(!Number.isInteger(n)||n<1||!item){showQuizCodeError('Quiz code is unavailable with this book file.');return;}selected.push(item);}cancelPendingAnswer();state.sessionWords=selected;shuffleArray(state.sessionWords);state.currentPool=[...vocabularyList];state.currentMode='quiz';state.currentIndex=0;state.quizHistory=[];document.getElementById('status-message').classList.add('hidden');document.getElementById('app-title').textContent='QuranFahm.app';switchView('quiz-view');showQuizQuestion();}
+export function generateQuizChoices(correct){if(activeBook!=='book_e')return generateOriginalQuizChoices(correct);const answer=answerOf(correct),prompt=promptOf(correct);let pool=vocabularyList.filter(x=>promptOf(x)!==prompt&&answerOf(x)!==answer);shuffleArray(pool);const choices=[correct];for(const item of pool){if(choices.length>=4)break;if(!choices.some(c=>answerOf(c).toLowerCase()===answerOf(item).toLowerCase()))choices.push(item);}while(choices.length<4)choices.push({word:'—',meaning:'Alternative Choice Option '+(choices.length+1)});shuffleArray(choices);return choices;}
 
-// Answer generation and meaning-token handling intentionally retain the original logic.
-export function startQuizWithCode() {
-    const input = document.getElementById('quiz-code-field');
-    const enteredCode = input.value.trim().toUpperCase().replace(/\s+/g, '');
-    clearQuizCodeError();
-
-    if (vocabularyList.length === 0) {
-        showQuizCodeError('Vocabulary is not loaded yet. Please wait and try again.');
-        return;
-    }
-
-    const codeBook = enteredCode.startsWith('B2:') ? 'book_b' : 'book_a';
-    if (codeBook !== activeBook) { showQuizCodeError('Select ' + (codeBook === 'book_b' ? 'Book B' : 'Book A') + ' for this quiz code.'); return; }
-    const selectedQuestionNumbers = enteredCode ? decodeTeacherQuizCode(enteredCode) : null;
-    if (!selectedQuestionNumbers) {
-        showQuizCodeError('Invalid quiz code. Please try again or check with your teacher.');
-        input.focus();
-        return;
-    }
-    const selectedWords = [];
-    for (const questionNumber of selectedQuestionNumbers) {
-        const matches = activeBook === 'book_b' ? vocabularyList.filter(item => item.number === questionNumber) : [];
-        const selected = activeBook === 'book_b' ? (matches.length === 1 ? matches[0] : null) : vocabularyList[questionNumber - 1];
-        if (!Number.isInteger(questionNumber) || questionNumber < 1 || !selected) {
-            showQuizCodeError('This quiz code is not available with the current vocabulary file. Please check with your teacher.');
-            return;
-        }
-        selectedWords.push(selected);
-    }
-
-    if (selectedWords.length === 0) {
-        showQuizCodeError('This quiz has no questions assigned. Please check with your teacher.');
-        return;
-    }
-
-    cancelPendingAnswer();
-    // Keep the teacher's exact selection, but randomize the order for each student.
-    state.sessionWords = [...selectedWords];
-    shuffleArray(state.sessionWords);
-    state.currentPool = [...vocabularyList];
-    state.currentMode = 'quiz';
-    state.currentIndex = 0;
-    state.quizHistory = [];
-    document.getElementById('status-message').classList.add('hidden');
-    document.getElementById('app-title').textContent = 'Quran Arabic Quiz';
-    switchView('quiz-view');
-    showQuizQuestion();
-}
-
-export function generateQuizChoices(correctItem) {
+function generateOriginalQuizChoices(correctItem) {
     let choices = [correctItem];
     const correctMeaningsLower = getMeaningTokens(correctItem.meaning);
 
@@ -98,109 +53,72 @@ export function getMeaningTokens(meaningString) {
         .filter(s => s.length > 0);
 }
 
-export function showQuizQuestion() {
-    const currentItem = state.sessionWords[state.currentIndex];
-    document.getElementById('quiz-counter').textContent = "Question " + (state.currentIndex + 1) + " of " + state.sessionWords.length;
-    document.getElementById('quiz-arabic-field').textContent = currentItem.word;
 
-    const optionsBox = document.getElementById('quiz-options-box');
-    optionsBox.innerHTML = '';
-
-    const choices = generateQuizChoices(currentItem);
-    
-    choices.forEach(choice => {
-        const btn = document.createElement('button');
-        btn.textContent = choice.meaning;
-        btn.dir = activeBook === 'book_b' ? 'rtl' : 'auto';
-        btn.lang = activeBook === 'book_b' ? 'ur' : 'en';
-        btn.onclick = function() { evaluateQuizAnswer(btn, choice, currentItem); };
-        optionsBox.appendChild(btn);
-    });
-}
-
-export function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
-    const optionsBox = document.getElementById('quiz-options-box');
-    const buttons = optionsBox.getElementsByTagName('button');
-    
-    for (let btn of buttons) {
-        btn.disabled = true;
-    }
-
-    const isCorrect = (chosenChoice.meaning === correctItem.meaning);
-    
-    state.quizHistory.push({
-        index: state.currentIndex + 1,
-        word: correctItem.word,
-        chosen: chosenChoice.meaning,
-        correct: correctItem.meaning,
-        isCorrect: isCorrect
-    });
-
-    if (isCorrect) {
-        selectedButton.classList.add('correct-choice');
-    } else {
-        selectedButton.classList.add('wrong-choice');
-        for (let btn of buttons) {
-            if (btn.textContent === correctItem.meaning) {
-                btn.classList.add('correct-choice');
-            }
-        }
-    }
-
-    state.answerTimer = setTimeout(() => {
-        state.answerTimer = null;
-        state.currentIndex++;
-        if (state.currentIndex < state.sessionWords.length) {
-            showQuizQuestion();
-        } else {
-            displayQuizSummary();
-        }
-    }, 1200);
-}
-
+export function showQuizQuestion(){const item=state.sessionWords[state.currentIndex],prompt=document.getElementById('quiz-arabic-field'),isE=activeBook==='book_e';document.getElementById('quiz-counter').textContent='Question '+(state.currentIndex+1)+' of '+state.sessionWords.length;prompt.textContent=promptOf(item);prompt.classList.toggle('book5-english-prompt',isE);prompt.dir=isE?'ltr':'auto';prompt.lang=isE?'en':'ar';const box=document.getElementById('quiz-options-box');box.innerHTML='';generateQuizChoices(item).forEach(choice=>{const btn=document.createElement('button');btn.textContent=answerOf(choice);btn.dir=(activeBook==='book_b'||isE)?'rtl':'auto';btn.lang=isE?'ar':activeBook==='book_b'?'ur':'en';if(isE)btn.classList.add('book5-arabic-answer');btn.onclick=()=>evaluateQuizAnswer(btn,choice,item);box.appendChild(btn);});}
+export function evaluateQuizAnswer(button,chosen,correct){const box=document.getElementById('quiz-options-box'),buttons=box.getElementsByTagName('button');for(const b of buttons)b.disabled=true;const isCorrect=answerOf(chosen)===answerOf(correct);state.quizHistory.push({index:state.currentIndex+1,word:promptOf(correct),chosen:answerOf(chosen),correct:answerOf(correct),isCorrect});if(isCorrect)button.classList.add('correct-choice');else{button.classList.add('wrong-choice');for(const b of buttons)if(b.textContent===answerOf(correct))b.classList.add('correct-choice');}state.answerTimer=setTimeout(()=>{state.answerTimer=null;state.currentIndex++;if(state.currentIndex<state.sessionWords.length)showQuizQuestion();else displayQuizSummary();},1200);}
 export function displayQuizSummary() {
-    const totalCorrect = state.quizHistory.filter(h => h.isCorrect).length;
-    const percentage = Math.round((totalCorrect / state.sessionWords.length) * 100);
-    
-    document.getElementById('score-text-value').textContent = totalCorrect + "/" + state.sessionWords.length;
-    document.getElementById('percent-text-value').textContent = percentage + "%";
+    const spelling = state.currentMode === 'spelling';
+    const score = state.quizHistory.filter(item => item.isCorrect).length;
+    const total = state.sessionWords.length;
+    const mistakes = state.quizHistory.filter(item => !item.isCorrect);
+    document.getElementById('scorecard-heading').textContent = spelling ? 'Spelling Complete!' : 'Quiz Complete!';
+    document.getElementById('score-text-value').textContent = score + '/' + total;
+    document.getElementById('percent-text-value').textContent = (total ? Math.round(score / total * 100) : 0) + '%';
+    const count = document.getElementById('spelling-mistake-count');
+    count.classList.toggle('hidden', !spelling);
+    count.textContent = mistakes.length + (mistakes.length === 1 ? ' mistake' : ' mistakes');
+    const container = document.getElementById('summary-table-container');
+    container.classList.add('hidden');
+    const toggle = document.getElementById('toggle-table-btn');
+    toggle.textContent = 'Show Summary';
 
-    const tableContainer = document.getElementById('summary-table-container');
-    tableContainer.classList.add('hidden');
-    document.getElementById('toggle-table-btn').textContent = "📊 Show Performance Summary";
-
-    const table = document.createElement('table');
-    table.className = 'summary-table';
-    const head = table.createTHead().insertRow();
-    ['#', 'Result', 'Word', 'Correct Meaning', 'Your Choice'].forEach(label => {
-        const cell = document.createElement('th');
-        cell.textContent = label;
-        head.appendChild(cell);
-    });
-    const body = table.createTBody();
-    state.quizHistory.forEach(item => {
-        const row = body.insertRow();
-        const values = [item.index, item.isCorrect ? '✓' : '✗', item.word, item.correct, item.chosen];
-        const classes = ['', item.isCorrect ? 'classic-indicator-pass' : 'classic-indicator-fail', 'large-bold-cell large-arabic-cell', 'large-bold-cell', 'small-choice-cell'];
-        values.forEach((value, index) => {
-            const cell = row.insertCell();
-            cell.textContent = String(value);
-            cell.className = classes[index];
+    if (!state.quizHistory.length) {
+        const message = document.createElement('p');
+        message.className = 'spelling-perfect-score';
+        message.textContent = 'No mistakes. Well done!';
+        container.replaceChildren(message);
+    } else {
+        const table = document.createElement('table');
+        table.className = 'summary-table';
+        const head = table.createTHead().insertRow();
+        const labels = [
+            '#', 'Result', activeBook === 'book_e' ? 'English Word' : 'Word',
+            activeBook === 'book_e' ? 'Arabic Answer' : 'Correct Meaning',
+            spelling ? 'Your Answer' : 'Your Choice'
+        ];
+        labels.forEach(label => {
+            const cell = document.createElement('th');
+            cell.textContent = label;
+            head.appendChild(cell);
         });
-    });
-    tableContainer.replaceChildren(table);
+        const body = table.createTBody();
+        state.quizHistory.forEach(item => {
+            const row = body.insertRow();
+            const values = [item.index, item.isCorrect ? '✓' : '×', item.word, item.correct, item.chosen];
+            const classes = [
+                '', item.isCorrect ? 'classic-indicator-pass' : 'classic-indicator-fail',
+                activeBook === 'book_e' ? 'large-bold-cell' : 'large-bold-cell large-arabic-cell',
+                'large-bold-cell', 'small-choice-cell'
+            ];
+            values.forEach((value, index) => {
+                const cell = row.insertCell();
+                cell.textContent = String(value);
+                cell.className = classes[index];
+                if (activeBook === 'book_e' && index >= 3) {
+                    cell.dir = 'rtl';
+                    cell.lang = 'ar';
+                    cell.classList.add('book5-arabic-answer');
+                }
+            });
+        });
+        container.replaceChildren(table);
+    }
     switchView('quiz-finished-view');
 }
-
 export function toggleSummaryTableVisibility() {
-    const tableContainer = document.getElementById('summary-table-container');
-    const toggleBtn = document.getElementById('toggle-table-btn');
-    
-    if (tableContainer.classList.contains('hidden')) {
-        tableContainer.classList.remove('hidden');
-        toggleBtn.textContent = "📊 Hide Performance Summary";
-    } else {
-        tableContainer.classList.add('hidden');
-        toggleBtn.textContent = "📊 Show Performance Summary";
-    }
+    const container = document.getElementById('summary-table-container');
+    container.classList.toggle('hidden');
+    const label = 'Summary';
+    document.getElementById('toggle-table-btn').textContent =
+        (container.classList.contains('hidden') ? 'Show ' : 'Hide ') + label;
 }
