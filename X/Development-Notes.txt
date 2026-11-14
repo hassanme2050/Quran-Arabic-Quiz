@@ -1,7 +1,8 @@
-QuranAQ-v1114.26 Dates (Status: User tested, working and approved)
+QuranAQ-v1114.26 Dates (Status: Published to X; book-memory refinement awaits user testing)
 Date: November 14, 2026
 
 Local
+- Added browser memory for the last selected home-screen book. Refresh restores it when enabled by Admin; unavailable books fall back safely. All 38 automated checks and browser reload/storage checks passed; user testing of this refinement is pending.
 - User tested and confirmed the app, Spelling Mode and Admin work correctly; approved publication to GitHub X.
 - Created from QuranAQ-v1107.26 Dates after confirming all 89 files match the current GitHub X version. Book 5 Pace Academy is not included.
 - Replaced Last 10 Words with a Custom Range-style round dropdown; Review, Quiz and Spelling use the selected group of ten verified entries, with shorter final rounds where needed.
@@ -9,7 +10,7 @@ Local
 - Added per-book Enable/Disable/Hide for Spelling in the separate Admin dashboard; existing root configuration remains compatible. Rebuilt the portable pages; 33 automated checks and desktop/mobile browser checks passed.
 
 Github/Server (https://hassanme2050.github.io/Quran-Arabic-Quiz/X/)
-- Published the user-tested and approved Dates v1114.26 release to X, including Spelling, Admin controls and ten-word rounds. Root books, CP and configuration are preserved; no Android packages or local screenshots are uploaded.
+- Published approved Dates v1114.26 with Spelling, Admin controls and ten-word rounds; the requested book-memory refinement is also published to X and awaits user testing. Root books, CP, configuration and all other files outside X remain preserved. Android packages and local screenshots are excluded.
 
 Local build and validation
 - Student: index.html; Admin: admin/index.html; Editor and Quiz Generator remain separate portable modules.
