@@ -1,3 +1,6 @@
+import { spellingEntries } from '../shared/spelling.js';
+import { initializeSpelling, startSpellingSession } from './spelling.js';
+import { tenWordRound, selectTenWordRound } from './ten-word-rounds.js';
 import {initializeSettings,onSettingsChange,canUse,featureState,recordGoTap,syncBookSelector} from './feature-settings.js';
 import {refreshAvailability} from './vocabulary.js?v=1030.26-dates3';
 import { openQuest, initializeQuest } from './quest.js?v=1030.26-dates3';
@@ -40,6 +43,7 @@ function triggerSelectedSession(mode) {
 }
 export function updateSegmentSelection(targetStrategy) {
     state.activeStrategySetting = targetStrategy;
+    document.getElementById('ten-word-round-drawer').classList.toggle('open', targetStrategy === 'last');
     const pill = document.getElementById('active-slider-pill');
     const optAll = document.getElementById('opt-all');
     const optLast = document.getElementById('opt-last');
@@ -69,7 +73,7 @@ export function updateSegmentSelection(targetStrategy) {
 }
 
 export function startSession(strategy, mode) {
-    if(!canUse(activeBook,mode==='flashcard'?'review':'quiz'))return;
+    if(!['flashcard','quiz','spelling'].includes(mode)||!canUse(activeBook,mode==='flashcard'?'review':mode))return;
     if (!vocabularyList.length) return;
     cancelPendingAnswer();
     cancelQuizAttempt();
@@ -82,9 +86,8 @@ export function startSession(strategy, mode) {
         state.currentPool = [...vocabularyList];
         state.sessionWords = getRandomSubset(state.currentPool, 10);
     } else if (strategy === 'last') {
-        state.currentPool = vocabularyList.slice(-10);
+        state.currentPool = tenWordRound(vocabularyList, state.activeRound);
         state.sessionWords = [...state.currentPool];
-        shuffleArray(state.sessionWords);
     } else if (strategy === 'custom') {
         let startIdx = parseInt(document.getElementById('range-input-start').value) - 1;
         let endIdx = parseInt(document.getElementById('range-input-end').value) - 1;
@@ -92,6 +95,15 @@ export function startSession(strategy, mode) {
         state.sessionWords = getRandomSubset(state.currentPool, 10);
     }
 
+    if (mode === 'spelling') {
+        state.currentPool = spellingEntries(state.currentPool, activeBook);
+        state.sessionWords = strategy === 'last' ? [...state.currentPool] : getRandomSubset(state.currentPool, 10);
+    }
+    if (!state.sessionWords.length) {
+        document.getElementById('status-message').classList.remove('hidden');
+        launchToastAlert('No Arabic spelling words are available in this selection. Choose another round or range.');
+        return;
+    }
     state.currentIndex = 0;
     
     if (state.currentMode === 'flashcard') {
@@ -109,6 +121,8 @@ export function startSession(strategy, mode) {
         }
         
         showCard();
+    } else if (state.currentMode === 'spelling') {
+        startSpellingSession();
     } else {
         document.getElementById('app-title').classList.remove('dictionary-title');
         document.getElementById('app-title').textContent = "QuranFahm.app";
@@ -121,6 +135,8 @@ function updateFeatureControls(force=false){if(!force&&document.getElementById('
 async function handleGoClick(){if(recordGoTap()){updateFeatureControls();if(!vocabularyList.length&&document.getElementById('vocabulary-book-selector').value===activeBook)loadVocabulary(activeBook);launchToastAlert('Session unlocked');return;}if(document.getElementById('quiz-code-field').value.trim()&&canUse(activeBook,'quizCode'))startQuizWithCode();}
 async function initializeApp(){
     initializeDictionarySearch();
+    initializeSpelling();
+    document.getElementById('ten-word-round').addEventListener('change', event => selectTenWordRound(event.target.value));
     document.getElementById('verse-details-view').addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeWordDetails();}if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();navigateWordVerse(event.key==='ArrowLeft'?-1:1);}});
     initializeQuest();
     const actions = {
