@@ -210,6 +210,9 @@ export function evaluateQuizAnswer(selectedButton, chosenChoice, correctItem) {
 
 export function displayQuizSummary() {
     finishQuizAttempt();
+    const spelling = state.currentMode === 'spelling';
+    document.getElementById('quiz-finished-view').dataset.mode = spelling ? 'spelling' : 'quiz';
+    document.getElementById('scorecard-title').textContent = spelling ? 'Spelling Complete!' : 'Quiz Complete!';
     const attempt=state.quizAttempt,hasParticipant=attempt?.phase==='finished';
     const target=document.getElementById('screenshot-target-scorecard');
     target.classList.toggle('participant-scorecard',hasParticipant);
@@ -235,7 +238,7 @@ export function displayQuizSummary() {
     const table = document.createElement('table');
     table.className = 'summary-table';
     const head = table.createTHead().insertRow();
-    ['#', 'Result', activeBook==='book_c'?'Question':'Word', activeBook==='book_c'?'Correct Answer':'Correct Meaning', 'Your Choice'].forEach(label => {
+    ['#', 'Result', spelling?'Meaning':activeBook==='book_c'?'Question':'Word', spelling?'Correct Arabic':activeBook==='book_c'?'Correct Answer':'Correct Meaning', spelling?'Your Answer':'Your Choice'].forEach(label => {
         const cell = document.createElement('th');
         cell.textContent = label;
         head.appendChild(cell);
@@ -244,11 +247,15 @@ export function displayQuizSummary() {
     state.quizHistory.forEach(item => {
         const row = body.insertRow();
         const values = [item.index, item.isCorrect ? '✓' : '✗', item.word, item.correct, item.chosen];
-        const classes = ['', item.isCorrect ? 'classic-indicator-pass' : 'classic-indicator-fail', 'large-bold-cell large-arabic-cell', 'large-bold-cell', 'small-choice-cell'];
+        const classes = ['', item.isCorrect ? 'classic-indicator-pass' : 'classic-indicator-fail', spelling?'summary-spelling-prompt':'large-bold-cell large-arabic-cell', spelling?'large-bold-cell summary-spelling-answer':'large-bold-cell', spelling?'summary-spelling-answer summary-spelling-typed':'small-choice-cell'];
         values.forEach((value, index) => {
             const cell = row.insertCell();
             cell.textContent = String(value);
             cell.className = classes[index];
+            if (spelling && index >= 2) {
+                cell.dir = index >= 3 || activeBook === 'book_b' ? 'rtl' : 'ltr';
+                cell.lang = index >= 3 ? 'ar' : activeBook === 'book_b' ? 'ur' : 'en';
+            }
         });
     });
     tableContainer.replaceChildren(table);
